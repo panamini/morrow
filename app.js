@@ -1415,6 +1415,7 @@ function bindEvents() {
   });
   dom.durationRow.addEventListener('pointermove', (event) => {
     if (!durationPointer) return;
+    event.preventDefault();
     const dx = event.clientX - durationPointer.lastStepX;
     const dy = event.clientY - durationPointer.y;
     if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy) * 0.85) return;

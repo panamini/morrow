@@ -433,6 +433,7 @@ body[data-mode="bedside"].bedside-idle .bedside-clock {
   height: 42px;
   opacity: 0;
   pointer-events: none;
+  touch-action: none;
   transition: opacity .32s ease, transform .32s ease, filter .32s ease;
 }
 .duration-row.is-revealed { opacity: .84; pointer-events: auto; transform: translateX(-50%) translateY(0); }
@@ -446,6 +447,7 @@ body[data-mode="bedside"].bedside-idle .duration-row { opacity: .025; filter: bl
   background: transparent;
   border: 0;
   padding: 0;
+  touch-action: none;
   color: rgba(250,248,239,.82);
   font-size: var(--type-label-size);
   text-transform: lowercase;
