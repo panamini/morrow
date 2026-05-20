@@ -1041,6 +1041,7 @@ function applyWorld(world) {
   if (renderer) renderer.setWorld(world.id);
   if (audioState.userFacingAudioState === 'PLAYING') ensureAudioEngine().crossfadeToWorld(world);
   syncSettingsControls(false);
+  updateWorldReadout();
   return world;
 }
 
@@ -1182,7 +1183,7 @@ function initializeWorldSelection(entry = 'object') {
   if (dom.worldsPanel) dom.worldsPanel.dataset.entry = entry;
 }
 function updateWorldReadout() {
-  const selected = getWorld(worldSelectionState.selectedWorld || state.selectedWorldId);
+  const selected = getWorld(worldSelectionState.activeWorld || worldSelectionState.selectedWorld || state.selectedWorldId);
   if (dom.worldConstellationName) dom.worldConstellationName.textContent = selected.name;
   if (dom.worldBackButton) dom.worldBackButton.textContent = worldSelectionState.entryMode === 'wakeWorld' ? 'BACK' : 'CLOSE';
 }
