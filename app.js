@@ -959,8 +959,8 @@ function wakeRingDistanceModel(event) {
   const distance = Math.hypot(event.clientX - cx, event.clientY - cy);
   const hourRadius = dom.hourRing.getBoundingClientRect().width * 0.48;
   const minuteRadius = dom.minuteRing.getBoundingClientRect().width * 0.48;
-  const hourBand = Math.max(28, hourRadius * 0.18);
-  const minuteBand = Math.max(26, minuteRadius * 0.13);
+  const hourBand = Math.max(36, hourRadius * 0.24);
+  const minuteBand = Math.max(30, minuteRadius * 0.13);
   const deadZone = Math.max(22, Math.abs(minuteRadius - hourRadius) * 0.18);
   if (Math.abs(distance - hourRadius) <= hourBand && Math.abs(distance - minuteRadius) > deadZone) return 'hour';
   if (Math.abs(distance - minuteRadius) <= minuteBand) return 'minute';
@@ -1063,7 +1063,6 @@ function setWakeWorldByStep(step) {
     ensureAudioEngine().startMode('ringing', { worldId: next.id, intensity: 1 });
   }
   updateClocks();
-  showToast(`Wake ${next.name}`, 1000);
   return next;
 }
 
