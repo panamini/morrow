@@ -1,0 +1,10 @@
+{
+  "name": "Dawn Chamber",
+  "short_name": "Dawn Chamber",
+  "description": "A static orbital chromatic bedside object for light, sound, sleep and waking.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070807",
+  "theme_color": "#070807",
+  "icons": []
+}

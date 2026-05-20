@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070807">
+  <meta name="description" content="Dawn Chamber — an orbital chromatic bedside object for light, sound, sleep and waking.">
+  <title>Dawn Chamber</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-mode="object" data-audio="stopped">
+  <canvas id="apertureCanvas" aria-hidden="true"></canvas>
+  <div id="grain" aria-hidden="true"></div>
+  <div id="debugGridOverlay" class="debug-grid-overlay" aria-hidden="true"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <button id="soundToggleButton" class="sound-toggle-button" type="button" aria-label="Sound off. Tap to play." aria-pressed="false">OFF</button>
+
+  <main id="app" class="app-shell">
+    <section id="objectPanel" class="panel object-panel is-active" aria-label="Dawn Chamber object">
+      <button id="objectGestureSurface" class="gesture-surface" type="button" aria-label="Dawn Chamber object. Swipe to change world.">
+        <time id="objectTime" class="time-memory">--:--</time>
+        <span id="nextWake" class="wake-memory">07:30</span>
+      </button>
+      <nav id="objectRail" class="command-rail object-rail" aria-label="Primary navigation">
+        <button id="railBed" class="rail-word is-active" type="button" aria-label="Enter bedside">BED</button>
+        <button id="railWake" class="rail-word" type="button" aria-label="Set wake">WAKE</button>
+        <button id="railWorld" class="rail-word" type="button" aria-label="Choose world">WORLD</button>
+      </nav>
+      <button id="railSet" class="corner-set-button" type="button" aria-label="Open settings">SET</button>
+    </section>
+
+    <section id="bedsidePanel" class="panel bedside-panel immersive" aria-label="Bedside mode" hidden>
+      <button id="bedsideGestureSurface" class="gesture-surface" type="button" aria-label="Bedside. Tap to reveal controls. Swipe vertically for brightness.">
+        <time id="bedsideTime" class="bedside-clock">--:--</time>
+        <span id="bedsideSoundBreath" class="breath-dot" aria-hidden="true"></span>
+      </button>
+      <button id="bedsideWorldPrev" class="world-step-button bedside-world-edge bedside-world-edge-prev" type="button" aria-label="Previous bedside world">&lt;</button>
+      <button id="bedsideWorldNext" class="world-step-button bedside-world-edge bedside-world-edge-next" type="button" aria-label="Next bedside world">&gt;</button>
+      <div id="durationRow" class="duration-row" role="group" aria-label="Sleep duration. Swipe or tap to change.">
+        <button class="duration-option" data-duration="10m" type="button">10</button>
+        <button class="duration-option" data-duration="15m" type="button">15</button>
+        <button class="duration-option is-selected" data-duration="30m" type="button">30</button>
+        <button class="duration-option" data-duration="1h" type="button">1h</button>
+        <button class="duration-option" data-duration="night" type="button">night</button>
+      </div>
+      <nav id="bedsideRail" class="command-rail bedside-rail" aria-label="Bedside controls">
+        <button id="bedsideExitButton" class="rail-word is-close" type="button" aria-label="Close bedside">CLOSE</button>
+      </nav>
+    </section>
+
+    <section id="wakeSetPanel" class="panel wake-set-panel" aria-label="Set wake time" hidden>
+      <button id="wakeCloseButton" class="close-word" type="button" aria-label="Close wake setting">CLOSE</button>
+      <div id="wakeGestureArea" class="wake-stage" aria-label="Wake time selector. Inner ring sets hours. Outer ring sets minutes." data-active-ring="hour">
+        <div id="minuteRing" class="orbital-ring minute-ring" aria-label="Outer minute ring"></div>
+        <div id="hourRing" class="orbital-ring hour-ring" aria-label="Inner hour ring"></div>
+        <div class="wake-numerals" aria-live="polite">
+          <button id="wakeHour" class="digit-zone is-selected" type="button" aria-label="Wake hour"><span id="wakeHourValue" class="digit-value">07</span></button>
+          <span id="wakeColon" class="digit-colon" aria-hidden="true">:</span>
+          <button id="wakeMinute" class="digit-zone" type="button" aria-label="Wake minute"><span id="wakeMinuteValue" class="digit-value">30</span></button>
+        </div>
+      </div>
+      <div id="wakeWorldSelector" class="inline-world-selector" aria-label="Wake world selector">
+        <div class="inline-world-copy">
+          <span id="wakeWorldName" class="inline-world-name">Milk Blue</span>
+          <span class="inline-world-hint">Swipe or tap arrows</span>
+        </div>
+      </div>
+      <button id="wakeWorldPrev" class="world-step-button wake-world-edge wake-world-edge-prev" type="button" aria-label="Previous wake world">&lt;</button>
+      <button id="wakeWorldNext" class="world-step-button wake-world-edge wake-world-edge-next" type="button" aria-label="Next wake world">&gt;</button>
+      <nav id="wakeRail" class="command-rail wake-rail" aria-label="Wake controls">
+        <button id="wakeRailClose" class="rail-word" type="button">CLOSE</button>
+        <button id="wakeSetConfirmButton" class="rail-word is-active" type="button">SET</button>
+      </nav>
+    </section>
+
+    <section id="worldsPanel" class="panel worlds-panel" aria-label="World constellation" hidden data-entry="world">
+      <button id="worldsCloseButton" class="close-word world-close" type="button" aria-label="Close worlds">CLOSE</button>
+      <div id="wakeWorldMemory" class="wake-world-memory" aria-live="polite"></div>
+      <div id="worldConstellation" class="world-constellation" role="group" aria-label="World constellation. Tap or swipe to choose a world, then use it."></div>
+      <button id="worldPrevButton" class="world-screen-step world-screen-prev" type="button" aria-label="Previous world">&lt;</button>
+      <button id="worldNextButton" class="world-screen-step world-screen-next" type="button" aria-label="Next world">&gt;</button>
+      <div id="worldCopy" class="world-copy">
+        <div id="worldConstellationName" class="world-name-readout" aria-live="polite">Milk Blue</div>
+        <div id="worldHint" class="world-hint">Swipe or tap arrows to change</div>
+      </div>
+      <nav id="worldRail" class="command-rail world-rail" aria-label="World controls">
+        <button id="worldBackButton" class="rail-word" type="button">CLOSE</button>
+      </nav>
+    </section>
+
+    <section id="settingsPanel" class="panel settings-panel panel-scroll" aria-label="Settings" hidden>
+      <div id="settingsBackdrop" class="panel-backdrop" aria-hidden="true"></div>
+      <article id="settingsSheet" class="sheet" tabindex="-1">
+        <header class="sheet-header">
+          <button id="settingsCloseButton" class="close-word sheet-close" type="button" aria-label="Close settings">CLOSE</button>
+          <div class="sheet-title">
+            <h1>Set</h1>
+            <p>Sound preferences, diagnostics, safety.</p>
+          </div>
+        </header>
+        <div class="settings-grid">
+          <section class="settings-section" aria-label="Sound preferences">
+            <h2>Sound</h2>
+            <label>Sound mode
+              <select id="soundModeSelect" aria-label="Sound mode"></select>
+            </label>
+            <label class="switch-line"><input id="binauralToggle" type="checkbox"> Binaural delta, headphones only</label>
+            <label>Delta beat <span id="deltaReadout">2 Hz</span>
+              <input id="deltaSlider" type="range" min="1" max="4" step="0.5" value="2">
+            </label>
+            <label>Master <span id="masterVolumeReadout">0.90</span>
+              <input id="masterVolume" type="range" min="0" max="1" step="0.01" value="0.90">
+            </label>
+            <label>Bedside <span id="bedsideVolumeReadout">0.62</span>
+              <input id="bedsideVolume" type="range" min="0" max="1" step="0.01" value="0.62">
+            </label>
+            <label>Object <span id="objectVolumeReadout">0.82</span>
+              <input id="objectVolume" type="range" min="0" max="1" step="0.01" value="0.82">
+            </label>
+            <label>Wake <span id="wakeVolumeReadout">0.86</span>
+              <input id="wakeVolume" type="range" min="0" max="1" step="0.01" value="0.86">
+            </label>
+            <label>Air <span id="airVolumeReadout">0.55</span>
+              <input id="airVolume" type="range" min="0" max="1" step="0.01" value="0.55">
+            </label>
+            <label>Strikes <span id="strikeVolumeReadout">0.72</span>
+              <input id="strikeVolume" type="range" min="0" max="1" step="0.01" value="0.72">
+            </label>
+            <label>Shimmer <span id="shimmerReadout">0.34</span>
+              <input id="shimmerAmount" type="range" min="0" max="1" step="0.01" value="0.34">
+            </label>
+            <div class="text-action-row" role="group" aria-label="Volume calibration">
+              <button id="softTestButton" class="text-button" type="button">Soft test</button>
+              <button id="mediumTestButton" class="text-button" type="button">Medium test</button>
+              <button id="wakeTestButton" class="text-button" type="button">Wake test</button>
+              <button id="stopAudioButton" class="text-button" type="button">Stop audio</button>
+            </div>
+            <p class="quiet-note">Binaural requires headphones. Sound labels are musical preferences, not health care.</p>
+          </section>
+
+          <section class="settings-section" aria-label="Visual settings">
+            <h2>Light</h2>
+            <label>Brightness <span id="brightnessReadout">0.86</span>
+              <input id="brightnessSlider" type="range" min="0.08" max="1" step="0.01" value="0.86">
+            </label>
+            <label class="switch-line"><input id="reduceMotionToggle" type="checkbox"> Reduce motion</label>
+            <label class="switch-line"><input id="use24hToggle" type="checkbox" checked> 24-hour time</label>
+          </section>
+
+          <section class="settings-section" aria-label="Safety and diagnostics">
+            <h2>Safety</h2>
+            <p class="quiet-note">Web alarms need the page open. Use a backup alarm for important mornings. Audio starts from a user gesture.</p>
+            <div class="text-action-row">
+              <button id="openSafetyButton" class="text-button" type="button">Web limits</button>
+              <button id="openDiagnosticsButton" class="text-button" type="button">Diagnostics</button>
+              <button id="diagGridButton" class="text-button" type="button">Grid overlay</button>
+            </div>
+          </section>
+        </div>
+      </article>
+    </section>
+
+    <section id="safetyPanel" class="panel panel-scroll sheet-panel" aria-label="Web limits" hidden>
+      <div id="safetyBackdrop" class="panel-backdrop" aria-hidden="true"></div>
+      <article id="safetySheet" class="sheet copy-sheet" tabindex="-1">
+        <header class="sheet-header">
+          <button id="safetyCloseButton" class="close-word sheet-close" type="button">CLOSE</button>
+          <div class="sheet-title"><h1>Limits</h1><p>Browser behavior varies.</p></div>
+        </header>
+        <div class="copy-block">
+          <p>Keep this page open for web wake behavior. A locked phone or backgrounded browser can interrupt timers or audio. Use a backup alarm for important mornings.</p>
+          <p>Sound uses the local Web Audio API and starts only after a direct user gesture. Binaural mode is intended for headphones.</p>
+          <p>No health claims are made.</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="diagnosticsPanel" class="panel panel-scroll sheet-panel" aria-label="Diagnostics" hidden>
+      <div id="diagnosticsBackdrop" class="panel-backdrop" aria-hidden="true"></div>
+      <article id="diagnosticsSheet" class="sheet copy-sheet" tabindex="-1">
+        <header class="sheet-header">
+          <button id="diagnosticsCloseButton" class="close-word sheet-close" type="button">CLOSE</button>
+          <div class="sheet-title"><h1>Diagnostics</h1><p>Audio, grid, safety.</p></div>
+        </header>
+        <div class="text-action-row">
+          <button id="diagToneButton" class="text-button" type="button">Soft test</button>
+          <button id="diagPlayButton" class="text-button" type="button">Play</button>
+          <button id="diagBedsideButton" class="text-button" type="button">Bedside</button>
+          <button id="diagWakeButton" class="text-button" type="button">Wake</button>
+          <button id="diagStopButton" class="text-button" type="button">Stop</button>
+          <button id="diagGridButton2" class="text-button" type="button">Grid</button>
+        </div>
+        <pre id="diagnosticsOutput" class="diagnostics-output" aria-live="polite"></pre>
+      </article>
+    </section>
+
+    <section id="ringingPanel" class="panel ringing-panel" aria-label="Wake sequence" hidden>
+      <div class="ringing-center">
+        <time id="ringingTime" class="ringing-clock">--:--</time>
+        <div id="wakePhaseDots" class="phase-dots" aria-hidden="true"></div>
+      </div>
+      <div class="ringing-actions">
+        <button id="stopWakeButton" class="wake-stop" type="button">STOP</button>
+        <button id="snoozeWakeButton" class="wake-snooze" type="button">+9</button>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
