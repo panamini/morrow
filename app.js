@@ -841,6 +841,12 @@ function changeBedsideDuration(step) {
   showToast(next.id === 'night' ? 'All night' : `${next.label} min`, 900);
   startBedsideSessionTimer();
 }
+function stepDurationWheel(step) {
+  if (!step) return;
+  changeBedsideDuration(step);
+  focusDurationControl();
+  revealBedsideControls();
+}
 
 function clearBedsideIdleTimer() {
   if (bedsideIdleTimer) window.clearTimeout(bedsideIdleTimer);
@@ -1249,7 +1255,7 @@ function selectWorldFromConstellation(event, playOnHold = false) {
 
 function updateRails() {
   [dom.railBed, dom.railWake, dom.railWorld].forEach((button) => button && button.classList.remove('is-active', 'is-far'));
-  const active = state.currentMode === 'wakeSet' ? dom.railWake : state.currentMode === 'worlds' ? dom.railWorld : dom.railBed;
+  const active = state.currentMode === 'bedside' ? dom.railBed : state.currentMode === 'wakeSet' ? dom.railWake : state.currentMode === 'worlds' ? dom.railWorld : null;
   if (active) active.classList.add('is-active');
   updateSoundControls();
 }
@@ -1380,14 +1386,35 @@ function bindEvents() {
 
   if (dom.bedsideDurationButton) dom.bedsideDurationButton.addEventListener('click', () => { focusDurationControl(); revealBedsideControls(); });
   dom.bedsideExitButton.addEventListener('click', () => setMode('object', { keepAudio: true }));
-  dom.durationRow.addEventListener('pointerdown', (event) => { durationPointer = { x: event.clientX, y: event.clientY, at: nowMs() }; dom.durationRow.classList.add('is-focused'); revealBedsideControls(); });
+  dom.durationRow.addEventListener('pointerdown', (event) => {
+    durationPointer = { x: event.clientX, y: event.clientY, lastStepX: event.clientX, at: nowMs(), moved: false };
+    dom.durationRow.classList.add('is-focused');
+    revealBedsideControls();
+    try { dom.durationRow.setPointerCapture(event.pointerId); } catch (error) { /* capture optional */ }
+  });
+  dom.durationRow.addEventListener('pointermove', (event) => {
+    if (!durationPointer) return;
+    const dx = event.clientX - durationPointer.lastStepX;
+    const dy = event.clientY - durationPointer.y;
+    if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy) * 0.85) return;
+    durationPointer.moved = true;
+    durationPointer.lastStepX = event.clientX;
+    stepDurationWheel(dx < 0 ? 1 : -1);
+  });
   dom.durationRow.addEventListener('pointerup', (event) => {
     if (!durationPointer) return;
+    try { dom.durationRow.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
     const direct = event.target.closest && event.target.closest('[data-duration]');
     const dx = event.clientX - durationPointer.x;
-    if (direct && nowMs() - durationPointer.at < 520 && Math.abs(dx) < 20) state.bedsideDuration = direct.dataset.duration;
-    else if (Math.abs(dx) > 22) changeBedsideDuration(dx < 0 ? 1 : -1);
+    if (direct && !durationPointer.moved && nowMs() - durationPointer.at < 520 && Math.abs(dx) < 20) state.bedsideDuration = direct.dataset.duration;
+    else if (!durationPointer.moved && Math.abs(dx) > 22) stepDurationWheel(dx < 0 ? 1 : -1);
     saveState(); updateDurationRow(); revealBedsideControls(); window.setTimeout(() => dom.durationRow && dom.durationRow.classList.remove('is-focused'), 1800); durationPointer = null;
+  });
+  dom.durationRow.addEventListener('pointercancel', (event) => {
+    if (!durationPointer) return;
+    try { dom.durationRow.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
+    durationPointer = null;
+    window.setTimeout(() => dom.durationRow && dom.durationRow.classList.remove('is-focused'), 900);
   });
 
   dom.wakeCloseButton.addEventListener('click', () => setMode('object', { keepAudio: true }));
