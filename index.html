@@ -25,7 +25,6 @@
       <nav id="objectRail" class="command-rail object-rail" aria-label="Primary navigation">
         <button id="railBed" class="rail-word" type="button" aria-label="Enter bedside">BED</button>
         <button id="railWake" class="rail-word" type="button" aria-label="Set wake">WAKE</button>
-        <button id="railWorld" class="rail-word" type="button" aria-label="Choose world">WORLD</button>
       </nav>
       <button id="railSet" class="corner-set-button" type="button" aria-label="Open settings">SET</button>
     </section>
@@ -91,17 +90,17 @@
 
     <section id="settingsPanel" class="panel settings-panel panel-scroll" aria-label="Settings" hidden>
       <div id="settingsBackdrop" class="panel-backdrop" aria-hidden="true"></div>
-      <article id="settingsSheet" class="sheet" tabindex="-1">
-        <header class="sheet-header">
-          <button id="settingsCloseButton" class="close-word sheet-close" type="button" aria-label="Close settings">CLOSE</button>
+      <article id="settingsSheet" class="sheet settings-sheet" tabindex="-1">
+        <header class="sheet-header settings-header">
           <div class="sheet-title">
-            <h1>Set</h1>
-            <p>Sound preferences, diagnostics, safety.</p>
+            <h1>Settings</h1>
+            <p>Sound, light, safety.</p>
           </div>
+          <button id="settingsCloseButton" class="close-word sheet-close" type="button" aria-label="Close settings">CLOSE</button>
         </header>
         <div class="settings-grid">
           <section class="settings-section" aria-label="Sound preferences">
-            <h2>Sound</h2>
+            <h2>Sound engine</h2>
             <label>Sound mode
               <select id="soundModeSelect" aria-label="Sound mode"></select>
             </label>

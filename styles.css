@@ -789,6 +789,9 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
   margin-bottom: var(--s-6);
 }
 .sheet-close { position: static; align-self: start; justify-self: start; }
+.settings-header { grid-template-columns: 1fr auto; align-items: start; }
+.settings-header .sheet-close { justify-self: end; min-width: auto; min-height: 40px; padding: 0; opacity: .58; filter: blur(.6px); }
+.settings-header .sheet-close:hover, .settings-header .sheet-close:focus-visible { opacity: 1; filter: blur(0); }
 .sheet-title h1 {
   margin: 0;
   font-size: clamp(3.1rem, 8vw, 6.4rem);
@@ -886,7 +889,9 @@ body.debug-grid .debug-grid-overlay { display: block; }
   .object-audio-word { bottom: calc(var(--dock-bottom) + 78px); }
   .sheet { width: 100vw; padding-left: var(--grid-margin); padding-right: var(--grid-margin); }
   .sheet-header { grid-template-columns: 1fr; gap: var(--s-3); }
+  .settings-header { grid-template-columns: 1fr auto; }
   .sheet-close { justify-self: start; }
+  .settings-header .sheet-close { justify-self: end; }
   .duration-row { top: calc(45% + clamp(54px, 18vw, 96px)); }
 }
 
