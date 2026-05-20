@@ -1,11 +1,12 @@
 'use strict';
 
-const APP_SCHEMA_VERSION = 8;
+const APP_SCHEMA_VERSION = 9;
 const STORAGE_KEY = 'dawnChamberV4State';
 const MASTER_GAIN_CEILING = 0.72;
 const GRID_GEOMETRY_HARD_RULE = 'If the constellation cannot fit, shrink the orbit';
 const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
+const WORLD_DEFAULT_SOUND_MODE = 'world-default';
 
 const BED_DURATION_OPTIONS = [
   { id: '10m', label: '10', ms: 10 * 60 * 1000 },
@@ -16,13 +17,13 @@ const BED_DURATION_OPTIONS = [
 ];
 
 const SOUND_MODES = [
-  { id: 'still-water', name: 'Still Water', baseFrequency: 132, partialRatios: [1, 1.125, 1.333, 1.5, 1.875, 2.25], droneRatios: [0.5, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 1.333, weight: 4 }, { ratio: 1.125, weight: 2 }, { ratio: 1.875, weight: 1 }, { ratio: 2.25, weight: 1 }], bowlDensity: 0.22, shimmerProbability: 0.10, nightSafeCutoff: 720, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: 'quiet water reference' },
-  { id: 'limestone-harmonic', name: 'Limestone Harmonic', baseFrequency: 138, partialRatios: [1, 1.47, 2.08, 2.72, 3.86, 5.03], droneRatios: [0.5, 1, 2.08], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 2.08, weight: 5 }, { ratio: 1.47, weight: 3 }, { ratio: 2.72, weight: 2 }, { ratio: 3.86, weight: 1 }, { ratio: 5.03, weight: 1 }], bowlDensity: 0.34, shimmerProbability: 0.20, nightSafeCutoff: 900, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: 'symbolic resonance, musical reference' },
-  { id: 'night-temple', name: 'Night Temple', baseFrequency: 138, partialRatios: [0.804, 1, 1.25, 1.5, 2, 2.25], droneRatios: [0.804, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 8 }, { ratio: 1.5, weight: 5 }, { ratio: 0.804, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 1.25, weight: 2 }, { ratio: 2.25, weight: 1 }], bowlDensity: 0.22, shimmerProbability: 0.12, nightSafeCutoff: 640, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: '138 Hz bowl with 111 Hz night drone reference' },
-  { id: 'glass-orbit', name: 'Glass Orbit', baseFrequency: 247, partialRatios: [1, 1.25, 1.414, 1.6, 1.875, 2.25], droneRatios: [0.5, 1, 1.25], strikeGrammar: [{ ratio: 1, weight: 6 }, { ratio: 1.25, weight: 5 }, { ratio: 1.875, weight: 3 }, { ratio: 2.25, weight: 2 }, { ratio: 1.6, weight: 1 }, { ratio: 1.414, weight: 1 }], bowlDensity: 0.40, shimmerProbability: 0.42, nightSafeCutoff: 1180, binaural: { allowed: false, deltaHz: 3 }, ritualLabel: 'bright musical orbit' },
-  { id: 'deep-return', name: 'Deep Return', baseFrequency: 110, partialRatios: [1, 1.25, 1.5, 2, 2.5, 3], droneRatios: [0.5, 1, 1.5, 2], strikeGrammar: [{ ratio: 1, weight: 8 }, { ratio: 1.5, weight: 7 }, { ratio: 2, weight: 5 }, { ratio: 1.25, weight: 2 }, { ratio: 2.5, weight: 1 }, { ratio: 3, weight: 1 }], bowlDensity: 0.18, shimmerProbability: 0.08, nightSafeCutoff: 520, binaural: { allowed: false, deltaHz: 1.5 }, ritualLabel: 'low musical anchor' },
-  { id: 'ember-human', name: 'Ember Human', baseFrequency: 216, partialRatios: [1, 1.125, 1.25, 1.5, 1.75, 2], droneRatios: [0.5, 1, 1.25, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 1.25, weight: 5 }, { ratio: 2, weight: 3 }, { ratio: 1.125, weight: 2 }, { ratio: 1.75, weight: 1 }], bowlDensity: 0.30, shimmerProbability: 0.18, nightSafeCutoff: 860, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: 'warm musical reference' },
-  { id: 'near-silent', name: 'Near Silent', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], droneRatios: [0.5, 1], strikeGrammar: [{ ratio: 1, weight: 9 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 3, weight: 1 }], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: false, deltaHz: 0 }, ritualLabel: 'nearly silent preference' }
+  { id: 'still-water', name: '432 Still Water', referenceHz: '432 Hz', description: 'A=432-style consonance: 216 Hz bed with 432 Hz octave bloom, calm and rounded.', baseFrequency: 216, partialRatios: [0.5, 1, 1.25, 1.5, 2, 2.5], droneRatios: [0.5, 1, 2], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 2, weight: 6 }, { ratio: 1.5, weight: 5 }, { ratio: 1.25, weight: 2 }, { ratio: 2.5, weight: 1 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.20, shimmerProbability: 0.10, nightSafeCutoff: 720, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '432 Hz musical tuning reference' },
+  { id: 'limestone-harmonic', name: '417 Limestone Shift', referenceHz: '417 Hz', description: '417 Hz reference through 139 Hz fundamentals: mineral, slightly tense, good for transition.', baseFrequency: 139, partialRatios: [1, 1.5, 2, 3, 4.5, 6], droneRatios: [0.5, 1, 3], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 3, weight: 5 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 4.5, weight: 1 }, { ratio: 6, weight: 1 }], bowlDensity: 0.32, shimmerProbability: 0.18, nightSafeCutoff: 900, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '417 Hz symbolic frequency reference' },
+  { id: 'night-temple', name: '138/111 Night Temple', referenceHz: '138 Hz + 111 Hz', description: 'The sleep anchor: 138 Hz bowl, 111 Hz night drone, slow binaural only with headphones.', baseFrequency: 138, partialRatios: [0.804, 1, 1.25, 1.5, 2, 2.25], droneRatios: [0.804, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 8 }, { ratio: 1.5, weight: 5 }, { ratio: 0.804, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 1.25, weight: 2 }, { ratio: 2.25, weight: 1 }], bowlDensity: 0.22, shimmerProbability: 0.12, nightSafeCutoff: 640, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: '138 Hz bowl with 111 Hz night drone reference' },
+  { id: 'glass-orbit', name: '528 Glass Orbit', referenceHz: '528 Hz', description: '528 Hz octave bloom from a 264 Hz bed: brighter, glassier, more wake-forward.', baseFrequency: 264, partialRatios: [0.5, 1, 1.25, 1.5, 2, 3], droneRatios: [0.5, 1, 2], strikeGrammar: [{ ratio: 1, weight: 6 }, { ratio: 2, weight: 6 }, { ratio: 1.5, weight: 4 }, { ratio: 1.25, weight: 3 }, { ratio: 3, weight: 2 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.40, shimmerProbability: 0.42, nightSafeCutoff: 1180, binaural: { allowed: false, deltaHz: 3 }, ritualLabel: '528 Hz symbolic frequency reference' },
+  { id: 'deep-return', name: '174 Deep Return', referenceHz: '174 Hz', description: '174 Hz low reference from an 87 Hz bed: grounded, sparse, slow physical weight.', baseFrequency: 87, partialRatios: [1, 2, 3, 4, 5, 6], droneRatios: [1, 2, 3], strikeGrammar: [{ ratio: 2, weight: 8 }, { ratio: 1, weight: 6 }, { ratio: 3, weight: 5 }, { ratio: 4, weight: 2 }, { ratio: 5, weight: 1 }, { ratio: 6, weight: 1 }], bowlDensity: 0.16, shimmerProbability: 0.06, nightSafeCutoff: 520, binaural: { allowed: false, deltaHz: 1.5 }, ritualLabel: '174 Hz symbolic frequency reference' },
+  { id: 'ember-human', name: '639 Ember Human', referenceHz: '639 Hz', description: '639 Hz upper bloom from 213 Hz: warm midrange, closer, more human and present.', baseFrequency: 213, partialRatios: [0.5, 1, 1.125, 1.5, 2, 3], droneRatios: [0.5, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 3, weight: 5 }, { ratio: 2, weight: 3 }, { ratio: 1.125, weight: 2 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.30, shimmerProbability: 0.18, nightSafeCutoff: 860, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '639 Hz symbolic frequency reference' },
+  { id: 'near-silent', name: '7.83 Quiet Field', referenceHz: '7.83 Hz', description: 'Near-silent air with optional 7.83 Hz-style delta reference: minimal notes, maximum space.', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], droneRatios: [0.5, 1], strikeGrammar: [{ ratio: 1, weight: 9 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 3, weight: 1 }], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: true, deltaHz: 7.83 }, ritualLabel: '7.83 Hz symbolic binaural reference' }
 ];
 
 const WORLDS = [
@@ -67,7 +68,7 @@ const DEFAULT_STATE = {
       limiterCeiling: 0.72,
       binauralEnabled: true,
       binauralDeltaHz: 2,
-      soundMode: 'night-temple'
+      soundMode: WORLD_DEFAULT_SOUND_MODE
     }
   }
 };
@@ -195,7 +196,11 @@ function mixHex(a, b, t) {
   return `rgb(${Math.round(lerp(ca.r, cb.r, t))},${Math.round(lerp(ca.g, cb.g, t))},${Math.round(lerp(ca.b, cb.b, t))})`;
 }
 function getWorld(id = state.selectedWorldId) { return WORLDS.find((world) => world.id === id) || WORLDS[0]; }
-function getSoundMode(id = state.settings.audio.soundMode) { return SOUND_MODES.find((mode) => mode.id === id) || SOUND_MODES[2]; }
+function getSoundMode(id = 'night-temple') { return SOUND_MODES.find((mode) => mode.id === id) || SOUND_MODES[2]; }
+function getEffectiveSoundMode(world = getWorld()) {
+  const override = state.settings.audio.soundMode;
+  return getSoundMode(override === WORLD_DEFAULT_SOUND_MODE ? world.soundMode : override);
+}
 function recordError(scope, error) {
   const message = error && error.message ? error.message : String(error || 'Unknown error');
   audioState.lastAudioError = `${scope}: ${message}`;
@@ -222,7 +227,9 @@ function validateState(candidate) {
   });
   next.settings.audio.limiterCeiling = clamp(Number(next.settings.audio.limiterCeiling) || MASTER_GAIN_CEILING, 0, MASTER_GAIN_CEILING);
   next.settings.audio.binauralDeltaHz = clamp(Number(next.settings.audio.binauralDeltaHz) || 2, 1, 4);
-  if (!SOUND_MODES.some((mode) => mode.id === next.settings.audio.soundMode)) next.settings.audio.soundMode = 'night-temple';
+  const savedSchema = Number(candidate.schemaVersion) || 0;
+  const soundModeIsValid = next.settings.audio.soundMode === WORLD_DEFAULT_SOUND_MODE || SOUND_MODES.some((mode) => mode.id === next.settings.audio.soundMode);
+  if (!soundModeIsValid || savedSchema < 9) next.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
   next.settings.use24h = Boolean(next.settings.use24h);
   next.currentMode = 'object';
   next.schemaVersion = APP_SCHEMA_VERSION;
@@ -246,7 +253,7 @@ function cacheDom() {
     'bedsidePanel', 'bedsideGestureSurface', 'bedsideTime', 'bedsideSoundBreath', 'bedsideWorldPrev', 'bedsideWorldNext', 'durationRow', 'bedsideRail', 'bedsideDurationButton', 'bedsideExitButton',
     'wakeSetPanel', 'wakeCloseButton', 'wakeGestureArea', 'hourRing', 'minuteRing', 'wakeHour', 'wakeMinute', 'wakeHourValue', 'wakeMinuteValue', 'wakeColon', 'wakeWorldSelector', 'wakeWorldPrev', 'wakeWorldName', 'wakeWorldNext', 'wakeRail', 'wakeRailClose', 'wakeSetConfirmButton',
     'worldsPanel', 'worldsCloseButton', 'wakeWorldMemory', 'worldConstellation', 'worldPrevButton', 'worldNextButton', 'worldCopy', 'worldConstellationName', 'worldHint', 'worldRail', 'worldBackButton',
-    'settingsPanel', 'settingsBackdrop', 'settingsSheet', 'settingsCloseButton', 'soundModeSelect', 'binauralToggle', 'deltaReadout', 'deltaSlider', 'masterVolumeReadout', 'masterVolume', 'bedsideVolumeReadout', 'bedsideVolume', 'objectVolumeReadout', 'objectVolume', 'wakeVolumeReadout', 'wakeVolume', 'airVolumeReadout', 'airVolume', 'strikeVolumeReadout', 'strikeVolume', 'shimmerReadout', 'shimmerAmount', 'softTestButton', 'mediumTestButton', 'wakeTestButton', 'stopAudioButton', 'brightnessReadout', 'brightnessSlider', 'reduceMotionToggle', 'use24hToggle', 'openSafetyButton', 'openDiagnosticsButton', 'diagGridButton',
+    'settingsPanel', 'settingsBackdrop', 'settingsSheet', 'settingsCloseButton', 'soundModeSelect', 'soundModeDescription', 'binauralToggle', 'deltaReadout', 'deltaSlider', 'masterVolumeReadout', 'masterVolume', 'bedsideVolumeReadout', 'bedsideVolume', 'objectVolumeReadout', 'objectVolume', 'wakeVolumeReadout', 'wakeVolume', 'airVolumeReadout', 'airVolume', 'strikeVolumeReadout', 'strikeVolume', 'shimmerReadout', 'shimmerAmount', 'softTestButton', 'mediumTestButton', 'wakeTestButton', 'stopAudioButton', 'brightnessReadout', 'brightnessSlider', 'reduceMotionToggle', 'use24hToggle', 'openSafetyButton', 'openDiagnosticsButton', 'diagGridButton',
     'safetyPanel', 'safetyBackdrop', 'safetySheet', 'safetyCloseButton',
     'diagnosticsPanel', 'diagnosticsBackdrop', 'diagnosticsSheet', 'diagnosticsCloseButton', 'diagToneButton', 'diagPlayButton', 'diagBedsideButton', 'diagWakeButton', 'diagStopButton', 'diagGridButton2', 'diagnosticsOutput',
     'ringingPanel', 'ringingTime', 'wakePhaseDots', 'stopWakeButton', 'snoozeWakeButton'
@@ -602,7 +609,7 @@ function createAudioEngine() {
       audioState.currentAudioSessionId = nextSessionId;
       stopScheduledNodes('mode_crossfade_internal', wasPlaying ? 0.06 : 0.02);
       const world = getWorld(options.worldId || state.selectedWorldId);
-      const soundMode = getSoundMode(world.soundMode || state.settings.audio.soundMode);
+      const soundMode = getEffectiveSoundMode(world);
       audioState.currentWorldId = world.id;
       audioState.currentMode = modeName;
       audioState.currentSoundModeId = soundMode.id;
@@ -1031,7 +1038,6 @@ function confirmWakeSet() {
 function applyWorld(world) {
   if (!world) return null;
   state.selectedWorldId = world.id;
-  state.settings.audio.soundMode = world.soundMode || state.settings.audio.soundMode;
   worldSelectionState.activeWorld = world.id;
   worldSelectionState.selectedWorld = world.id;
   worldSelectionState.focusedWorld = world.id;
@@ -1254,7 +1260,12 @@ function selectWorldFromConstellation(event, playOnHold = false) {
 }
 
 function updateRails() {
+  [dom.objectRail, dom.bedsideRail, dom.wakeRail, dom.worldRail].forEach((rail) => rail && rail.classList.remove('is-current'));
   [dom.railBed, dom.railWake, dom.railWorld].forEach((button) => button && button.classList.remove('is-active', 'is-far'));
+  if (dom.objectRail && state.currentMode === 'object') dom.objectRail.classList.add('is-current');
+  if (dom.bedsideRail && state.currentMode === 'bedside') dom.bedsideRail.classList.add('is-current');
+  if (dom.wakeRail && state.currentMode === 'wakeSet') dom.wakeRail.classList.add('is-current');
+  if (dom.worldRail && state.currentMode === 'worlds') dom.worldRail.classList.add('is-current');
   const active = state.currentMode === 'bedside' ? dom.railBed : state.currentMode === 'wakeSet' ? dom.railWake : state.currentMode === 'worlds' ? dom.railWorld : null;
   if (active) active.classList.add('is-active');
   updateSoundControls();
@@ -1309,13 +1320,23 @@ function revealObjectHint() { dom.objectRail.classList.add('show-labels'); windo
 
 function populateSoundModes() {
   dom.soundModeSelect.textContent = '';
+  const defaultOption = document.createElement('option');
+  defaultOption.value = WORLD_DEFAULT_SOUND_MODE;
+  defaultOption.textContent = 'World default';
+  dom.soundModeSelect.appendChild(defaultOption);
   SOUND_MODES.forEach((mode) => {
     const option = document.createElement('option'); option.value = mode.id; option.textContent = mode.name; dom.soundModeSelect.appendChild(option);
   });
 }
 function syncSettingsControls(save = false) {
   const audio = state.settings.audio;
+  const currentWorld = getWorld(state.selectedWorldId);
+  const effectiveSoundMode = getEffectiveSoundMode(currentWorld);
   dom.soundModeSelect.value = audio.soundMode;
+  if (dom.soundModeDescription) {
+    const worldPrefix = audio.soundMode === WORLD_DEFAULT_SOUND_MODE ? `${currentWorld.name} uses ${effectiveSoundMode.name}. ` : `Override: ${effectiveSoundMode.name}. `;
+    dom.soundModeDescription.textContent = worldPrefix + effectiveSoundMode.description;
+  }
   dom.binauralToggle.checked = Boolean(audio.binauralEnabled);
   dom.deltaSlider.value = audio.binauralDeltaHz;
   dom.deltaReadout.textContent = `${audio.binauralDeltaHz} Hz`;
@@ -1499,7 +1520,12 @@ function bindEvents() {
   ['masterVolume', 'bedsideVolume', 'objectVolume', 'wakeVolume', 'airVolume', 'strikeVolume', 'shimmerAmount'].forEach((id) => {
     dom[id].addEventListener('input', () => { const key = id; state.settings.audio[key] = Number(dom[id].value); syncSettingsControls(true); });
   });
-  dom.soundModeSelect.addEventListener('change', () => { state.settings.audio.soundMode = dom.soundModeSelect.value; saveState(); });
+  dom.soundModeSelect.addEventListener('change', () => {
+    state.settings.audio.soundMode = dom.soundModeSelect.value;
+    saveState();
+    syncSettingsControls(false);
+    if (audioState.userFacingAudioState === 'PLAYING') ensureAudioEngine().crossfadeToWorld(getWorld(state.selectedWorldId));
+  });
   dom.binauralToggle.addEventListener('change', () => { state.settings.audio.binauralEnabled = dom.binauralToggle.checked; saveState(); });
   dom.deltaSlider.addEventListener('input', () => { state.settings.audio.binauralDeltaHz = Number(dom.deltaSlider.value); syncSettingsControls(true); });
   dom.brightnessSlider.addEventListener('input', () => { state.settings.visualBrightness = Number(dom.brightnessSlider.value); syncSettingsControls(true); });
