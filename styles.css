@@ -6,14 +6,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Sono";
-  src: url("assets/fonts/sono-mono-latin.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --ink: rgba(250, 248, 239, 0.96);
   --ink-soft: rgba(250, 248, 239, 0.70);
@@ -64,7 +56,7 @@
   --type-time-size: clamp(4.8rem, 20vw, 12rem);
   --type-label-size: clamp(.74rem, 1.35vw, .92rem);
   --type-micro-size: clamp(.62rem, 1.05vw, .75rem);
-  --clock-mono: "Sono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --clock-typeface: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
 
   --wake-time-size: clamp(4.2rem, 9.6vw, 7.2rem);
   --wake-digit-width: clamp(128px, 14vw, 174px);
@@ -405,12 +397,13 @@ body[data-audio="playing"] .object-audio-word { color: var(--ink); }
   top: 45%;
   transform: translate(-50%, -50%);
   display: block;
-  font-family: var(--clock-mono);
+  font-family: var(--clock-typeface);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "zero" 1;
   font-size: clamp(5.4rem, 19vw, 12rem);
   line-height: .78;
-  letter-spacing: var(--track-display);
+  letter-spacing: 0;
+  font-weight: 500;
   font-weight: 830;
   text-align: center;
   color: var(--ink);
@@ -583,13 +576,13 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
 .digit-zone:focus-visible { outline: 0; }
 .digit-value {
   display: block;
-  font-family: var(--clock-mono);
+  font-family: var(--clock-typeface);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "zero" 1;
   font-size: var(--wake-time-size);
   line-height: .82;
   letter-spacing: 0;
-  font-weight: 830;
+  font-weight: 500;
   color: var(--ink);
   opacity: .58;
   filter: blur(2.4px);
