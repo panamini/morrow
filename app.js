@@ -1408,7 +1408,8 @@ function bindEvents() {
   if (dom.bedsideDurationButton) dom.bedsideDurationButton.addEventListener('click', () => { focusDurationControl(); revealBedsideControls(); });
   dom.bedsideExitButton.addEventListener('click', () => setMode('object', { keepAudio: true }));
   dom.durationRow.addEventListener('pointerdown', (event) => {
-    durationPointer = { x: event.clientX, y: event.clientY, lastStepX: event.clientX, at: nowMs(), moved: false };
+    const direct = event.target.closest && event.target.closest('[data-duration]');
+    durationPointer = { x: event.clientX, y: event.clientY, lastStepX: event.clientX, at: nowMs(), moved: false, downDuration: direct ? direct.dataset.duration : null };
     dom.durationRow.classList.add('is-focused');
     revealBedsideControls();
     try { dom.durationRow.setPointerCapture(event.pointerId); } catch (error) { /* capture optional */ }
@@ -1427,8 +1428,9 @@ function bindEvents() {
     if (!durationPointer) return;
     try { dom.durationRow.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
     const direct = event.target.closest && event.target.closest('[data-duration]');
+    const tappedDuration = durationPointer.downDuration || (direct ? direct.dataset.duration : null);
     const dx = event.clientX - durationPointer.x;
-    if (direct && !durationPointer.moved && nowMs() - durationPointer.at < 520 && Math.abs(dx) < 20) state.bedsideDuration = direct.dataset.duration;
+    if (tappedDuration && !durationPointer.moved && nowMs() - durationPointer.at < 520 && Math.abs(dx) < 20) state.bedsideDuration = tappedDuration;
     else if (!durationPointer.moved && Math.abs(dx) > 22) stepDurationWheel(dx < 0 ? 1 : -1);
     saveState(); updateDurationRow(); revealBedsideControls(); window.setTimeout(() => dom.durationRow && dom.durationRow.classList.remove('is-focused'), 1800); durationPointer = null;
   });
