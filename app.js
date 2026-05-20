@@ -838,7 +838,6 @@ function changeBedsideDuration(step) {
   state.bedsideDuration = next.id;
   saveState();
   updateDurationRow();
-  showToast(next.id === 'night' ? 'All night' : `${next.label} min`, 900);
   startBedsideSessionTimer();
 }
 function stepDurationWheel(step) {
