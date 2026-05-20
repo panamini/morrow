@@ -57,11 +57,12 @@
   --type-label-size: clamp(.74rem, 1.35vw, .92rem);
   --type-micro-size: clamp(.62rem, 1.05vw, .75rem);
   --clock-typeface: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  --clock-weight: 820;
 
-  --wake-time-size: clamp(4.2rem, 9.6vw, 7.2rem);
-  --wake-digit-width: clamp(128px, 14vw, 174px);
-  --wake-colon-width: clamp(34px, 3.3vw, 48px);
-  --wake-digit-gap: clamp(8px, .9vw, 16px);
+  --wake-time-size: clamp(4.1rem, 9.2vw, 6.9rem);
+  --wake-digit-width: clamp(88px, 8.4vw, 118px);
+  --wake-colon-width: clamp(16px, 1.35vw, 22px);
+  --wake-digit-gap: 0px;
   --wake-baseline-y: 50%;
   --wake-hour-column: 3 / span 3;
   --wake-colon-column: 6 / span 1;
@@ -572,7 +573,7 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
   width: auto;
   transform: translateY(-1px);
 }
-.digit-zone { min-height: clamp(120px, 22vw, 180px); display: grid; place-items: center; background: transparent; border: 0; padding: 0; touch-action: none; }
+.digit-zone { min-height: clamp(108px, 18vw, 168px); display: grid; place-items: center; background: transparent; border: 0; padding: 0; touch-action: none; }
 .digit-zone:focus-visible { outline: 0; }
 .digit-value {
   display: block;
@@ -582,16 +583,16 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
   font-size: var(--wake-time-size);
   line-height: .82;
   letter-spacing: 0;
-  font-weight: 500;
+  font-weight: var(--clock-weight);
   color: var(--ink);
-  opacity: .58;
-  filter: blur(2.4px);
+  opacity: .66;
+  filter: blur(1.2px);
   transform: scale(.98);
   text-shadow: 0 22px 94px rgba(0,0,0,.24);
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
 }
 .digit-zone.is-selected .digit-value { opacity: .98; filter: blur(0); transform: scale(1); }
-.digit-colon { width: var(--wake-colon-width); text-align: center; font-size: clamp(2.6rem, 5.2vw, 4.2rem); line-height: .82; letter-spacing: 0; font-weight: 720; color: rgba(250,248,239,.44); transform: translateY(-.03em); }
+.digit-colon { width: var(--wake-colon-width); text-align: center; font-size: clamp(2.3rem, 4.8vw, 3.8rem); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.44); transform: translateY(-.03em); }
 .wake-rail .world-word { color: var(--ink); }
 .inline-world-selector {
   position: absolute;
@@ -874,7 +875,7 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
 body.debug-grid .debug-grid-overlay { display: block; }
 
 @media (max-width: 680px) {
-  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.8rem, 16vw, 6.4rem); --wake-digit-width: 32vw; --wake-colon-width: 32px; --wake-digit-gap: 2px; }
+  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-digit-width: 24vw; --wake-colon-width: 18px; --wake-digit-gap: 0px; }
   .command-rail {
     gap: clamp(10px, 3vw, 18px);
     padding: 0 var(--s-4);
