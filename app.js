@@ -16,13 +16,13 @@ const BED_DURATION_OPTIONS = [
 ];
 
 const SOUND_MODES = [
-  { id: 'still-water', name: 'Still Water', baseFrequency: 132, partialRatios: [1, 1.125, 1.333, 1.5, 1.875, 2.25], bowlDensity: 0.22, shimmerProbability: 0.10, nightSafeCutoff: 720, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: 'quiet water reference' },
-  { id: 'limestone-harmonic', name: 'Limestone Harmonic', baseFrequency: 138, partialRatios: [1, 1.47, 2.08, 2.72, 3.86, 5.03], bowlDensity: 0.34, shimmerProbability: 0.20, nightSafeCutoff: 900, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: 'symbolic resonance, musical reference' },
-  { id: 'night-temple', name: 'Night Temple', baseFrequency: 146, partialRatios: [1, 1.2, 1.5, 1.875, 2.25, 2.625], bowlDensity: 0.28, shimmerProbability: 0.16, nightSafeCutoff: 680, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: 'night ritual label, not health care' },
-  { id: 'glass-orbit', name: 'Glass Orbit', baseFrequency: 247, partialRatios: [1, 1.25, 1.414, 1.6, 1.875, 2.25], bowlDensity: 0.40, shimmerProbability: 0.42, nightSafeCutoff: 1180, binaural: { allowed: true, deltaHz: 3 }, ritualLabel: 'bright musical orbit' },
-  { id: 'deep-return', name: 'Deep Return', baseFrequency: 110, partialRatios: [1, 1.25, 1.5, 2, 2.5, 3], bowlDensity: 0.18, shimmerProbability: 0.08, nightSafeCutoff: 520, binaural: { allowed: true, deltaHz: 1.5 }, ritualLabel: 'low musical anchor' },
-  { id: 'ember-human', name: 'Ember Human', baseFrequency: 216, partialRatios: [1, 1.125, 1.25, 1.5, 1.75, 2], bowlDensity: 0.30, shimmerProbability: 0.18, nightSafeCutoff: 860, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: 'warm musical reference' },
-  { id: 'near-silent', name: 'Near Silent', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: false, deltaHz: 0 }, ritualLabel: 'nearly silent preference' }
+  { id: 'still-water', name: 'Still Water', baseFrequency: 132, partialRatios: [1, 1.125, 1.333, 1.5, 1.875, 2.25], droneRatios: [0.5, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 1.333, weight: 4 }, { ratio: 1.125, weight: 2 }, { ratio: 1.875, weight: 1 }, { ratio: 2.25, weight: 1 }], bowlDensity: 0.22, shimmerProbability: 0.10, nightSafeCutoff: 720, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: 'quiet water reference' },
+  { id: 'limestone-harmonic', name: 'Limestone Harmonic', baseFrequency: 138, partialRatios: [1, 1.47, 2.08, 2.72, 3.86, 5.03], droneRatios: [0.5, 1, 2.08], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 2.08, weight: 5 }, { ratio: 1.47, weight: 3 }, { ratio: 2.72, weight: 2 }, { ratio: 3.86, weight: 1 }, { ratio: 5.03, weight: 1 }], bowlDensity: 0.34, shimmerProbability: 0.20, nightSafeCutoff: 900, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: 'symbolic resonance, musical reference' },
+  { id: 'night-temple', name: 'Night Temple', baseFrequency: 138, partialRatios: [0.804, 1, 1.25, 1.5, 2, 2.25], droneRatios: [0.804, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 8 }, { ratio: 1.5, weight: 5 }, { ratio: 0.804, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 1.25, weight: 2 }, { ratio: 2.25, weight: 1 }], bowlDensity: 0.22, shimmerProbability: 0.12, nightSafeCutoff: 640, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: '138 Hz bowl with 111 Hz night drone reference' },
+  { id: 'glass-orbit', name: 'Glass Orbit', baseFrequency: 247, partialRatios: [1, 1.25, 1.414, 1.6, 1.875, 2.25], droneRatios: [0.5, 1, 1.25], strikeGrammar: [{ ratio: 1, weight: 6 }, { ratio: 1.25, weight: 5 }, { ratio: 1.875, weight: 3 }, { ratio: 2.25, weight: 2 }, { ratio: 1.6, weight: 1 }, { ratio: 1.414, weight: 1 }], bowlDensity: 0.40, shimmerProbability: 0.42, nightSafeCutoff: 1180, binaural: { allowed: false, deltaHz: 3 }, ritualLabel: 'bright musical orbit' },
+  { id: 'deep-return', name: 'Deep Return', baseFrequency: 110, partialRatios: [1, 1.25, 1.5, 2, 2.5, 3], droneRatios: [0.5, 1, 1.5, 2], strikeGrammar: [{ ratio: 1, weight: 8 }, { ratio: 1.5, weight: 7 }, { ratio: 2, weight: 5 }, { ratio: 1.25, weight: 2 }, { ratio: 2.5, weight: 1 }, { ratio: 3, weight: 1 }], bowlDensity: 0.18, shimmerProbability: 0.08, nightSafeCutoff: 520, binaural: { allowed: false, deltaHz: 1.5 }, ritualLabel: 'low musical anchor' },
+  { id: 'ember-human', name: 'Ember Human', baseFrequency: 216, partialRatios: [1, 1.125, 1.25, 1.5, 1.75, 2], droneRatios: [0.5, 1, 1.25, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 1.25, weight: 5 }, { ratio: 2, weight: 3 }, { ratio: 1.125, weight: 2 }, { ratio: 1.75, weight: 1 }], bowlDensity: 0.30, shimmerProbability: 0.18, nightSafeCutoff: 860, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: 'warm musical reference' },
+  { id: 'near-silent', name: 'Near Silent', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], droneRatios: [0.5, 1], strikeGrammar: [{ ratio: 1, weight: 9 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 3, weight: 1 }], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: false, deltaHz: 0 }, ritualLabel: 'nearly silent preference' }
 ];
 
 const WORLDS = [
@@ -36,12 +36,12 @@ const WORLDS = [
 ];
 
 const WAKE_CURVE = [
-  { atMinute: 0, name: 'firstLight', masterGainTarget: 0.18 },
-  { atMinute: 3, name: 'bodyReturns', masterGainTarget: 0.24 },
-  { atMinute: 6, name: 'gentleResonance', masterGainTarget: 0.34 },
-  { atMinute: 9, name: 'clearWake', masterGainTarget: 0.45 },
-  { atMinute: 12, name: 'morningPresence', masterGainTarget: 0.56 },
-  { atMinute: 27, name: 'persistentMorning', masterGainTarget: 0.66 }
+  { atMinute: 0, name: 'firstLight', visualIntensity: 0.10, audioDensity: 0.05, masterGainTarget: 0.16, layers: ['air'] },
+  { atMinute: 3, name: 'bodyReturns', visualIntensity: 0.22, audioDensity: 0.14, masterGainTarget: 0.23, layers: ['air', 'lowDrone'] },
+  { atMinute: 6, name: 'gentleResonance', visualIntensity: 0.36, audioDensity: 0.28, masterGainTarget: 0.34, layers: ['air', 'lowDrone', 'bowlPartials'] },
+  { atMinute: 9, name: 'clearWake', visualIntensity: 0.52, audioDensity: 0.42, masterGainTarget: 0.46, layers: ['air', 'drone', 'bowlPartials', 'softBloom'] },
+  { atMinute: 12, name: 'morningPresence', visualIntensity: 0.68, audioDensity: 0.60, masterGainTarget: 0.56, layers: ['air', 'drone', 'partials', 'bloom', 'pulse'] },
+  { atMinute: 27, name: 'persistentMorning', visualIntensity: 0.82, audioDensity: 0.76, masterGainTarget: 0.66, layers: ['air', 'drone', 'partials', 'bloom', 'pulse', 'clearBell'] }
 ];
 
 const DEFAULT_STATE = {
@@ -99,6 +99,7 @@ const audioState = {
 const visualState = {
   brightness: DEFAULT_STATE.settings.visualBrightness,
   audioIntensity: 0,
+  wakeVisualIntensity: 0,
   modeClarity: 0.82,
   apertureShape: 'circle'
 };
@@ -111,6 +112,8 @@ let alarmTimer = null;
 let bedsideIdleTimer = null;
 let bedsideSessionTimer = null;
 let diagnosticsTimer = null;
+let wakeCurveTimer = null;
+let wakeCurveStartedAt = 0;
 let gridOverlayEnabled = false;
 let sensoryPointer = null;
 let durationPointer = null;
@@ -153,6 +156,28 @@ function lerp(a, b, t) { return a + (b - a) * t; }
 function modulo(value, length) { return ((value % length) + length) % length; }
 function pad2(value) { return String(value).padStart(2, '0'); }
 function nowMs() { return Date.now(); }
+function getWakePhase(minute) {
+  let current = WAKE_CURVE[0];
+  let next = WAKE_CURVE[WAKE_CURVE.length - 1];
+  for (let index = 0; index < WAKE_CURVE.length; index += 1) {
+    if (minute >= WAKE_CURVE[index].atMinute) current = WAKE_CURVE[index];
+    if (WAKE_CURVE[index].atMinute > minute) { next = WAKE_CURVE[index]; break; }
+  }
+  const span = Math.max(1, next.atMinute - current.atMinute);
+  const t = current === next ? 1 : clamp((minute - current.atMinute) / span, 0, 1);
+  return {
+    atMinute: minute,
+    name: current.name,
+    visualIntensity: lerp(current.visualIntensity, next.visualIntensity, t),
+    audioDensity: lerp(current.audioDensity, next.audioDensity, t),
+    masterGainTarget: lerp(current.masterGainTarget, next.masterGainTarget, t),
+    layers: current.layers
+  };
+}
+function getCurrentWakePhase() {
+  const startedAt = wakeCurveStartedAt || Date.now();
+  return getWakePhase((Date.now() - startedAt) / 60000);
+}
 function parseTime(value) {
   const parts = String(value || '07:30').split(':').map(Number);
   return { hour: Number.isFinite(parts[0]) ? clamp(parts[0], 0, 23) : 7, minute: Number.isFinite(parts[1]) ? clamp(parts[1], 0, 59) : 30 };
@@ -273,7 +298,8 @@ function createApertureRenderer(canvas) {
     const cssW = width / dpr; const cssH = height / dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const palette = mixedPalette(time);
-    const brightness = state.settings.visualBrightness;
+    const wakeBoost = mode === 'ringing' ? visualState.wakeVisualIntensity : 0;
+    const brightness = clamp(state.settings.visualBrightness + wakeBoost * 0.18, 0.08, 1);
     ctx.fillStyle = palette.wall;
     ctx.fillRect(0, 0, cssW, cssH);
     const cx = cssW / 2;
@@ -285,7 +311,7 @@ function createApertureRenderer(canvas) {
     const driftX = Math.sin(time * 0.00013) * r * 0.045;
     const driftY = Math.cos(time * 0.00011) * r * 0.035;
     const bedDim = mode === 'bedside' ? 0.72 : 1;
-    const glow = brightness * bedDim;
+    const glow = brightness * bedDim * (1 + wakeBoost * 0.24);
 
     fillCircle(cx, cy, r * 2.45, [
       [0, rgba(palette.spill, 0.030 * glow)],
@@ -354,6 +380,7 @@ function createAudioEngine() {
   let droneOscillators = [];
   let transientOscillators = [];
   let sessionId = 0;
+  let currentWakePhase = WAKE_CURVE[0];
   function updateContextState() { audioState.audioContextState = ctx ? ctx.state : 'none'; return audioState.audioContextState; }
   function initContext() {
     if (ctx) return ctx;
@@ -403,7 +430,7 @@ function createAudioEngine() {
     droneOscillators = [];
     transientOscillators = [];
     eventTimer = null;
-    if (oldTimer) window.clearInterval(oldTimer);
+    if (oldTimer) window.clearTimeout(oldTimer);
     modeGain.gain.cancelScheduledValues(at);
     modeGain.gain.setTargetAtTime(0.0001, at, fade);
     window.setTimeout(() => {
@@ -434,9 +461,72 @@ function createAudioEngine() {
     audioState.masterGainValue = clamp(master, 0, MASTER_GAIN_CEILING);
     audioState.modeGainValue = target;
   }
+  function syncWakePhase(phase = getCurrentWakePhase()) {
+    if (!ctx || audioState.currentMode !== 'ringing') return phase;
+    currentWakePhase = phase;
+    setMasterTarget('ringing', phase.masterGainTarget, 1.4);
+    visualState.audioIntensity = phase.audioDensity;
+    return phase;
+  }
+  function pickWeightedRatio(soundMode) {
+    const grammar = soundMode.strikeGrammar || soundMode.partialRatios.map((ratio) => ({ ratio, weight: 1 }));
+    const totalWeight = grammar.reduce((sum, candidate) => sum + Math.max(0, candidate.weight || 0), 0);
+    let cursor = Math.random() * (totalWeight || 1);
+    for (const candidate of grammar) {
+      cursor -= Math.max(0, candidate.weight || 0);
+      if (cursor <= 0) return candidate.ratio || 1;
+    }
+    return grammar[0]?.ratio || 1;
+  }
+  function pickDroneRatio(soundMode) {
+    const ratios = soundMode.droneRatios || soundMode.partialRatios || [1];
+    return ratios[Math.floor(Math.random() * ratios.length)] || 1;
+  }
+  function maybeScheduleBloom(modeName, soundMode, emphasis = 1) {
+    if (!ctx || !modeGain) return;
+    const shimmer = clamp(Number(state.settings.audio.shimmerAmount) || 0, 0, 1);
+    const air = clamp(Number(state.settings.audio.airVolume) || 0, 0, 1);
+    const modeMultiplier = modeName === 'bedside' ? 0.52 : modeName === 'ringing' ? 1.18 : 1;
+    const probability = clamp((soundMode.shimmerProbability || 0) * shimmer * modeMultiplier, 0, 0.55);
+    if (air <= 0.001 || Math.random() > probability) return;
+
+    const ratio = pickDroneRatio(soundMode);
+    const octave = Math.random() > 0.76 && modeName !== 'bedside' ? 2 : 1;
+    const freq = soundMode.baseFrequency * ratio * octave;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    const at = ctx.currentTime;
+    const peak = clamp((0.010 + shimmer * 0.018) * air * emphasis, 0.001, modeName === 'bedside' ? 0.020 : 0.040);
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq * (0.998 + Math.random() * 0.004), at);
+    filter.type = 'lowpass';
+    filter.frequency.value = modeName === 'bedside' ? soundMode.nightSafeCutoff * 0.82 : Math.min(soundMode.nightSafeCutoff * 1.25, 1600);
+    filter.Q.value = 0.35;
+    gain.gain.value = 0.0001;
+    gain.gain.setTargetAtTime(peak, at + 0.18 + Math.random() * 0.7, 1.6 + Math.random() * 1.8);
+    gain.gain.setTargetAtTime(0.0001, at + 4.8 + Math.random() * 5.2, 5.5 + Math.random() * 4.5);
+
+    if (pan) {
+      pan.pan.value = -0.5 + Math.random();
+      osc.connect(filter); filter.connect(gain); gain.connect(pan); pan.connect(modeGain);
+    } else {
+      osc.connect(filter); filter.connect(gain); gain.connect(modeGain);
+    }
+    osc.start(); osc.stop(at + 19);
+    transientOscillators.push(osc);
+    audioState.activeNodes += pan ? 4 : 3;
+    window.setTimeout(() => {
+      transientOscillators = transientOscillators.filter((candidate) => candidate !== osc);
+      audioState.activeNodes = Math.max(0, audioState.activeNodes - (pan ? 4 : 3));
+    }, 19200);
+  }
   function scheduleStrike(modeName, world, soundMode, emphasis = 1) {
     if (!ctx || !modeGain) return;
-    const ratio = soundMode.partialRatios[Math.floor(Math.random() * soundMode.partialRatios.length)] || 1;
+    const wakeEmphasis = modeName === 'ringing' ? 0.58 + currentWakePhase.audioDensity * 0.92 : 1;
+    const ratio = pickWeightedRatio(soundMode);
     const freq = soundMode.baseFrequency * ratio;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -447,7 +537,7 @@ function createAudioEngine() {
     osc.type = Math.random() > 0.5 ? 'sine' : 'triangle';
     osc.frequency.setValueAtTime(freq * (0.996 + Math.random() * 0.008), ctx.currentTime);
     gain.gain.value = 0.0001;
-    const peak = clamp((modeName === 'bedside' ? 0.070 : 0.115) * state.settings.audio.strikeVolume * emphasis, 0.001, 0.22);
+    const peak = clamp((modeName === 'bedside' ? 0.070 : 0.115) * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, 0.22);
     gain.gain.setTargetAtTime(peak, ctx.currentTime + 0.01, 0.06);
     gain.gain.setTargetAtTime(0.0001, ctx.currentTime + 0.18, 1.9 + Math.random() * 1.4);
     osc.connect(filter); filter.connect(gain); gain.connect(modeGain);
@@ -458,17 +548,38 @@ function createAudioEngine() {
       transientOscillators = transientOscillators.filter((candidate) => candidate !== osc);
       audioState.activeNodes = Math.max(0, audioState.activeNodes - 3);
     }, 5200);
+    maybeScheduleBloom(modeName, soundMode, emphasis * wakeEmphasis);
   }
   function startDrones(modeName, world, soundMode) {
     if (!ctx || !modeGain) return;
-    const ratios = soundMode.partialRatios.slice(0, modeName === 'bedside' ? 3 : 4);
+    const ratios = (soundMode.droneRatios || soundMode.partialRatios).slice(0, modeName === 'bedside' ? 3 : 4);
     ratios.forEach((ratio, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
       osc.type = 'sine';
-      osc.frequency.value = soundMode.baseFrequency * ratio * (0.5 + index * 0.02);
+      const frequency = soundMode.baseFrequency * ratio;
+      osc.frequency.value = frequency;
       gain.gain.value = (modeName === 'bedside' ? 0.030 : 0.045) / (index + 1);
+      if (index === 0 && pan && audioState.binauralEnabled && soundMode.binaural.allowed) {
+        const rightOsc = ctx.createOscillator();
+        const rightGain = ctx.createGain();
+        const rightPan = ctx.createStereoPanner();
+        const deltaHz = clamp(Number(audioState.deltaHz || soundMode.binaural.deltaHz) || 2, 1, 4);
+        osc.frequency.value = frequency;
+        rightOsc.type = 'sine';
+        rightOsc.frequency.value = frequency + deltaHz;
+        gain.gain.value *= 0.58;
+        rightGain.gain.value = gain.gain.value;
+        pan.pan.value = -1;
+        rightPan.pan.value = 1;
+        osc.connect(gain); gain.connect(pan); pan.connect(modeGain);
+        rightOsc.connect(rightGain); rightGain.connect(rightPan); rightPan.connect(modeGain);
+        osc.start(); rightOsc.start();
+        droneOscillators.push(osc, rightOsc);
+        audioState.activeNodes += 6;
+        return;
+      }
       if (pan) {
         pan.pan.value = index % 2 === 0 ? -0.18 : 0.18;
         osc.connect(gain); gain.connect(pan); pan.connect(modeGain);
@@ -497,18 +608,27 @@ function createAudioEngine() {
       audioState.currentSoundModeId = soundMode.id;
       audioState.binauralEnabled = Boolean(state.settings.audio.binauralEnabled && soundMode.binaural.allowed);
       audioState.deltaHz = state.settings.audio.binauralDeltaHz;
+      if (modeName === 'ringing') currentWakePhase = getCurrentWakePhase();
       const density = options.density || (modeName === 'bedside' ? soundMode.bowlDensity * 0.55 : soundMode.bowlDensity);
-      const spacing = clamp(3800 - density * 2200, modeName === 'bedside' ? 2600 : 1200, 5200);
+      const spacingBase = modeName === 'bedside' ? 6200 : modeName === 'ringing' ? 3000 : 4800;
+      const spacingPull = modeName === 'ringing' ? 1800 : 2200;
+      const spacingFloor = modeName === 'bedside' ? 3600 : modeName === 'ringing' ? 1400 : 2200;
       window.setTimeout(() => {
         if (nextSessionId !== sessionId) return;
-        setMasterTarget(modeName, options.intensity || 1, 0.30);
+        if (modeName === 'ringing') syncWakePhase(currentWakePhase);
+        else setMasterTarget(modeName, options.intensity || 1, 0.30);
         startDrones(modeName, world, soundMode);
-        window.setTimeout(() => {
-          if (nextSessionId === sessionId) scheduleStrike(modeName, world, soundMode, modeName === 'ringing' ? 1.6 : 1);
-        }, 70);
-        if (eventTimer) window.clearInterval(eventTimer);
-        eventTimer = window.setInterval(() => scheduleStrike(modeName, world, soundMode, modeName === 'ringing' ? 1.6 : 1), spacing);
+        const scheduleNextStrike = () => {
+          if (nextSessionId !== sessionId) return;
+          if (modeName === 'ringing') syncWakePhase(getCurrentWakePhase());
+          const effectiveDensity = modeName === 'ringing' ? currentWakePhase.audioDensity : density;
+          const spacing = clamp(spacingBase - effectiveDensity * spacingPull, spacingFloor, 7600);
+          scheduleStrike(modeName, world, soundMode, modeName === 'ringing' ? 1.6 : 1);
+          const nextSpacing = spacing * (0.72 + Math.random() * 0.70);
+          eventTimer = window.setTimeout(scheduleNextStrike, nextSpacing);
+        };
         audioState.activeTimers = 1;
+        eventTimer = window.setTimeout(scheduleNextStrike, 70);
       }, wasPlaying ? 95 : 0);
       audioState.audioPlaybackState = 'playing';
       audioState.userFacingAudioState = 'PLAYING';
@@ -576,7 +696,7 @@ function createAudioEngine() {
       limiterCeiling: MASTER_GAIN_CEILING
     };
   }
-  return { unlockAudioFromGesture, playFromGesture, startModeFromGesture, startMode, stopExplicit, stopForDurationExpiry, stopForWakeDismiss, crossfadeToWorld, getAudioDiagnostics, setMasterTarget };
+  return { unlockAudioFromGesture, playFromGesture, startModeFromGesture, startMode, stopExplicit, stopForDurationExpiry, stopForWakeDismiss, crossfadeToWorld, getAudioDiagnostics, setMasterTarget, syncWakePhase };
 }
 
 function unlockAudioFromGesture(event) { return ensureAudioEngine().unlockAudioFromGesture(event); }
@@ -614,6 +734,8 @@ function setMode(mode, options = {}) {
     setActiveVisualWorld(visualWorldId);
   }
   if (mode === 'bedside') { revealBedsideControls(); startBedsideSessionTimer(); } else { document.body.classList.remove('bedside-idle'); clearBedsideIdleTimer(); clearBedsideSessionTimer(); }
+  if (mode === 'ringing') startWakeCurve();
+  else if (previous === 'ringing') stopWakeCurve();
   if (mode === 'wakeSet') { wakeSetState.wakeStep = 'time'; syncWakeStateFromAlarm(); setActiveSetter('hour'); markWakeInteraction(); }
   if (mode === 'worlds') { initializeWorldSelection(options.entry || previous); renderWorlds(); }
   if (mode === 'settings') syncSettingsControls();
@@ -644,6 +766,40 @@ function updateClocks() {
   updateOrbitalRings();
 }
 function startClock() { updateClocks(); if (clockTimer) window.clearInterval(clockTimer); clockTimer = window.setInterval(updateClocks, 1000); }
+function updateWakePhaseDots(phase) {
+  if (!dom.wakePhaseDots) return;
+  if (!dom.wakePhaseDots.children.length) {
+    WAKE_CURVE.forEach(() => {
+      const dot = document.createElement('span');
+      dom.wakePhaseDots.appendChild(dot);
+    });
+  }
+  const activeIndex = WAKE_CURVE.findIndex((candidate, index) => phase.atMinute < (WAKE_CURVE[index + 1]?.atMinute ?? Infinity));
+  [...dom.wakePhaseDots.children].forEach((dot, index) => dot.classList.toggle('is-active', index === Math.max(0, activeIndex)));
+}
+function applyWakeCurvePhase() {
+  const phase = getCurrentWakePhase();
+  visualState.wakeVisualIntensity = phase.visualIntensity;
+  visualState.audioIntensity = phase.audioDensity;
+  updateWakePhaseDots(phase);
+  if (audioEngine && audioState.userFacingAudioState === 'PLAYING' && audioState.currentMode === 'ringing') {
+    audioEngine.syncWakePhase(phase);
+  }
+  return phase;
+}
+function startWakeCurve() {
+  if (!wakeCurveStartedAt) wakeCurveStartedAt = Date.now();
+  applyWakeCurvePhase();
+  if (wakeCurveTimer) window.clearInterval(wakeCurveTimer);
+  wakeCurveTimer = window.setInterval(applyWakeCurvePhase, 1000);
+}
+function stopWakeCurve() {
+  if (wakeCurveTimer) window.clearInterval(wakeCurveTimer);
+  wakeCurveTimer = null;
+  wakeCurveStartedAt = 0;
+  visualState.wakeVisualIntensity = 0;
+  visualState.audioIntensity = 0;
+}
 function checkAlarmTick() {
   if (!state.alarm.enabled || state.currentMode === 'ringing') return;
   const now = new Date();
