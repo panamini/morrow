@@ -7,8 +7,8 @@
 }
 
 @font-face {
-  font-family: "Geist Mono";
-  src: url("assets/fonts/geist-mono-latin.woff2") format("woff2");
+  font-family: "Sono";
+  src: url("assets/fonts/sono-mono-latin.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -64,7 +64,7 @@
   --type-time-size: clamp(4.8rem, 20vw, 12rem);
   --type-label-size: clamp(.74rem, 1.35vw, .92rem);
   --type-micro-size: clamp(.62rem, 1.05vw, .75rem);
-  --clock-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --clock-mono: "Sono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
   --wake-time-size: clamp(4.2rem, 9.6vw, 7.2rem);
   --wake-digit-width: clamp(128px, 14vw, 174px);
