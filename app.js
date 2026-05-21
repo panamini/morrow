@@ -23,13 +23,39 @@ const SOUND_MODES = [
   { id: 'glass-orbit', name: '528 Glass Orbit', referenceHz: '528 Hz', description: '528 Hz octave bloom from a 264 Hz bed: brighter, glassier, more wake-forward.', baseFrequency: 264, partialRatios: [0.5, 1, 1.25, 1.5, 2, 3], droneRatios: [0.5, 1, 2], strikeGrammar: [{ ratio: 1, weight: 6 }, { ratio: 2, weight: 6 }, { ratio: 1.5, weight: 4 }, { ratio: 1.25, weight: 3 }, { ratio: 3, weight: 2 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.40, shimmerProbability: 0.42, nightSafeCutoff: 1180, binaural: { allowed: false, deltaHz: 3 }, ritualLabel: '528 Hz symbolic frequency reference' },
   { id: 'deep-return', name: '174 Deep Return', referenceHz: '174 Hz', description: '174 Hz low reference from an 87 Hz bed: grounded, sparse, slow physical weight.', baseFrequency: 87, partialRatios: [1, 2, 3, 4, 5, 6], droneRatios: [1, 2, 3], strikeGrammar: [{ ratio: 2, weight: 8 }, { ratio: 1, weight: 6 }, { ratio: 3, weight: 5 }, { ratio: 4, weight: 2 }, { ratio: 5, weight: 1 }, { ratio: 6, weight: 1 }], bowlDensity: 0.16, shimmerProbability: 0.06, nightSafeCutoff: 520, binaural: { allowed: false, deltaHz: 1.5 }, ritualLabel: '174 Hz symbolic frequency reference' },
   { id: 'ember-human', name: '639 Ember Human', referenceHz: '639 Hz', description: '639 Hz upper bloom from 213 Hz: warm midrange, closer, more human and present.', baseFrequency: 213, partialRatios: [0.5, 1, 1.125, 1.5, 2, 3], droneRatios: [0.5, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 3, weight: 5 }, { ratio: 2, weight: 3 }, { ratio: 1.125, weight: 2 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.30, shimmerProbability: 0.18, nightSafeCutoff: 860, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '639 Hz symbolic frequency reference' },
-  { id: 'near-silent', name: '7.83 Quiet Field', referenceHz: '7.83 Hz', description: 'Near-silent air with optional 7.83 Hz-style delta reference: minimal notes, maximum space.', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], droneRatios: [0.5, 1], strikeGrammar: [{ ratio: 1, weight: 9 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 3, weight: 1 }], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: true, deltaHz: 7.83 }, ritualLabel: '7.83 Hz symbolic binaural reference' }
+  { id: 'near-silent', name: '7.83 Quiet Field', referenceHz: '7.83 Hz', description: 'Near-silent air with optional 7.83 Hz-style delta reference: minimal notes, maximum space.', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], droneRatios: [0.5, 1], strikeGrammar: [{ ratio: 1, weight: 9 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 3, weight: 1 }], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: true, deltaHz: 7.83 }, ritualLabel: '7.83 Hz symbolic binaural reference' },
+  {
+    id: 'space-field',
+    name: 'C# Space Field',
+    referenceHz: 'C# / F# 6/9 field',
+    description: 'C#-dominant F# 6/9 drone: deep, almost still, no beat, slow room pressure.',
+    baseFrequency: 69.31,
+    partialRatios: [0.667, 1, 1.5, 2, 2.667, 3, 3.375, 4, 4.5],
+    droneRatios: [1, 0.667, 2, 1.5, 2.667, 4],
+    strikeGrammar: [{ ratio: 1, weight: 10 }, { ratio: 2, weight: 7 }, { ratio: 1.5, weight: 5 }, { ratio: 2.667, weight: 3 }, { ratio: 4, weight: 2 }, { ratio: 3, weight: 1.5 }, { ratio: 3.375, weight: 0.35 }, { ratio: 4.5, weight: 0.30 }, { ratio: 0.667, weight: 0.25 }],
+    bowlDensity: 0.025,
+    shimmerProbability: 0.005,
+    nightSafeCutoff: 520,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'C#-anchored F# 6/9 drone reference',
+    engineV2: {
+      style: 'field',
+      phraseGapsMs: { bedside: [38000, 110000], object: [26000, 85000], ringing: [9000, 38000] },
+      restProbability: { bedside: 0.72, object: 0.58, ringing: 0.32 },
+      maxEventsPerPhrase: { bedside: 1, object: 2, ringing: 3 },
+      attackSeconds: [4.5, 16],
+      releaseSeconds: [12, 42],
+      gainScale: 0.45,
+      repeatMemory: 5,
+      phraseCells: [[1], [1, 1.5], [1, 2], [1, 2, 1.5], [0.667, 1], [1, 2.667], [1, 2, 4], [1.5, 2], [1, 3.375], [1, 4.5]]
+    }
+  }
 ];
 
 const WORLDS = [
   { id: 'milk-blue', name: 'Milk Blue', mood: 'cyan membrane, cobalt depth, quiet wall', soundMode: 'night-temple', palettes: { object: { wall: '#141d30', spill: '#0937ce', outer: '#5ff0c7', inner: '#79f0dd', core: '#244d9a', core2: '#43a7c2', shadow: '#02030a' }, bedside: { wall: '#020710', spill: '#061f4a', outer: '#2aa982', inner: '#3b7b8f', core: '#081120', core2: '#102439', shadow: '#000204' }, wake: { wall: '#7f563c', spill: '#c7efe2', outer: '#d7fff0', inner: '#a9ffd9', core: '#4a6475', core2: '#81c4c0', shadow: '#1b120d' } } },
   { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-human', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
-  { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'deep-return', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
+  { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'limestone-harmonic', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
   { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'still-water', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
   { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
@@ -89,6 +115,9 @@ const audioState = {
   currentMode: 'none',
   currentWorldId: null,
   currentSoundModeId: 'night-temple',
+  engineStyle: 'legacy',
+  lastPhraseAt: 0,
+  lastEventAt: 0,
   masterGainValue: 0,
   modeGainValue: 0,
   compressorEnabled: false,
@@ -197,6 +226,10 @@ function rgba(hex, alpha) { const c = hexToRgb(hex); return `rgba(${c.r},${c.g},
 function mixHex(a, b, t) {
   const ca = hexToRgb(a); const cb = hexToRgb(b);
   return `rgb(${Math.round(lerp(ca.r, cb.r, t))},${Math.round(lerp(ca.g, cb.g, t))},${Math.round(lerp(ca.b, cb.b, t))})`;
+}
+function parseCssPixels(value, fallback = 0) {
+  const parsed = Number.parseFloat(String(value || '').trim());
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 function getWorld(id = state.selectedWorldId) { return WORLDS.find((world) => world.id === id) || WORLDS[0]; }
 function getSoundMode(id = 'night-temple') { return SOUND_MODES.find((mode) => mode.id === id) || SOUND_MODES[2]; }
@@ -402,6 +435,12 @@ function createAudioEngine() {
   let transientOscillators = [];
   let sessionId = 0;
   let currentWakePhase = WAKE_CURVE[0];
+  const musicMemory = {
+    lastRatios: [],
+    phraseIndex: 0,
+    lastPhraseAt: 0,
+    lastEventAt: 0
+  };
   function updateContextState() { audioState.audioContextState = ctx ? ctx.state : 'none'; return audioState.audioContextState; }
   function initContext() {
     if (ctx) return ctx;
@@ -503,8 +542,93 @@ function createAudioEngine() {
     const ratios = soundMode.droneRatios || soundMode.partialRatios || [1];
     return ratios[Math.floor(Math.random() * ratios.length)] || 1;
   }
+  function randomBetween(range, fallback = 1) {
+    if (!Array.isArray(range) || range.length < 2) return fallback;
+    return range[0] + Math.random() * (range[1] - range[0]);
+  }
+  function updateActiveOscillatorCount() {
+    audioState.activeOscillators = droneOscillators.length + transientOscillators.length;
+  }
+  function rememberRatio(ratio, limit = 5) {
+    musicMemory.lastRatios.push(Number(ratio));
+    while (musicMemory.lastRatios.length > limit) musicMemory.lastRatios.shift();
+  }
+  function ratioInMemory(ratio, limit = 5) {
+    return musicMemory.lastRatios.slice(-limit).some((candidate) => Math.abs(candidate - ratio) < 0.001);
+  }
+  function getRatioWeight(soundMode, ratio) {
+    const grammar = soundMode.strikeGrammar || [];
+    const found = grammar.find((candidate) => Math.abs((candidate.ratio || 1) - ratio) < 0.001);
+    return found ? Math.max(0.01, found.weight || 0.01) : 1;
+  }
+  function getWakeDensity(modeName) {
+    return modeName === 'ringing' ? clamp(currentWakePhase.audioDensity || 0, 0, 1) : 0;
+  }
+  function buildDefaultPhraseCells(soundMode) {
+    const grammar = (soundMode.strikeGrammar || soundMode.partialRatios.map((ratio) => ({ ratio, weight: 1 }))).slice();
+    const ranked = grammar.sort((a, b) => (b.weight || 0) - (a.weight || 0)).map((candidate) => candidate.ratio || 1);
+    const root = ranked.find((ratio) => Math.abs(ratio - 1) < 0.001) || ranked[0] || 1;
+    const color = ranked.find((ratio) => Math.abs(ratio - root) > 0.001) || root;
+    const octave = ranked.find((ratio) => Math.abs(ratio - 2) < 0.001) || ranked.find((ratio) => ratio > root && Math.abs(ratio - color) > 0.001) || color;
+    const low = ranked.find((ratio) => ratio < root) || root;
+    const high = ranked.find((ratio) => ratio > octave && getRatioWeight(soundMode, ratio) <= getRatioWeight(soundMode, root) * 0.55) || octave;
+    return [[root], [root, color], [root, octave], [low, root], [color, octave], [root, color, octave], [root, high]];
+  }
+  function getV2Profile(modeName, soundMode) {
+    const custom = soundMode.engineV2 || {};
+    const wakeDensity = getWakeDensity(modeName);
+    const defaultGaps = { bedside: [22000, 70000], object: [9000, 26000], ringing: [6500, 19000] };
+    const defaultRest = { bedside: 0.64, object: 0.36, ringing: 0.22 };
+    const defaultMax = { bedside: 1, object: 2, ringing: 3 };
+    const gapRange = (custom.phraseGapsMs && custom.phraseGapsMs[modeName]) || defaultGaps[modeName] || defaultGaps.object;
+    const ringingPull = modeName === 'ringing' ? clamp(1.12 - wakeDensity * 0.62, 0.46, 1.12) : 1;
+    const maxEventsBase = (custom.maxEventsPerPhrase && custom.maxEventsPerPhrase[modeName]) || defaultMax[modeName] || 2;
+    const restBase = (custom.restProbability && custom.restProbability[modeName] !== undefined) ? custom.restProbability[modeName] : (defaultRest[modeName] || 0.36);
+    return {
+      style: custom.style || 'canonical',
+      phraseGapsMs: [gapRange[0] * ringingPull, gapRange[1] * ringingPull],
+      restProbability: clamp(restBase - wakeDensity * 0.34, 0.05, 0.86),
+      maxEvents: clamp(Math.round(maxEventsBase + wakeDensity * 2), 1, 5),
+      attackSeconds: custom.attackSeconds || (custom.style === 'field' ? [3.5, 12] : [0.45, 2.2]),
+      releaseSeconds: custom.releaseSeconds || (custom.style === 'field' ? [10, 32] : [4, 18]),
+      gainScale: custom.gainScale || (custom.style === 'field' ? 0.55 : 0.82),
+      repeatMemory: custom.repeatMemory || 4,
+      phraseCells: custom.phraseCells || buildDefaultPhraseCells(soundMode)
+    };
+  }
+  function selectPhraseCell(modeName, soundMode, profile) {
+    const cutoff = modeName === 'bedside' ? (soundMode.nightSafeCutoff || 640) : Infinity;
+    const candidates = profile.phraseCells
+      .map((cell) => cell.filter((ratio) => soundMode.baseFrequency * ratio <= cutoff))
+      .filter((cell) => cell.length);
+    const cells = candidates.length ? candidates : [[1]];
+    const weighted = cells.map((cell) => {
+      const rarest = Math.min(...cell.map((ratio) => getRatioWeight(soundMode, ratio)));
+      const memoryPenalty = cell.some((ratio) => ratioInMemory(ratio, profile.repeatMemory)) ? 0.32 : 1;
+      const lengthPenalty = 1 / Math.max(1, cell.length * 0.72);
+      return { cell, weight: Math.max(0.01, rarest * memoryPenalty * lengthPenalty) };
+    });
+    const totalWeight = weighted.reduce((sum, candidate) => sum + candidate.weight, 0);
+    let cursor = Math.random() * (totalWeight || 1);
+    for (const candidate of weighted) {
+      cursor -= candidate.weight;
+      if (cursor <= 0) return candidate.cell.slice(0, profile.maxEvents);
+    }
+    return weighted[0].cell.slice(0, profile.maxEvents);
+  }
+  function registerTransientOscillator(osc, nodeCount, stopMs) {
+    transientOscillators.push(osc);
+    audioState.activeNodes += nodeCount;
+    updateActiveOscillatorCount();
+    window.setTimeout(() => {
+      transientOscillators = transientOscillators.filter((candidate) => candidate !== osc);
+      audioState.activeNodes = Math.max(0, audioState.activeNodes - nodeCount);
+      updateActiveOscillatorCount();
+    }, stopMs);
+  }
   function maybeScheduleBloom(modeName, soundMode, emphasis = 1) {
     if (!ctx || !modeGain) return;
+    if (soundMode.engineV2 && soundMode.engineV2.style === 'field') return;
     const shimmer = clamp(Number(state.settings.audio.shimmerAmount) || 0, 0, 1);
     const air = clamp(Number(state.settings.audio.airVolume) || 0, 0, 1);
     const modeMultiplier = modeName === 'bedside' ? 0.52 : modeName === 'ringing' ? 1.18 : 1;
@@ -537,12 +661,58 @@ function createAudioEngine() {
       osc.connect(filter); filter.connect(gain); gain.connect(modeGain);
     }
     osc.start(); osc.stop(at + 19);
-    transientOscillators.push(osc);
-    audioState.activeNodes += pan ? 4 : 3;
-    window.setTimeout(() => {
-      transientOscillators = transientOscillators.filter((candidate) => candidate !== osc);
-      audioState.activeNodes = Math.max(0, audioState.activeNodes - (pan ? 4 : 3));
-    }, 19200);
+    registerTransientOscillator(osc, pan ? 4 : 3, 19200);
+  }
+  function scheduleResonantEvent(modeName, world, soundMode, ratio, emphasis = 1) {
+    if (!ctx || !modeGain) return;
+    const profile = getV2Profile(modeName, soundMode);
+    const isField = profile.style === 'field';
+    const at = ctx.currentTime;
+    const wakeEmphasis = modeName === 'ringing' ? 0.62 + getWakeDensity(modeName) * 0.84 : 1;
+    const attack = randomBetween(profile.attackSeconds, isField ? 7 : 1);
+    const release = randomBetween(profile.releaseSeconds, isField ? 22 : 8);
+    const hold = isField ? randomBetween([1.5, 8], 4) : randomBetween([0.35, 2.5], 1);
+    const rawFrequency = soundMode.baseFrequency * ratio;
+    const cutoff = modeName === 'bedside' ? (soundMode.nightSafeCutoff || 640) : Math.min((soundMode.nightSafeCutoff || 900) * (isField ? 1 : 1.16), isField ? 720 : 1500);
+    if (modeName === 'bedside' && rawFrequency > cutoff) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    const modeScale = modeName === 'bedside' ? 0.56 : modeName === 'ringing' ? 0.92 : 0.78;
+    const fieldScale = isField ? 0.026 : 0.052;
+    const peak = clamp(fieldScale * profile.gainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isField ? 0.035 : 0.095);
+    const detuneCents = (Math.random() - 0.5) * (isField ? 5 : 10);
+    const upperTone = rawFrequency >= 130 && ratio >= 1.5;
+
+    osc.type = Math.random() > 0.72 && !isField ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(rawFrequency, at);
+    if (osc.detune) osc.detune.setValueAtTime(detuneCents, at);
+    filter.type = 'lowpass';
+    filter.frequency.value = Math.max(160, cutoff);
+    filter.Q.value = isField ? 0.32 : 0.45;
+    gain.gain.value = 0.0001;
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.linearRampToValueAtTime(peak, at + attack);
+    gain.gain.setTargetAtTime(0.0001, at + attack + hold, Math.max(1.2, release / 3));
+
+    if (pan) {
+      pan.pan.value = upperTone ? (Math.random() - 0.5) * (isField ? 0.24 : 0.42) : 0;
+      if (upperTone) pan.pan.setTargetAtTime(-pan.pan.value * 0.72, at + attack + hold, release * 0.55);
+      osc.connect(filter); filter.connect(gain); gain.connect(pan); pan.connect(modeGain);
+    } else {
+      osc.connect(filter); filter.connect(gain); gain.connect(modeGain);
+    }
+
+    const stopAt = at + attack + hold + release + 5;
+    osc.start(at);
+    osc.stop(stopAt);
+    rememberRatio(ratio, profile.repeatMemory);
+    musicMemory.lastEventAt = nowMs();
+    audioState.lastEventAt = musicMemory.lastEventAt;
+    registerTransientOscillator(osc, pan ? 4 : 3, Math.ceil((stopAt - at) * 1000) + 200);
+    maybeScheduleBloom(modeName, soundMode, emphasis * wakeEmphasis * 0.6);
   }
   function scheduleStrike(modeName, world, soundMode, emphasis = 1) {
     if (!ctx || !modeGain) return;
@@ -563,17 +733,15 @@ function createAudioEngine() {
     gain.gain.setTargetAtTime(0.0001, ctx.currentTime + 0.18, 1.9 + Math.random() * 1.4);
     osc.connect(filter); filter.connect(gain); gain.connect(modeGain);
     osc.start(); osc.stop(ctx.currentTime + 5);
-    transientOscillators.push(osc);
-    audioState.activeNodes += 3;
-    window.setTimeout(() => {
-      transientOscillators = transientOscillators.filter((candidate) => candidate !== osc);
-      audioState.activeNodes = Math.max(0, audioState.activeNodes - 3);
-    }, 5200);
+    registerTransientOscillator(osc, 3, 5200);
     maybeScheduleBloom(modeName, soundMode, emphasis * wakeEmphasis);
   }
   function startDrones(modeName, world, soundMode) {
     if (!ctx || !modeGain) return;
-    const ratios = (soundMode.droneRatios || soundMode.partialRatios).slice(0, modeName === 'bedside' ? 3 : 4);
+    const profile = getV2Profile(modeName, soundMode);
+    const isField = profile.style === 'field';
+    const ratios = (soundMode.droneRatios || soundMode.partialRatios).slice(0, modeName === 'bedside' ? 3 : isField ? 6 : 4);
+    const at = ctx.currentTime;
     ratios.forEach((ratio, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -581,7 +749,16 @@ function createAudioEngine() {
       osc.type = 'sine';
       const frequency = soundMode.baseFrequency * ratio;
       osc.frequency.value = frequency;
-      gain.gain.value = (modeName === 'bedside' ? 0.030 : 0.045) / (index + 1);
+      if (osc.detune) osc.detune.value = (Math.random() - 0.5) * (isField ? 4 : 7);
+      const baseGain = ((modeName === 'bedside' ? 0.022 : isField ? 0.034 : 0.038) * (isField ? profile.gainScale + 0.32 : 1)) / Math.sqrt(index + 1);
+      const breathDepth = index === 0 ? 0.035 : index < 3 ? 0.055 : 0.038;
+      const breathCycle = [8, 14, 25, 46, 96, 150, 220][index % 7];
+      let breathAt = at;
+      gain.gain.setValueAtTime(baseGain, at);
+      for (let step = 0; step < 8; step += 1) {
+        breathAt += breathCycle * (0.85 + Math.random() * 0.32);
+        gain.gain.linearRampToValueAtTime(baseGain * (1 - breathDepth + Math.random() * breathDepth * 2), breathAt);
+      }
       if (index === 0 && pan && audioState.binauralEnabled && soundMode.binaural.allowed) {
         const rightOsc = ctx.createOscillator();
         const rightGain = ctx.createGain();
@@ -599,10 +776,12 @@ function createAudioEngine() {
         osc.start(); rightOsc.start();
         droneOscillators.push(osc, rightOsc);
         audioState.activeNodes += 6;
+        updateActiveOscillatorCount();
         return;
       }
       if (pan) {
-        pan.pan.value = index % 2 === 0 ? -0.18 : 0.18;
+        pan.pan.value = frequency < 110 || index === 0 ? 0 : (index % 2 === 0 ? -0.16 : 0.16);
+        if (frequency >= 110) pan.pan.setTargetAtTime(-pan.pan.value * 0.65, at + 36 + index * 11, 80 + Math.random() * 90);
         osc.connect(gain); gain.connect(pan); pan.connect(modeGain);
       } else {
         osc.connect(gain); gain.connect(modeGain);
@@ -611,7 +790,39 @@ function createAudioEngine() {
       droneOscillators.push(osc);
       audioState.activeNodes += pan ? 3 : 2;
     });
-    audioState.activeOscillators = droneOscillators.length;
+    updateActiveOscillatorCount();
+  }
+  function scheduleNextPhrase(modeName, world, soundMode, nextSessionId, options = {}) {
+    const profile = getV2Profile(modeName, soundMode);
+    const phraseStartedAt = nowMs();
+    const shouldRest = options.allowRest !== false && Math.random() < profile.restProbability;
+    musicMemory.phraseIndex += 1;
+    musicMemory.lastPhraseAt = phraseStartedAt;
+    audioState.lastPhraseAt = phraseStartedAt;
+    if (modeName === 'ringing') syncWakePhase(getCurrentWakePhase());
+
+    if (!shouldRest) {
+      const cell = selectPhraseCell(modeName, soundMode, profile);
+      const eventCount = Math.min(profile.maxEvents, cell.length);
+      const eventGap = profile.style === 'field'
+        ? randomBetween(modeName === 'ringing' ? [3600, 11500] : [6200, 19000], 9000)
+        : randomBetween(modeName === 'ringing' ? [1800, 6200] : [3200, 9800], 5200);
+      cell.slice(0, eventCount).forEach((ratio, index) => {
+        const offset = index === 0 ? randomBetween([0, profile.style === 'field' ? 1700 : 650], 0) : eventGap * index * (0.82 + Math.random() * 0.42);
+        window.setTimeout(() => {
+          if (nextSessionId !== sessionId || !ctx || !modeGain) return;
+          if (ratioInMemory(ratio, profile.repeatMemory) && index > 0 && Math.random() < 0.42) return;
+          scheduleResonantEvent(modeName, world, soundMode, ratio, modeName === 'ringing' ? 1.2 : 1);
+        }, offset);
+      });
+    }
+
+    const gap = randomBetween(profile.phraseGapsMs, modeName === 'bedside' ? 42000 : 16000) * (0.82 + Math.random() * 0.46);
+    eventTimer = window.setTimeout(() => {
+      if (nextSessionId !== sessionId) return;
+      scheduleNextPhrase(modeName, world, soundMode, nextSessionId, { allowRest: true });
+    }, gap);
+    audioState.activeTimers = 1;
   }
   function startMode(modeName = 'object', options = {}) {
     try {
@@ -629,27 +840,37 @@ function createAudioEngine() {
       audioState.currentSoundModeId = soundMode.id;
       audioState.binauralEnabled = Boolean(state.settings.audio.binauralEnabled && soundMode.binaural.allowed);
       audioState.deltaHz = state.settings.audio.binauralDeltaHz;
+      audioState.engineStyle = options.engine === 'legacy' ? 'legacy' : 'v2-field';
       if (modeName === 'ringing') currentWakePhase = getCurrentWakePhase();
-      const density = options.density || (modeName === 'bedside' ? soundMode.bowlDensity * 0.55 : soundMode.bowlDensity);
-      const spacingBase = modeName === 'bedside' ? 6200 : modeName === 'ringing' ? 3000 : 4800;
-      const spacingPull = modeName === 'ringing' ? 1800 : 2200;
-      const spacingFloor = modeName === 'bedside' ? 3600 : modeName === 'ringing' ? 1400 : 2200;
       window.setTimeout(() => {
         if (nextSessionId !== sessionId) return;
         if (modeName === 'ringing') syncWakePhase(currentWakePhase);
         else setMasterTarget(modeName, options.intensity || 1, 0.30);
         startDrones(modeName, world, soundMode);
-        const scheduleNextStrike = () => {
-          if (nextSessionId !== sessionId) return;
-          if (modeName === 'ringing') syncWakePhase(getCurrentWakePhase());
-          const effectiveDensity = modeName === 'ringing' ? currentWakePhase.audioDensity : density;
-          const spacing = clamp(spacingBase - effectiveDensity * spacingPull, spacingFloor, 7600);
-          scheduleStrike(modeName, world, soundMode, modeName === 'ringing' ? 1.6 : 1);
-          const nextSpacing = spacing * (0.72 + Math.random() * 0.70);
-          eventTimer = window.setTimeout(scheduleNextStrike, nextSpacing);
-        };
-        audioState.activeTimers = 1;
-        eventTimer = window.setTimeout(scheduleNextStrike, 70);
+        if (options.engine === 'legacy') {
+          const density = options.density || (modeName === 'bedside' ? soundMode.bowlDensity * 0.55 : soundMode.bowlDensity);
+          const spacingBase = modeName === 'bedside' ? 6200 : modeName === 'ringing' ? 3000 : 4800;
+          const spacingPull = modeName === 'ringing' ? 1800 : 2200;
+          const spacingFloor = modeName === 'bedside' ? 3600 : modeName === 'ringing' ? 1400 : 2200;
+          const scheduleNextStrike = () => {
+            if (nextSessionId !== sessionId) return;
+            if (modeName === 'ringing') syncWakePhase(getCurrentWakePhase());
+            const effectiveDensity = modeName === 'ringing' ? currentWakePhase.audioDensity : density;
+            const spacing = clamp(spacingBase - effectiveDensity * spacingPull, spacingFloor, 7600);
+            scheduleStrike(modeName, world, soundMode, modeName === 'ringing' ? 1.6 : 1);
+            const nextSpacing = spacing * (0.72 + Math.random() * 0.70);
+            eventTimer = window.setTimeout(scheduleNextStrike, nextSpacing);
+          };
+          audioState.activeTimers = 1;
+          eventTimer = window.setTimeout(scheduleNextStrike, 70);
+        } else {
+          const firstPhraseDelay = modeName === 'bedside' ? randomBetween([16000, 38000], 24000) : modeName === 'ringing' ? 900 : randomBetween([4500, 14000], 8000);
+          audioState.activeTimers = 1;
+          eventTimer = window.setTimeout(() => {
+            if (nextSessionId !== sessionId) return;
+            scheduleNextPhrase(modeName, world, soundMode, nextSessionId, { allowRest: false });
+          }, firstPhraseDelay);
+        }
       }, wasPlaying ? 95 : 0);
       audioState.audioPlaybackState = 'playing';
       audioState.userFacingAudioState = 'PLAYING';
@@ -705,6 +926,10 @@ function createAudioEngine() {
       audioContextState: audioState.audioContextState,
       currentMode: audioState.currentMode,
       activeWorld: audioState.currentWorldId || state.selectedWorldId,
+      currentSoundModeId: audioState.currentSoundModeId,
+      engineStyle: audioState.engineStyle,
+      lastPhraseAt: audioState.lastPhraseAt,
+      lastEventAt: audioState.lastEventAt,
       modeGain: Number(audioState.modeGainValue.toFixed(4)),
       masterGainTarget: Number(audioState.masterGainValue.toFixed(4)),
       compressorEnabled: audioState.compressorEnabled,
@@ -1394,10 +1619,15 @@ function refreshDiagnostics(immediate = false) {
       audioPlaybackState: diagnostics.audioPlaybackState,
       audioContextState: diagnostics.audioContextState,
       activeWorld: diagnostics.activeWorld,
+      currentSoundModeId: diagnostics.currentSoundModeId,
+      engineStyle: diagnostics.engineStyle,
+      lastPhraseAt: diagnostics.lastPhraseAt,
+      lastEventAt: diagnostics.lastEventAt,
       modeGain: diagnostics.modeGain,
       masterGainTarget: diagnostics.masterGainTarget,
       compressorEnabled: diagnostics.compressorEnabled,
       activeNodes: diagnostics.activeNodes,
+      activeOscillators: diagnostics.activeOscillators,
       lastAudioError: diagnostics.lastAudioError,
       lastAudioStopReason: diagnostics.lastAudioStopReason,
       currentAudioSessionId: diagnostics.currentAudioSessionId,
