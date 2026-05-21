@@ -920,6 +920,10 @@ body.debug-grid .debug-grid-overlay { display: block; }
   .settings-header { grid-template-columns: 1fr auto; }
   .sheet-close { justify-self: start; }
   .settings-header .sheet-close { justify-self: end; }
+  body[data-mode="settings"] .sound-toggle-button {
+    top: calc(var(--safe-top) + var(--grid-margin) + 52px);
+    right: calc(var(--safe-right) + var(--grid-margin));
+  }
   .duration-row { top: calc(45% + clamp(54px, 18vw, 96px)); }
 }
 

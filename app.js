@@ -101,6 +101,7 @@ const visualState = {
   brightness: DEFAULT_STATE.settings.visualBrightness,
   audioIntensity: 0,
   wakeVisualIntensity: 0,
+  objectTapPulseUntil: 0,
   modeClarity: 0.82,
   apertureShape: 'circle'
 };
@@ -320,7 +321,9 @@ function createApertureRenderer(canvas) {
     const driftX = Math.sin(time * 0.00013) * r * 0.045;
     const driftY = Math.cos(time * 0.00011) * r * 0.035;
     const bedDim = mode === 'bedside' ? 0.72 : 1;
-    const glow = brightness * bedDim * (1 + wakeBoost * 0.24);
+    const tapPulse = mode === 'object' ? clamp((visualState.objectTapPulseUntil - time) / 620, 0, 1) : 0;
+    const pulseEase = tapPulse * tapPulse * (3 - 2 * tapPulse);
+    const glow = brightness * bedDim * (1 + wakeBoost * 0.24 + pulseEase * 0.34);
 
     fillCircle(cx, cy, r * 2.45, [
       [0, rgba(palette.spill, 0.030 * glow)],
@@ -357,6 +360,15 @@ function createApertureRenderer(canvas) {
       [0.82, rgba(palette.spill, 0.022 * glow)],
       [1, rgba(palette.outer, 0)]
     ], 'screen');
+
+    if (tapPulse > 0) {
+      fillCircle(cx, cy, r * (1.05 + (1 - tapPulse) * 0.42), [
+        [0, rgba(palette.outer, 0.060 * pulseEase)],
+        [0.38, rgba(palette.inner, 0.110 * pulseEase)],
+        [0.74, rgba(palette.spill, 0.052 * pulseEase)],
+        [1, rgba(palette.spill, 0)]
+      ], 'screen');
+    }
 
     if (gridOverlayEnabled) setRootCenter(cssW / 2, cssH / 2, r);
     if (running) rafId = window.requestAnimationFrame(draw);
@@ -1302,6 +1314,10 @@ function handleGlobalSoundToggle(event) {
   return playCurrentSoundFromGesture(event);
 }
 
+function triggerObjectTapPulse() {
+  visualState.objectTapPulseUntil = performance.now() + 620;
+}
+
 function handleSensoryPointerStart(event, mode) {
   sensoryPointer = { x: event.clientX, y: event.clientY, mode, at: nowMs(), pointerType: event.pointerType || 'mouse' };
   apertureTapToggleArmed = false;
@@ -1325,6 +1341,8 @@ function handleSensoryPointerEnd(event) {
     saveState();
     showToast(`Brightness ${next.toFixed(2)}`, 800);
   } else if (nowMs() - sensoryPointer.at < 380 && Math.hypot(dx, dy) < 12 && sensoryPointer.mode === 'object') {
+    triggerObjectTapPulse();
+    handleGlobalSoundToggle(event);
     revealObjectHint();
   }
   sensoryPointer = null;
