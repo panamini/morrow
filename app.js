@@ -94,7 +94,8 @@ const DEFAULT_STATE = {
       limiterCeiling: 0.72,
       binauralEnabled: true,
       binauralDeltaHz: 2,
-      soundMode: WORLD_DEFAULT_SOUND_MODE
+      soundMode: WORLD_DEFAULT_SOUND_MODE,
+      worldSoundModes: {}
     }
   }
 };
@@ -233,9 +234,12 @@ function parseCssPixels(value, fallback = 0) {
 }
 function getWorld(id = state.selectedWorldId) { return WORLDS.find((world) => world.id === id) || WORLDS[0]; }
 function getSoundMode(id = 'night-temple') { return SOUND_MODES.find((mode) => mode.id === id) || SOUND_MODES[2]; }
+function getWorldSoundModeId(world = getWorld()) {
+  const override = state.settings.audio.worldSoundModes?.[world.id];
+  return SOUND_MODES.some((mode) => mode.id === override) ? override : world.soundMode;
+}
 function getEffectiveSoundMode(world = getWorld()) {
-  const override = state.settings.audio.soundMode;
-  return getSoundMode(override === WORLD_DEFAULT_SOUND_MODE ? world.soundMode : override);
+  return getSoundMode(getWorldSoundModeId(world));
 }
 function recordError(scope, error) {
   const message = error && error.message ? error.message : String(error || 'Unknown error');
@@ -257,6 +261,13 @@ function validateState(candidate) {
     Object.assign(next.settings, candidate.settings);
     next.settings.audio = Object.assign(clone(DEFAULT_STATE.settings.audio), candidate.settings.audio || {});
   }
+  if (!next.settings.audio.worldSoundModes || typeof next.settings.audio.worldSoundModes !== 'object') next.settings.audio.worldSoundModes = {};
+  Object.keys(next.settings.audio.worldSoundModes).forEach((worldId) => {
+    const modeId = next.settings.audio.worldSoundModes[worldId];
+    const validWorld = WORLDS.some((world) => world.id === worldId);
+    const validMode = SOUND_MODES.some((mode) => mode.id === modeId);
+    if (!validWorld || !validMode) delete next.settings.audio.worldSoundModes[worldId];
+  });
   ['masterVolume', 'objectVolume', 'bedsideVolume', 'wakeVolume', 'airVolume', 'strikeVolume', 'shimmerAmount'].forEach((key) => {
     const value = Number(next.settings.audio[key]);
     next.settings.audio[key] = Number.isFinite(value) ? clamp(value, 0, 1) : DEFAULT_STATE.settings.audio[key];
@@ -266,6 +277,7 @@ function validateState(candidate) {
   const savedSchema = Number(candidate.schemaVersion) || 0;
   const soundModeIsValid = next.settings.audio.soundMode === WORLD_DEFAULT_SOUND_MODE || SOUND_MODES.some((mode) => mode.id === next.settings.audio.soundMode);
   if (!soundModeIsValid || savedSchema < 9) next.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
+  next.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
   next.settings.use24h = Boolean(next.settings.use24h);
   next.currentMode = 'object';
   next.schemaVersion = APP_SCHEMA_VERSION;
@@ -1590,7 +1602,7 @@ function populateSoundModes() {
   dom.soundModeSelect.textContent = '';
   const defaultOption = document.createElement('option');
   defaultOption.value = WORLD_DEFAULT_SOUND_MODE;
-  defaultOption.textContent = 'World default';
+  defaultOption.textContent = 'Built-in world track';
   dom.soundModeSelect.appendChild(defaultOption);
   SOUND_MODES.forEach((mode) => {
     const option = document.createElement('option'); option.value = mode.id; option.textContent = mode.name; dom.soundModeSelect.appendChild(option);
@@ -1600,9 +1612,10 @@ function syncSettingsControls(save = false) {
   const audio = state.settings.audio;
   const currentWorld = getWorld(state.selectedWorldId);
   const effectiveSoundMode = getEffectiveSoundMode(currentWorld);
-  dom.soundModeSelect.value = audio.soundMode;
+  const hasWorldOverride = Boolean(audio.worldSoundModes?.[currentWorld.id]);
+  dom.soundModeSelect.value = hasWorldOverride ? effectiveSoundMode.id : WORLD_DEFAULT_SOUND_MODE;
   if (dom.soundModeDescription) {
-    const worldPrefix = audio.soundMode === WORLD_DEFAULT_SOUND_MODE ? `${currentWorld.name} uses ${effectiveSoundMode.name}. ` : `Override: ${effectiveSoundMode.name}. `;
+    const worldPrefix = hasWorldOverride ? `${currentWorld.name} custom track: ${effectiveSoundMode.name}. ` : `${currentWorld.name} track: ${effectiveSoundMode.name}. `;
     dom.soundModeDescription.textContent = worldPrefix + effectiveSoundMode.description;
   }
   dom.binauralToggle.checked = Boolean(audio.binauralEnabled);
@@ -1799,10 +1812,13 @@ function bindEvents() {
     dom[id].addEventListener('input', () => { const key = id; state.settings.audio[key] = Number(dom[id].value); syncSettingsControls(true); });
   });
   dom.soundModeSelect.addEventListener('change', () => {
-    state.settings.audio.soundMode = dom.soundModeSelect.value;
+    const world = getWorld(state.selectedWorldId);
+    state.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
+    if (dom.soundModeSelect.value === WORLD_DEFAULT_SOUND_MODE) delete state.settings.audio.worldSoundModes[world.id];
+    else state.settings.audio.worldSoundModes[world.id] = dom.soundModeSelect.value;
     saveState();
     syncSettingsControls(false);
-    if (audioState.userFacingAudioState === 'PLAYING') ensureAudioEngine().crossfadeToWorld(getWorld(state.selectedWorldId));
+    if (audioState.userFacingAudioState === 'PLAYING') ensureAudioEngine().crossfadeToWorld(world);
   });
   dom.binauralToggle.addEventListener('change', () => { state.settings.audio.binauralEnabled = dom.binauralToggle.checked; saveState(); });
   dom.deltaSlider.addEventListener('input', () => { state.settings.audio.binauralDeltaHz = Number(dom.deltaSlider.value); syncSettingsControls(true); });
