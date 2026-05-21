@@ -60,7 +60,6 @@
   --clock-weight: 900;
 
   --wake-time-size: clamp(4.1rem, 9.2vw, 6.9rem);
-  --wake-digit-width: 1.72em;
   --wake-colon-width: auto;
   --wake-digit-gap: 0px;
   --wake-baseline-y: 50%;
@@ -579,11 +578,11 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   width: auto;
   transform: translateY(-1px);
 }
-.digit-zone { width: var(--wake-digit-width); min-height: clamp(108px, 18vw, 168px); display: grid; place-items: center; background: transparent; border: 0; padding: 0; touch-action: none; }
+.digit-zone { width: auto; min-width: 0; min-height: clamp(108px, 18vw, 168px); display: grid; place-items: center; background: transparent; border: 0; padding: 0; touch-action: none; }
 .digit-zone:focus-visible { outline: 0; }
 .digit-value {
   display: block;
-  width: var(--wake-digit-width);
+  width: auto;
   font-family: var(--clock-typeface);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "zero" 1;
@@ -599,7 +598,7 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
 }
 .digit-zone.is-selected .digit-value { opacity: .98; filter: blur(0); transform: scale(1); }
-.digit-colon { width: var(--wake-colon-width); margin: 0 -.015em; text-align: center; font-size: clamp(2.3rem, 4.8vw, 3.8rem); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.44); transform: translateY(-.03em); }
+.digit-colon { width: var(--wake-colon-width); margin: 0 .015em; text-align: center; font-size: clamp(2.3rem, 4.8vw, 3.8rem); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.44); transform: translateY(-.03em); }
 .wake-rail .world-word { color: var(--ink); }
 .inline-world-selector {
   position: absolute;
@@ -882,7 +881,7 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
 body.debug-grid .debug-grid-overlay { display: block; }
 
 @media (max-width: 680px) {
-  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-digit-width: 1.72em; --wake-colon-width: auto; --wake-digit-gap: 0px; }
+  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-colon-width: auto; --wake-digit-gap: 0px; }
   .command-rail {
     gap: clamp(10px, 3vw, 18px);
     padding: 0 var(--s-4);
