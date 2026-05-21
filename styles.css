@@ -598,7 +598,7 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
 }
 .digit-zone.is-selected .digit-value { opacity: .98; filter: blur(0); transform: scale(1); }
-.digit-colon { width: var(--wake-colon-width); margin: 0 .015em; text-align: center; font-size: clamp(2.3rem, 4.8vw, 3.8rem); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.44); transform: translateY(-.03em); }
+.digit-colon { width: var(--wake-colon-width); margin: 0 .015em; text-align: center; font-size: var(--wake-time-size); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.44); transform: none; }
 .wake-rail .world-word { color: var(--ink); }
 .inline-world-selector {
   position: absolute;
