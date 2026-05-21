@@ -122,6 +122,7 @@ let wakePointer = null;
 let wakeWorldPointer = null;
 let wakeSettleTimer = null;
 let wakeEntryGuardUntil = 0;
+let wakeLastEntryAt = 0;
 let worldPointer = null;
 let worldLongHoldTimer = null;
 let wheelWorldThrottleAt = 0;
@@ -1095,6 +1096,8 @@ function enterWorldFromGesture(event) {
 }
 
 function enterWakeFromGesture(event) {
+  if (nowMs() - wakeLastEntryAt < 220) return;
+  wakeLastEntryAt = nowMs();
   wakeEntryGuardUntil = nowMs() + 420;
   setMode('wakeSet', { keepAudio: true });
   playWakeSoundFromGesture(event);
@@ -1413,6 +1416,7 @@ function bindEvents() {
   dom.railBed.addEventListener('pointerdown', () => { setMode('bedside', { keepAudio: true }); });
   dom.railWake.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); });
   dom.railWake.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
+  dom.railWake.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
   if (dom.railWorld) dom.railWorld.addEventListener('pointerdown', (event) => { event.preventDefault(); enterWorldFromGesture(event); });
   dom.railSet.addEventListener('click', () => setMode('settings', { keepAudio: true }));
   dom.soundToggleButton.addEventListener('pointerdown', (event) => { event.preventDefault(); handleGlobalSoundToggle(event); });

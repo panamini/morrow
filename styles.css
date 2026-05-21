@@ -57,11 +57,11 @@
   --type-label-size: clamp(.74rem, 1.35vw, .92rem);
   --type-micro-size: clamp(.62rem, 1.05vw, .75rem);
   --clock-typeface: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-  --clock-weight: 820;
+  --clock-weight: 900;
 
   --wake-time-size: clamp(4.1rem, 9.2vw, 6.9rem);
-  --wake-digit-width: clamp(88px, 8.4vw, 118px);
-  --wake-colon-width: clamp(16px, 1.35vw, 22px);
+  --wake-digit-width: 2.05ch;
+  --wake-colon-width: .42em;
   --wake-digit-gap: 0px;
   --wake-baseline-y: 50%;
   --wake-hour-column: 3 / span 3;
@@ -415,6 +415,7 @@ body[data-audio="playing"] .object-audio-word { color: var(--ink); }
 }
 body[data-mode="bedside"].bedside-idle .bedside-clock {
   opacity: 0;
+  visibility: hidden;
   filter: blur(9px);
   transform: translate(-50%, -50%) scale(.98);
 }
@@ -486,6 +487,7 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
 .bedside-world-edge-next { right: calc(var(--safe-right) + var(--grid-margin)); }
 body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   opacity: 0;
+  visibility: hidden;
   filter: blur(6px);
   pointer-events: none;
 }
@@ -590,9 +592,9 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   letter-spacing: 0;
   font-weight: var(--clock-weight);
   color: var(--ink);
-  opacity: .66;
-  filter: blur(1.2px);
-  transform: scale(.98);
+  opacity: .98;
+  filter: blur(0);
+  transform: scale(1);
   text-shadow: 0 22px 94px rgba(0,0,0,.24);
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
 }
@@ -880,7 +882,7 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
 body.debug-grid .debug-grid-overlay { display: block; }
 
 @media (max-width: 680px) {
-  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-digit-width: 24vw; --wake-colon-width: 18px; --wake-digit-gap: 0px; }
+  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-digit-width: 2.05ch; --wake-colon-width: .42em; --wake-digit-gap: 0px; }
   .command-rail {
     gap: clamp(10px, 3vw, 18px);
     padding: 0 var(--s-4);
@@ -893,7 +895,7 @@ body.debug-grid .debug-grid-overlay { display: block; }
   }
   .command-rail:not(.is-current) {
     opacity: .74;
-    filter: blur(.6px);
+    filter: blur(0);
   }
   .command-rail.is-current {
     opacity: .98;
@@ -902,10 +904,15 @@ body.debug-grid .debug-grid-overlay { display: block; }
   .command-rail.is-current .rail-word:not(.is-active),
   .command-rail.is-current .rail-word.is-far,
   .command-rail.is-current:focus-within .rail-word:not(:focus-visible):not(:hover):not(.is-active) {
-    filter: blur(0);
+    filter: blur(0) !important;
   }
   .command-rail.is-current .rail-word:not(.is-active) { opacity: .62; }
   .command-rail.is-current .rail-word.is-far { opacity: .34; }
+  .command-rail .rail-word,
+  .command-rail .audio-word,
+  .command-rail .close-word {
+    filter: blur(0) !important;
+  }
   .rail-word, .audio-word, .close-word { font-size: .72rem; letter-spacing: .10em; }
   .object-audio-word { bottom: calc(var(--dock-bottom) + 78px); }
   .sheet { width: 100vw; padding-left: var(--grid-margin); padding-right: var(--grid-margin); }
