@@ -60,8 +60,8 @@
   --clock-weight: 900;
 
   --wake-time-size: clamp(4.1rem, 9.2vw, 6.9rem);
-  --wake-digit-width: 2.05ch;
-  --wake-colon-width: .42em;
+  --wake-digit-width: clamp(96px, 9.4vw, 132px);
+  --wake-colon-width: clamp(22px, 2vw, 30px);
   --wake-digit-gap: 0px;
   --wake-baseline-y: 50%;
   --wake-hour-column: 3 / span 3;
@@ -592,9 +592,9 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   letter-spacing: 0;
   font-weight: var(--clock-weight);
   color: var(--ink);
-  opacity: .98;
-  filter: blur(0);
-  transform: scale(1);
+  opacity: .58;
+  filter: blur(2.4px);
+  transform: scale(.98);
   text-shadow: 0 22px 94px rgba(0,0,0,.24);
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
 }
@@ -882,7 +882,7 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
 body.debug-grid .debug-grid-overlay { display: block; }
 
 @media (max-width: 680px) {
-  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-digit-width: 2.05ch; --wake-colon-width: .42em; --wake-digit-gap: 0px; }
+  :root { --grid-columns: 4; --grid-margin: clamp(14px, 5vw, 24px); --grid-gutter: 10px; --wake-time-size: clamp(3.9rem, 15vw, 6.1rem); --wake-digit-width: 28vw; --wake-colon-width: 22px; --wake-digit-gap: 0px; }
   .command-rail {
     gap: clamp(10px, 3vw, 18px);
     padding: 0 var(--s-4);
