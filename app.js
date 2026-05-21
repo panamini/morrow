@@ -577,9 +577,9 @@ function createAudioEngine() {
   function getV2Profile(modeName, soundMode) {
     const custom = soundMode.engineV2 || {};
     const wakeDensity = getWakeDensity(modeName);
-    const defaultGaps = { bedside: [22000, 70000], object: [9000, 26000], ringing: [6500, 19000] };
-    const defaultRest = { bedside: 0.64, object: 0.36, ringing: 0.22 };
-    const defaultMax = { bedside: 1, object: 2, ringing: 3 };
+    const defaultGaps = { bedside: [26000, 90000], object: [7000, 22000], ringing: [5000, 16000] };
+    const defaultRest = { bedside: 0.72, object: 0.28, ringing: 0.18 };
+    const defaultMax = { bedside: 1, object: 3, ringing: 4 };
     const gapRange = (custom.phraseGapsMs && custom.phraseGapsMs[modeName]) || defaultGaps[modeName] || defaultGaps.object;
     const ringingPull = modeName === 'ringing' ? clamp(1.12 - wakeDensity * 0.62, 0.46, 1.12) : 1;
     const maxEventsBase = (custom.maxEventsPerPhrase && custom.maxEventsPerPhrase[modeName]) || defaultMax[modeName] || 2;
@@ -589,7 +589,7 @@ function createAudioEngine() {
       phraseGapsMs: [gapRange[0] * ringingPull, gapRange[1] * ringingPull],
       restProbability: clamp(restBase - wakeDensity * 0.34, 0.05, 0.86),
       maxEvents: clamp(Math.round(maxEventsBase + wakeDensity * 2), 1, 5),
-      attackSeconds: custom.attackSeconds || (custom.style === 'field' ? [3.5, 12] : [0.45, 2.2]),
+      attackSeconds: custom.attackSeconds || (custom.style === 'field' ? [3.5, 12] : [0.25, 1.6]),
       releaseSeconds: custom.releaseSeconds || (custom.style === 'field' ? [10, 32] : [4, 18]),
       gainScale: custom.gainScale || (custom.style === 'field' ? 0.55 : 0.82),
       repeatMemory: custom.repeatMemory || 4,
@@ -605,8 +605,8 @@ function createAudioEngine() {
     const weighted = cells.map((cell) => {
       const rarest = Math.min(...cell.map((ratio) => getRatioWeight(soundMode, ratio)));
       const memoryPenalty = cell.some((ratio) => ratioInMemory(ratio, profile.repeatMemory)) ? 0.32 : 1;
-      const lengthPenalty = 1 / Math.max(1, cell.length * 0.72);
-      return { cell, weight: Math.max(0.01, rarest * memoryPenalty * lengthPenalty) };
+      const lengthBonus = profile.style === 'field' ? (cell.length === 1 ? 0.72 : 1 + cell.length * 0.2) : (cell.length === 1 ? 0.34 : 1 + cell.length * 0.28);
+      return { cell, weight: Math.max(0.01, rarest * memoryPenalty * lengthBonus) };
     });
     const totalWeight = weighted.reduce((sum, candidate) => sum + candidate.weight, 0);
     let cursor = Math.random() * (totalWeight || 1);
@@ -750,7 +750,7 @@ function createAudioEngine() {
       const frequency = soundMode.baseFrequency * ratio;
       osc.frequency.value = frequency;
       if (osc.detune) osc.detune.value = (Math.random() - 0.5) * (isField ? 4 : 7);
-      const baseGain = ((modeName === 'bedside' ? 0.022 : isField ? 0.034 : 0.038) * (isField ? profile.gainScale + 0.32 : 1)) / Math.sqrt(index + 1);
+      const baseGain = ((modeName === 'bedside' ? 0.015 : isField ? 0.022 : 0.026) * (isField ? profile.gainScale + 0.24 : 1)) / Math.sqrt(index + 1);
       const breathDepth = index === 0 ? 0.035 : index < 3 ? 0.055 : 0.038;
       const breathCycle = [8, 14, 25, 46, 96, 150, 220][index % 7];
       let breathAt = at;
@@ -802,11 +802,21 @@ function createAudioEngine() {
     if (modeName === 'ringing') syncWakePhase(getCurrentWakePhase());
 
     if (!shouldRest) {
-      const cell = selectPhraseCell(modeName, soundMode, profile);
+      let cell = selectPhraseCell(modeName, soundMode, profile);
+      if (profile.style !== 'field' && cell.length === 1) {
+        const fallbackRatios = (soundMode.strikeGrammar || soundMode.partialRatios.map((ratio) => ({ ratio, weight: 1 })))
+          .map((candidate) => candidate.ratio || 1)
+          .filter((ratio) => Math.abs(ratio - cell[0]) > 0.001)
+          .filter((ratio) => !ratioInMemory(ratio, profile.repeatMemory));
+        if (fallbackRatios.length && Math.random() < 0.82) {
+          const chosen = fallbackRatios[Math.floor(Math.random() * Math.min(3, fallbackRatios.length))];
+          cell = [cell[0], chosen];
+        }
+      }
       const eventCount = Math.min(profile.maxEvents, cell.length);
       const eventGap = profile.style === 'field'
-        ? randomBetween(modeName === 'ringing' ? [3600, 11500] : [6200, 19000], 9000)
-        : randomBetween(modeName === 'ringing' ? [1800, 6200] : [3200, 9800], 5200);
+        ? randomBetween(modeName === 'ringing' ? [2800, 9800] : [5200, 17000], 9000)
+        : randomBetween(modeName === 'ringing' ? [1400, 5200] : [2200, 7600], 5200);
       cell.slice(0, eventCount).forEach((ratio, index) => {
         const offset = index === 0 ? randomBetween([0, profile.style === 'field' ? 1700 : 650], 0) : eventGap * index * (0.82 + Math.random() * 0.42);
         window.setTimeout(() => {
@@ -864,7 +874,7 @@ function createAudioEngine() {
           audioState.activeTimers = 1;
           eventTimer = window.setTimeout(scheduleNextStrike, 70);
         } else {
-          const firstPhraseDelay = modeName === 'bedside' ? randomBetween([16000, 38000], 24000) : modeName === 'ringing' ? 900 : randomBetween([4500, 14000], 8000);
+          const firstPhraseDelay = modeName === 'bedside' ? randomBetween([12000, 28000], 24000) : modeName === 'ringing' ? 700 : randomBetween([2200, 7000], 5000);
           audioState.activeTimers = 1;
           eventTimer = window.setTimeout(() => {
             if (nextSessionId !== sessionId) return;
