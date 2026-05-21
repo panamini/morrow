@@ -1411,7 +1411,8 @@ function bindEvents() {
   dom.bedsideGestureSurface.addEventListener('pointerup', handleSensoryPointerEnd);
 
   dom.railBed.addEventListener('pointerdown', () => { setMode('bedside', { keepAudio: true }); });
-  dom.railWake.addEventListener('click', (event) => { event.preventDefault(); enterWakeFromGesture(event); });
+  dom.railWake.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); });
+  dom.railWake.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
   if (dom.railWorld) dom.railWorld.addEventListener('pointerdown', (event) => { event.preventDefault(); enterWorldFromGesture(event); });
   dom.railSet.addEventListener('click', () => setMode('settings', { keepAudio: true }));
   dom.soundToggleButton.addEventListener('pointerdown', (event) => { event.preventDefault(); handleGlobalSoundToggle(event); });

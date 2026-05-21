@@ -414,9 +414,9 @@ body[data-audio="playing"] .object-audio-word { color: var(--ink); }
   transition: opacity .9s cubic-bezier(.2,.75,.18,1), filter .9s cubic-bezier(.2,.75,.18,1), transform .9s cubic-bezier(.2,.75,.18,1);
 }
 body[data-mode="bedside"].bedside-idle .bedside-clock {
-  opacity: .10;
-  filter: blur(7px);
-  transform: translate(-50%, -50%) scale(.985);
+  opacity: 0;
+  filter: blur(9px);
+  transform: translate(-50%, -50%) scale(.98);
 }
 .breath-dot {
   position: absolute;
@@ -484,6 +484,11 @@ body[data-mode="bedside"].bedside-idle .bedside-rail { opacity: 0; pointer-event
 }
 .bedside-world-edge-prev { left: calc(var(--safe-left) + var(--grid-margin)); }
 .bedside-world-edge-next { right: calc(var(--safe-right) + var(--grid-margin)); }
+body[data-mode="bedside"].bedside-idle .bedside-world-edge {
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
 .bedside-panel:hover .bedside-world-edge,
 .bedside-panel:focus-within .bedside-world-edge,
 .bedside-world-edge:hover,
@@ -894,6 +899,13 @@ body.debug-grid .debug-grid-overlay { display: block; }
     opacity: .98;
     filter: blur(0);
   }
+  .command-rail.is-current .rail-word:not(.is-active),
+  .command-rail.is-current .rail-word.is-far,
+  .command-rail.is-current:focus-within .rail-word:not(:focus-visible):not(:hover):not(.is-active) {
+    filter: blur(0);
+  }
+  .command-rail.is-current .rail-word:not(.is-active) { opacity: .62; }
+  .command-rail.is-current .rail-word.is-far { opacity: .34; }
   .rail-word, .audio-word, .close-word { font-size: .72rem; letter-spacing: .10em; }
   .object-audio-word { bottom: calc(var(--dock-bottom) + 78px); }
   .sheet { width: 100vw; padding-left: var(--grid-margin); padding-right: var(--grid-margin); }
