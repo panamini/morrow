@@ -301,10 +301,10 @@ body[data-audio="playing"] .object-audio-word { color: var(--ink); }
 .corner-set-button {
   position: absolute;
   left: calc(var(--safe-left) + var(--grid-margin));
-  bottom: calc(var(--dock-bottom) + var(--s-2));
+  bottom: calc(var(--dock-bottom) + var(--s-2) + 9px);
   z-index: 9;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 54px;
+  min-height: 40px;
   border-radius: 999px;
   border: 1px solid rgba(250,248,239,.07);
   background: rgba(10,10,9,.10);
