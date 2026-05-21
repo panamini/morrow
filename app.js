@@ -31,7 +31,7 @@ const SOUND_MODES = [
     description: 'C#-dominant F# 6/9 drone: deep, almost still, no beat, slow room pressure.',
     baseFrequency: 69.31,
     partialRatios: [0.667, 1, 1.5, 2, 2.667, 3, 3.375, 4, 4.5],
-    droneRatios: [1, 0.667, 2, 1.5, 2.667, 4],
+    droneRatios: [2, 2.667, 3, 4],
     strikeGrammar: [{ ratio: 1, weight: 10 }, { ratio: 2, weight: 7 }, { ratio: 1.5, weight: 5 }, { ratio: 2.667, weight: 3 }, { ratio: 4, weight: 2 }, { ratio: 3, weight: 1.5 }, { ratio: 3.375, weight: 0.35 }, { ratio: 4.5, weight: 0.30 }, { ratio: 0.667, weight: 0.25 }],
     bowlDensity: 0.025,
     shimmerProbability: 0.005,
@@ -40,12 +40,12 @@ const SOUND_MODES = [
     ritualLabel: 'C#-anchored F# 6/9 drone reference',
     engineV2: {
       style: 'field',
-      phraseGapsMs: { bedside: [38000, 110000], object: [26000, 85000], ringing: [9000, 38000] },
-      restProbability: { bedside: 0.72, object: 0.58, ringing: 0.32 },
-      maxEventsPerPhrase: { bedside: 1, object: 2, ringing: 3 },
-      attackSeconds: [4.5, 16],
-      releaseSeconds: [12, 42],
-      gainScale: 0.45,
+      phraseGapsMs: { bedside: [24000, 70000], object: [5000, 14000], ringing: [3200, 12000] },
+      restProbability: { bedside: 0.38, object: 0.05, ringing: 0.04 },
+      maxEventsPerPhrase: { bedside: 2, object: 4, ringing: 4 },
+      attackSeconds: [0.35, 2.8],
+      releaseSeconds: [5, 18],
+      gainScale: 1.3,
       repeatMemory: 5,
       phraseCells: [[1, 1.5], [1, 2], [1, 2, 1.5], [0.667, 1], [1, 2.667], [1, 2, 4], [1.5, 2], [1, 3.375], [1, 4.5]]
     }
@@ -681,8 +681,8 @@ function createAudioEngine() {
     const filter = ctx.createBiquadFilter();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
     const modeScale = modeName === 'bedside' ? 0.56 : modeName === 'ringing' ? 0.92 : 0.78;
-    const fieldScale = isField ? 0.026 : 0.052;
-    const peak = clamp(fieldScale * profile.gainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isField ? 0.035 : 0.095);
+    const fieldScale = isField ? 0.078 : 0.052;
+    const peak = clamp(fieldScale * profile.gainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isField ? 0.085 : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isField ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
 
@@ -750,7 +750,7 @@ function createAudioEngine() {
       const frequency = soundMode.baseFrequency * ratio;
       osc.frequency.value = frequency;
       if (osc.detune) osc.detune.value = (Math.random() - 0.5) * (isField ? 4 : 7);
-      const baseGain = ((modeName === 'bedside' ? 0.015 : isField ? 0.022 : 0.026) * (isField ? profile.gainScale + 0.24 : 1)) / Math.sqrt(index + 1);
+      const baseGain = ((modeName === 'bedside' ? 0.010 : isField ? 0.013 : 0.026) * (isField ? profile.gainScale + 0.12 : 1)) / Math.sqrt(index + 1);
       const breathDepth = index === 0 ? 0.035 : index < 3 ? 0.055 : 0.038;
       const breathCycle = [8, 14, 25, 46, 96, 150, 220][index % 7];
       let breathAt = at;
@@ -874,7 +874,7 @@ function createAudioEngine() {
           audioState.activeTimers = 1;
           eventTimer = window.setTimeout(scheduleNextStrike, 70);
         } else {
-          const firstPhraseDelay = modeName === 'bedside' ? randomBetween([12000, 28000], 24000) : modeName === 'ringing' ? 700 : randomBetween([2200, 7000], 5000);
+          const firstPhraseDelay = modeName === 'bedside' ? randomBetween([5000, 14000], 9000) : modeName === 'ringing' ? 500 : randomBetween([300, 1300], 700);
           audioState.activeTimers = 1;
           eventTimer = window.setTimeout(() => {
             if (nextSessionId !== sessionId) return;
@@ -1293,6 +1293,7 @@ function closeWakeSet() {
 function applyWorld(world) {
   if (!world) return null;
   state.selectedWorldId = world.id;
+  state.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
   worldSelectionState.activeWorld = world.id;
   worldSelectionState.selectedWorld = world.id;
   worldSelectionState.focusedWorld = world.id;
