@@ -121,6 +121,7 @@ let durationPointer = null;
 let wakePointer = null;
 let wakeWorldPointer = null;
 let wakeSettleTimer = null;
+let wakeEntryGuardUntil = 0;
 let worldPointer = null;
 let worldLongHoldTimer = null;
 let wheelWorldThrottleAt = 0;
@@ -1030,8 +1031,14 @@ function markWakeInteraction() {
 }
 
 function confirmWakeSet() {
+  if (isWakeEntryGuardActive()) return;
   saveState();
   showToast(`Wake ${state.alarm.time}`, 1100);
+  setMode('object', { keepAudio: true });
+}
+
+function closeWakeSet() {
+  if (isWakeEntryGuardActive()) return;
   setMode('object', { keepAudio: true });
 }
 
@@ -1088,8 +1095,13 @@ function enterWorldFromGesture(event) {
 }
 
 function enterWakeFromGesture(event) {
+  wakeEntryGuardUntil = nowMs() + 420;
   setMode('wakeSet', { keepAudio: true });
   playWakeSoundFromGesture(event);
+}
+
+function isWakeEntryGuardActive() {
+  return state.currentMode === 'wakeSet' && nowMs() < wakeEntryGuardUntil;
 }
 
 function setWorldByStep(step, context = state.currentMode, event = null) {
@@ -1399,7 +1411,7 @@ function bindEvents() {
   dom.bedsideGestureSurface.addEventListener('pointerup', handleSensoryPointerEnd);
 
   dom.railBed.addEventListener('pointerdown', () => { setMode('bedside', { keepAudio: true }); });
-  dom.railWake.addEventListener('pointerdown', (event) => { event.preventDefault(); enterWakeFromGesture(event); });
+  dom.railWake.addEventListener('click', (event) => { event.preventDefault(); enterWakeFromGesture(event); });
   if (dom.railWorld) dom.railWorld.addEventListener('pointerdown', (event) => { event.preventDefault(); enterWorldFromGesture(event); });
   dom.railSet.addEventListener('click', () => setMode('settings', { keepAudio: true }));
   dom.soundToggleButton.addEventListener('pointerdown', (event) => { event.preventDefault(); handleGlobalSoundToggle(event); });
@@ -1440,8 +1452,8 @@ function bindEvents() {
     window.setTimeout(() => dom.durationRow && dom.durationRow.classList.remove('is-focused'), 900);
   });
 
-  dom.wakeCloseButton.addEventListener('click', () => setMode('object', { keepAudio: true }));
-  dom.wakeRailClose.addEventListener('click', () => setMode('object', { keepAudio: true }));
+  dom.wakeCloseButton.addEventListener('click', closeWakeSet);
+  dom.wakeRailClose.addEventListener('click', closeWakeSet);
   dom.wakeSetConfirmButton.addEventListener('click', confirmWakeSet);
   dom.wakeHour.addEventListener('click', () => setActiveSetter('hour'));
   dom.wakeMinute.addEventListener('click', () => setActiveSetter('minute'));
