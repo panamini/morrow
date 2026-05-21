@@ -47,7 +47,7 @@ const SOUND_MODES = [
       releaseSeconds: [12, 42],
       gainScale: 0.45,
       repeatMemory: 5,
-      phraseCells: [[1], [1, 1.5], [1, 2], [1, 2, 1.5], [0.667, 1], [1, 2.667], [1, 2, 4], [1.5, 2], [1, 3.375], [1, 4.5]]
+      phraseCells: [[1, 1.5], [1, 2], [1, 2, 1.5], [0.667, 1], [1, 2.667], [1, 2, 4], [1.5, 2], [1, 3.375], [1, 4.5]]
     }
   }
 ];
@@ -572,7 +572,7 @@ function createAudioEngine() {
     const octave = ranked.find((ratio) => Math.abs(ratio - 2) < 0.001) || ranked.find((ratio) => ratio > root && Math.abs(ratio - color) > 0.001) || color;
     const low = ranked.find((ratio) => ratio < root) || root;
     const high = ranked.find((ratio) => ratio > octave && getRatioWeight(soundMode, ratio) <= getRatioWeight(soundMode, root) * 0.55) || octave;
-    return [[root], [root, color], [root, octave], [low, root], [color, octave], [root, color, octave], [root, high]];
+    return [[root, color], [root, octave], [low, root], [color, octave], [root, color, octave], [root, high]];
   }
   function getV2Profile(modeName, soundMode) {
     const custom = soundMode.engineV2 || {};
