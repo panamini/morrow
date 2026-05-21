@@ -37,12 +37,12 @@ const WORLDS = [
 ];
 
 const WAKE_CURVE = [
-  { atMinute: 0, name: 'firstLight', visualIntensity: 0.10, audioDensity: 0.05, masterGainTarget: 0.16, layers: ['air'] },
-  { atMinute: 3, name: 'bodyReturns', visualIntensity: 0.22, audioDensity: 0.14, masterGainTarget: 0.23, layers: ['air', 'lowDrone'] },
-  { atMinute: 6, name: 'gentleResonance', visualIntensity: 0.36, audioDensity: 0.28, masterGainTarget: 0.34, layers: ['air', 'lowDrone', 'bowlPartials'] },
-  { atMinute: 9, name: 'clearWake', visualIntensity: 0.52, audioDensity: 0.42, masterGainTarget: 0.46, layers: ['air', 'drone', 'bowlPartials', 'softBloom'] },
-  { atMinute: 12, name: 'morningPresence', visualIntensity: 0.68, audioDensity: 0.60, masterGainTarget: 0.56, layers: ['air', 'drone', 'partials', 'bloom', 'pulse'] },
-  { atMinute: 27, name: 'persistentMorning', visualIntensity: 0.82, audioDensity: 0.76, masterGainTarget: 0.66, layers: ['air', 'drone', 'partials', 'bloom', 'pulse', 'clearBell'] }
+  { atMinute: 0, name: 'firstLight', visualIntensity: 0.10, audioDensity: 0.05, masterGainTarget: 0.22, layers: ['air'] },
+  { atMinute: 3, name: 'bodyReturns', visualIntensity: 0.22, audioDensity: 0.14, masterGainTarget: 0.29, layers: ['air', 'lowDrone'] },
+  { atMinute: 6, name: 'gentleResonance', visualIntensity: 0.36, audioDensity: 0.28, masterGainTarget: 0.40, layers: ['air', 'lowDrone', 'bowlPartials'] },
+  { atMinute: 9, name: 'clearWake', visualIntensity: 0.52, audioDensity: 0.42, masterGainTarget: 0.51, layers: ['air', 'drone', 'bowlPartials', 'softBloom'] },
+  { atMinute: 12, name: 'morningPresence', visualIntensity: 0.68, audioDensity: 0.60, masterGainTarget: 0.61, layers: ['air', 'drone', 'partials', 'bloom', 'pulse'] },
+  { atMinute: 27, name: 'persistentMorning', visualIntensity: 0.82, audioDensity: 0.76, masterGainTarget: 0.70, layers: ['air', 'drone', 'partials', 'bloom', 'pulse', 'clearBell'] }
 ];
 
 const DEFAULT_STATE = {
@@ -59,9 +59,9 @@ const DEFAULT_STATE = {
     use24h: true,
     audio: {
       masterVolume: 0.90,
-      objectVolume: 0.82,
-      bedsideVolume: 0.62,
-      wakeVolume: 0.86,
+      objectVolume: 0.88,
+      bedsideVolume: 0.68,
+      wakeVolume: 0.95,
       airVolume: 0.55,
       strikeVolume: 0.72,
       shimmerAmount: 0.34,
