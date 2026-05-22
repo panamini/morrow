@@ -407,16 +407,16 @@ body[data-audio="playing"] .object-audio-word { color: var(--ink); }
   background: transparent;
   color: rgba(250,248,239,.58);
   opacity: .36;
-  filter: blur(.9px);
-  transition: opacity .22s ease, filter .22s ease, transform .18s ease, color .22s ease;
+  filter: none;
+  transition: opacity .22s ease, transform .18s ease, color .22s ease;
 }
 .sound-toggle-button.is-on {
   color: var(--ink);
   opacity: .76;
-  filter: blur(0);
 }
+.sound-toggle-button svg { display: block; }
 .sound-toggle-button::before { content: none; }
-.sound-toggle-button:hover, .sound-toggle-button:focus-visible { opacity: 1; filter: blur(0); color: var(--ink); }
+.sound-toggle-button:hover, .sound-toggle-button:focus-visible { opacity: 1; color: var(--ink); }
 .sound-toggle-button:active { transform: scale(.94); }
 
 /* Bedside sealed mode. */
