@@ -7,20 +7,22 @@
   <meta name="description" content="Dawn Chamber — an orbital chromatic bedside object for light, sound, sleep and waking.">
   <title>Dawn Chamber</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=20260522-wake-focus">
+  <link rel="stylesheet" href="styles.css?v=20260522-clock-stable-bed-idle">
 </head>
 <body data-mode="object" data-audio="stopped">
   <canvas id="apertureCanvas" aria-hidden="true"></canvas>
   <div id="grain" aria-hidden="true"></div>
   <div id="debugGridOverlay" class="debug-grid-overlay" aria-hidden="true"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <button id="soundToggleButton" class="sound-toggle-button" type="button" aria-label="Sound off. Tap to play." aria-pressed="false">OFF</button>
+  <button id="soundToggleButton" class="sound-toggle-button" type="button" aria-label="Sound off. Tap to play." aria-pressed="false">
+    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>
+  </button>
 
   <main id="app" class="app-shell">
     <section id="objectPanel" class="panel object-panel is-active" aria-label="Dawn Chamber object">
       <button id="objectGestureSurface" class="gesture-surface" type="button" aria-label="Dawn Chamber object. Swipe to change world.">
         <time id="objectTime" class="time-memory">--:--</time>
-        <span id="nextWake" class="wake-memory">07:30</span>
+        <span id="nextWake" class="wake-memory">WAKE -- · ON</span>
       </button>
       <nav id="objectRail" class="command-rail object-rail" aria-label="Primary navigation">
         <button id="railBed" class="rail-word" type="button" aria-label="Enter bedside">BED</button>
@@ -32,24 +34,30 @@
     <section id="bedsidePanel" class="panel bedside-panel immersive" aria-label="Bedside mode" hidden>
       <button id="bedsideGestureSurface" class="gesture-surface" type="button" aria-label="Bedside. Tap to reveal controls. Swipe vertically for brightness.">
         <time id="bedsideTime" class="bedside-clock">--:--</time>
+        <span id="bedsideWakeMemory" class="bedside-wake-memory">WAKE -- · ON</span>
         <span id="bedsideSoundBreath" class="breath-dot" aria-hidden="true"></span>
       </button>
-      <button id="bedsideWorldPrev" class="world-step-button bedside-world-edge bedside-world-edge-prev" type="button" aria-label="Previous bedside world">&lt;</button>
-      <button id="bedsideWorldNext" class="world-step-button bedside-world-edge bedside-world-edge-next" type="button" aria-label="Next bedside world">&gt;</button>
-      <div id="durationRow" class="duration-row" role="group" aria-label="Sleep duration. Swipe or tap to change.">
-        <button class="duration-option" data-duration="10m" type="button">10</button>
-        <button class="duration-option" data-duration="15m" type="button">15</button>
-        <button class="duration-option is-selected" data-duration="30m" type="button">30</button>
-        <button class="duration-option" data-duration="1h" type="button">1h</button>
-        <button class="duration-option" data-duration="night" type="button">night</button>
+      <button id="bedsideWorldPrev" class="world-step-button bedside-world-edge bedside-world-edge-prev" type="button" aria-label="Previous bedside world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 19.5-7.5-7.5 7.5-7.5"/></svg></button>
+      <button id="bedsideWorldNext" class="world-step-button bedside-world-edge bedside-world-edge-next" type="button" aria-label="Next bedside world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
+      <div id="bedSessionSummary" class="bedside-program-button" aria-live="polite">
+        <span>Current World</span>
+        <small>continuous or timed</small>
       </div>
+      <div id="durationRow" class="duration-row" role="group" aria-label="Bedside session. Swipe or tap to change.">
+        <button class="duration-option" data-session="infinite" type="button">∞</button>
+        <button class="duration-option" data-session="10m" type="button">10</button>
+        <button class="duration-option is-selected" data-session="30m" type="button">30</button>
+        <button class="duration-option" data-session="1h" type="button">1h</button>
+        <button class="duration-option" data-session="night-passage" type="button">night</button>
+      </div>
+      <button id="bedsideExitButton" class="mode-back-button" type="button" aria-label="Back to home"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg></button>
       <nav id="bedsideRail" class="command-rail bedside-rail" aria-label="Bedside controls">
-        <button id="bedsideExitButton" class="rail-word is-close" type="button" aria-label="Close bedside">CLOSE</button>
+        <button id="bedsideSetButton" class="rail-word is-active" type="button">START</button>
       </nav>
     </section>
 
     <section id="wakeSetPanel" class="panel wake-set-panel" aria-label="Set wake time" hidden>
-      <button id="wakeCloseButton" class="close-word" type="button" aria-label="Close wake setting">CLOSE</button>
+      <button id="wakeCloseButton" class="mode-back-button" type="button" aria-label="Back to home"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg></button>
       <div id="wakeGestureArea" class="wake-stage" aria-label="Wake time selector. Inner ring sets hours. Outer ring sets minutes.">
         <div id="minuteRing" class="orbital-ring minute-ring" aria-label="Outer minute ring"></div>
         <div id="hourRing" class="orbital-ring hour-ring" aria-label="Inner hour ring"></div>
@@ -61,15 +69,14 @@
       </div>
       <div id="wakeWorldSelector" class="inline-world-selector" aria-label="Wake world selector">
         <div class="inline-world-copy">
+          <span class="inline-world-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m7-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></span>
           <span id="wakeWorldName" class="inline-world-name">Milk Blue</span>
-          <span class="inline-world-hint">Swipe or tap arrows</span>
         </div>
       </div>
-      <button id="wakeWorldPrev" class="world-step-button wake-world-edge wake-world-edge-prev" type="button" aria-label="Previous wake world">&lt;</button>
-      <button id="wakeWorldNext" class="world-step-button wake-world-edge wake-world-edge-next" type="button" aria-label="Next wake world">&gt;</button>
+      <button id="wakeWorldPrev" class="world-step-button wake-world-edge wake-world-edge-prev" type="button" aria-label="Previous wake world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 19.5-7.5-7.5 7.5-7.5"/></svg></button>
+      <button id="wakeWorldNext" class="world-step-button wake-world-edge wake-world-edge-next" type="button" aria-label="Next wake world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
       <nav id="wakeRail" class="command-rail wake-rail" aria-label="Wake controls">
-        <button id="wakeRailClose" class="rail-word" type="button">CLOSE</button>
-        <button id="wakeSetConfirmButton" class="rail-word is-active" type="button">SET</button>
+        <button id="wakeSetConfirmButton" class="rail-word is-active" type="button">ON</button>
       </nav>
     </section>
 
@@ -77,11 +84,10 @@
       <button id="worldsCloseButton" class="close-word world-close" type="button" aria-label="Close worlds">CLOSE</button>
       <div id="wakeWorldMemory" class="wake-world-memory" aria-live="polite"></div>
       <div id="worldConstellation" class="world-constellation" role="group" aria-label="World constellation. Tap or swipe to choose a world, then use it."></div>
-      <button id="worldPrevButton" class="world-screen-step world-screen-prev" type="button" aria-label="Previous world">&lt;</button>
-      <button id="worldNextButton" class="world-screen-step world-screen-next" type="button" aria-label="Next world">&gt;</button>
+      <button id="worldPrevButton" class="world-screen-step world-screen-prev" type="button" aria-label="Previous world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 19.5-7.5-7.5 7.5-7.5"/></svg></button>
+      <button id="worldNextButton" class="world-screen-step world-screen-next" type="button" aria-label="Next world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
       <div id="worldCopy" class="world-copy">
         <div id="worldConstellationName" class="world-name-readout" aria-live="polite">Milk Blue</div>
-        <div id="worldHint" class="world-hint">Swipe or tap arrows to change</div>
       </div>
       <nav id="worldRail" class="command-rail world-rail" aria-label="World controls">
         <button id="worldBackButton" class="rail-word" type="button">CLOSE</button>
@@ -206,6 +212,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=20260522-night-nest"></script>
+  <script src="app.js?v=20260522-clock-stable-bed-idle"></script>
 </body>
 </html>

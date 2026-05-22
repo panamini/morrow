@@ -11,17 +11,19 @@ const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
 const WORLD_DEFAULT_SOUND_MODE = 'world-default';
 const TUNING_A4_HZ = 432;
+const SPEAKER_ON_ICON = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>';
+const SPEAKER_OFF_ICON = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>';
 
 function equalTemperamentHzFromMidi(midiNote, a4Hz = TUNING_A4_HZ) {
   return a4Hz * Math.pow(2, (midiNote - 69) / 12);
 }
 
-const BED_DURATION_OPTIONS = [
-  { id: '10m', label: '10', ms: 10 * 60 * 1000 },
-  { id: '15m', label: '15', ms: 15 * 60 * 1000 },
-  { id: '30m', label: '30', ms: 30 * 60 * 1000 },
-  { id: '1h', label: '1h', ms: 60 * 60 * 1000 },
-  { id: 'night', label: 'night', ms: null }
+const BED_SESSION_OPTIONS = [
+  { id: 'infinite', label: '∞', type: 'track', ms: null },
+  { id: '10m', label: '10', type: 'track', ms: 10 * 60 * 1000 },
+  { id: '30m', label: '30', type: 'track', ms: 30 * 60 * 1000 },
+  { id: '1h', label: '1h', type: 'track', ms: 60 * 60 * 1000 },
+  { id: 'night-passage', label: 'night', type: 'program', programId: 'night-passage' }
 ];
 
 const SOUND_MODES = [
@@ -235,7 +237,7 @@ const SOUND_MODES = [
     description: 'C#-dominant F# 6/9 drone: deep, almost still, no beat, slow room pressure.',
     baseFrequency: Number(equalTemperamentHzFromMidi(37).toFixed(2)), // C#2 = 68.04 at A432
     partialRatios: [0.667, 1, 1.5, 2, 2.667, 3, 3.375, 4, 4.5, 6.024, 8.058],
-    droneRatios: [1, 2, 6.024, 4, 1.5, 3, 0.667, 2.667],
+    droneRatios: [1, 2, 1.5, 4],
     strikeGrammar: [
       { ratio: 1, weight: 10 },
       { ratio: 2, weight: 8 },
@@ -256,15 +258,48 @@ const SOUND_MODES = [
     ritualLabel: 'C#-anchored F# 6/9 drone reference',
     engineV2: {
       style: 'field',
-      phraseGapsMs: { bedside: [52000, 150000], object: [26000, 90000], ringing: [11000, 42000] },
-      restProbability: { bedside: 0.76, object: 0.52, ringing: 0.22 },
+      phraseGapsMs: { bedside: [65000, 180000], object: [34000, 120000], ringing: [14000, 55000] },
+      restProbability: { bedside: 0.82, object: 0.62, ringing: 0.28 },
       maxEventsPerPhrase: { bedside: 1, object: 1, ringing: 2 },
-      attackSeconds: [7, 24],
-      releaseSeconds: [22, 70],
-      gainScale: 0.62,
-      foregroundGainScale: 0.72,
+      attackSeconds: [12, 36],
+      releaseSeconds: [45, 140],
+      gainScale: 0.50,
+      foregroundGainScale: 0.48,
       repeatMemory: 6,
-      droneVoiceLimit: 8,
+      droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.036,
+        bedsideGain: 0.024,
+        voiceRatios: [
+          1,
+          1.5,
+          2,
+          2.667,
+          3,
+          4,
+          4.5,
+          6.024
+        ],
+        maxVoices: 7,
+        attackSeconds: [28, 80],
+        releaseSeconds: [90, 240],
+        cyclesSeconds: [55, 89, 144, 233, 377],
+        panDrift: 0.22,
+        detuneCents: 5,
+        lowpassHz: [320, 680],
+        highpassHz: 30
+      },
+      orderedPhraseCells: [
+        [1],
+        [1.5, 2],
+        [2, 4],
+        [2.667, 3],
+        [4, 6.024],
+        [4.5, 4],
+        [1.5, 1],
+        [0.667, 1]
+      ],
       phraseCells: [
         [1],
         [2],
@@ -591,6 +626,19 @@ const WORLDS = [
   { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
 ];
 
+const NIGHT_PASSAGE_PROGRAM = {
+  id: 'night-passage',
+  name: 'Night Passage',
+  description: 'Blue Lullaby to dawn.',
+  phases: [
+    { id: 'settle', worldId: 'milk-blue', soundModeId: 'blue-bowl', label: 'Blue Lullaby', targetGain: 0.42, visualIntensity: 0.18 },
+    { id: 'sink', worldId: 'night-nest', soundModeId: 'night-nest', label: 'Night Nest', targetGain: 0.34, visualIntensity: 0.12 },
+    { id: 'hold', worldId: 'night-nest', soundModeId: 'night-nest', label: 'Night Nest', targetGain: 0.18, visualIntensity: 0.06 },
+    { id: 'pre-dawn', worldId: 'focus-white', soundModeId: 'human-return', label: 'Human Return', targetGain: 0.20, visualIntensity: 0.10 },
+    { id: 'wake', worldIdFromWake: true, label: 'Wake Ring', targetGain: 0.42, visualIntensity: 0.32 }
+  ]
+};
+
 const WAKE_CURVE = [
   { atMinute: 0, name: 'firstBreath', visualIntensity: 0.06, audioDensity: 0.02, masterGainTarget: 0.16, layers: ['air'] },
   { atMinute: 1, name: 'roomAppears', visualIntensity: 0.10, audioDensity: 0.04, masterGainTarget: 0.19, layers: ['air'] },
@@ -609,7 +657,7 @@ const DEFAULT_STATE = {
   previousMode: 'object',
   selectedWorldId: 'milk-blue',
   wakeWorldId: 'milk-blue',
-  bedsideDuration: '30m',
+  bedsideSessionId: '30m',
   alarm: { enabled: true, time: '07:30', snoozeMinutes: 9, lastTriggeredKey: '' },
   settings: {
     visualBrightness: 0.86,
@@ -675,6 +723,7 @@ let clockTimer = null;
 let alarmTimer = null;
 let bedsideIdleTimer = null;
 let bedsideSessionTimer = null;
+let bedsideSessionActive = false;
 let diagnosticsTimer = null;
 let wakeCurveTimer = null;
 let wakeCurveStartedAt = 0;
@@ -687,6 +736,19 @@ let wakeSettleTimer = null;
 let wakeEntryGuardUntil = 0;
 let wakeLastEntryAt = 0;
 let wakePreviewActive = false;
+let programPreviewTimers = [];
+let programPhaseTimers = [];
+const programState = {
+  activeProgramId: null,
+  activePhaseId: null,
+  activePhaseLabel: null,
+  nextPhaseId: null,
+  currentWorldId: null,
+  currentSoundModeId: null,
+  currentTargetGain: null,
+  wakeTargetAt: null,
+  lastError: null
+};
 let worldPointer = null;
 let worldLongHoldTimer = null;
 let wheelWorldThrottleAt = 0;
@@ -778,8 +840,35 @@ function getEffectiveSoundMode(world = getWorld()) {
 function getWakeSoundMode(world = getWorld()) {
   return getSoundMode(world.soundMode);
 }
+function getWakeWorldTrackLabel() {
+  const world = getWorld(state.wakeWorldId || state.selectedWorldId);
+  return getWakeSoundMode(world).name;
+}
 function getVisualScore(world = getWorld()) {
   return world.visualScore || 'default';
+}
+function getSelectedBedSessionOption() {
+  return BED_SESSION_OPTIONS.find((option) => option.id === state.bedsideSessionId) || BED_SESSION_OPTIONS[2];
+}
+function getWakeLabel() {
+  return state.alarm.enabled ? `WAKE ${state.alarm.time} · ON` : 'WAKE OFF';
+}
+function getWakeTargetDate(from = new Date()) {
+  const parsed = parseTime(state.alarm.time);
+  const target = new Date(from);
+  target.setHours(parsed.hour, parsed.minute, 0, 0);
+  if (target <= from) target.setDate(target.getDate() + 1);
+  return target;
+}
+function getMinutesUntilWake(from = new Date()) {
+  return Math.max(0, (getWakeTargetDate(from) - from) / 60000);
+}
+function resolveProgramPhase(phase) {
+  if (!phase) return null;
+  const wakeWorld = getWorld(state.wakeWorldId || 'phi-dawn');
+  const world = phase.worldIdFromWake ? wakeWorld : getWorld(phase.worldId);
+  const soundModeId = phase.soundModeId || world.soundMode;
+  return { ...phase, worldId: world.id, soundModeId };
 }
 function recordError(scope, error) {
   const message = error && error.message ? error.message : String(error || 'Unknown error');
@@ -794,7 +883,10 @@ function validateState(candidate) {
   if (!candidate || typeof candidate !== 'object') return next;
   if (WORLDS.some((world) => world.id === candidate.selectedWorldId)) next.selectedWorldId = candidate.selectedWorldId;
   if (WORLDS.some((world) => world.id === candidate.wakeWorldId)) next.wakeWorldId = candidate.wakeWorldId;
-  if (BED_DURATION_OPTIONS.some((option) => option.id === candidate.bedsideDuration)) next.bedsideDuration = candidate.bedsideDuration;
+  const savedSessionId = candidate.bedsideSessionId || candidate.bedsideDuration;
+  if (savedSessionId === 'night' || candidate.bedsideProgramId === NIGHT_PASSAGE_PROGRAM.id) next.bedsideSessionId = 'night-passage';
+  else if (savedSessionId === '15m') next.bedsideSessionId = '10m';
+  else if (BED_SESSION_OPTIONS.some((option) => option.id === savedSessionId)) next.bedsideSessionId = savedSessionId;
   if (candidate.alarm && typeof candidate.alarm === 'object') Object.assign(next.alarm, candidate.alarm);
   if (!/^\d{2}:\d{2}$/.test(next.alarm.time)) next.alarm.time = DEFAULT_STATE.alarm.time;
   if (candidate.settings && typeof candidate.settings === 'object') {
@@ -806,7 +898,7 @@ function validateState(candidate) {
     const modeId = next.settings.audio.worldSoundModes[worldId];
     const validWorld = WORLDS.some((world) => world.id === worldId);
     const validMode = SOUND_MODES.some((mode) => mode.id === modeId);
-    if (!validWorld || !validMode || (modeId === 'phi-dawn-chorale' && worldId !== 'phi-dawn')) delete next.settings.audio.worldSoundModes[worldId];
+    if (!validWorld || !validMode) delete next.settings.audio.worldSoundModes[worldId];
   });
   ['masterVolume', 'objectVolume', 'bedsideVolume', 'wakeVolume', 'airVolume', 'strikeVolume', 'shimmerAmount'].forEach((key) => {
     const value = Number(next.settings.audio[key]);
@@ -838,8 +930,8 @@ function setActiveVisualWorld(worldId = state.selectedWorldId) {
 function cacheDom() {
   [
     'apertureCanvas', 'grain', 'debugGridOverlay', 'toast', 'soundToggleButton', 'objectPanel', 'objectGestureSurface', 'objectTime', 'nextWake', 'objectRail', 'railBed', 'railWake', 'railWorld', 'railSet',
-    'bedsidePanel', 'bedsideGestureSurface', 'bedsideTime', 'bedsideSoundBreath', 'bedsideWorldPrev', 'bedsideWorldNext', 'durationRow', 'bedsideRail', 'bedsideDurationButton', 'bedsideExitButton',
-    'wakeSetPanel', 'wakeCloseButton', 'wakeGestureArea', 'hourRing', 'minuteRing', 'wakeHour', 'wakeMinute', 'wakeHourValue', 'wakeMinuteValue', 'wakeColon', 'wakeWorldSelector', 'wakeWorldPrev', 'wakeWorldName', 'wakeWorldNext', 'wakeRail', 'wakeRailClose', 'wakeSetConfirmButton',
+    'bedsidePanel', 'bedsideGestureSurface', 'bedsideTime', 'bedsideWakeMemory', 'bedSessionSummary', 'bedsideSoundBreath', 'bedsideWorldPrev', 'bedsideWorldNext', 'durationRow', 'bedsideSetButton', 'bedsideRail', 'bedsideDurationButton', 'bedsideExitButton',
+    'wakeSetPanel', 'wakeCloseButton', 'wakeGestureArea', 'hourRing', 'minuteRing', 'wakeHour', 'wakeMinute', 'wakeHourValue', 'wakeMinuteValue', 'wakeColon', 'wakeWorldSelector', 'wakeWorldPrev', 'wakeWorldName', 'wakeWorldNext', 'wakeRail', 'wakeSetConfirmButton',
     'worldsPanel', 'worldsCloseButton', 'wakeWorldMemory', 'worldConstellation', 'worldPrevButton', 'worldNextButton', 'worldCopy', 'worldConstellationName', 'worldHint', 'worldRail', 'worldBackButton',
     'settingsPanel', 'settingsBackdrop', 'settingsSheet', 'settingsCloseButton', 'soundModeSelect', 'soundModeDescription', 'binauralToggle', 'deltaReadout', 'deltaSlider', 'masterVolumeReadout', 'masterVolume', 'bedsideVolumeReadout', 'bedsideVolume', 'objectVolumeReadout', 'objectVolume', 'wakeVolumeReadout', 'wakeVolume', 'airVolumeReadout', 'airVolume', 'strikeVolumeReadout', 'strikeVolume', 'shimmerReadout', 'shimmerAmount', 'softTestButton', 'mediumTestButton', 'wakeTestButton', 'stopAudioButton', 'brightnessReadout', 'brightnessSlider', 'reduceMotionToggle', 'use24hToggle', 'openSafetyButton', 'openDiagnosticsButton', 'diagGridButton',
     'safetyPanel', 'safetyBackdrop', 'safetySheet', 'safetyCloseButton',
@@ -906,23 +998,23 @@ function createApertureRenderer(canvas) {
 
     if (score === 'space-field') {
       return {
-        breatheRate: 0.00016,
-        breatheDepth: 0.006,
-        audioBreathe: 0.010,
-        driftXRate: 0.000055,
-        driftYRate: 0.000045,
-        driftX: 0.030,
-        driftY: 0.024,
-        outerScale: 2.72,
-        innerScale: 1.86,
-        coreScale: 1.16,
-        outerAlpha: 1.22,
-        innerAlpha: 0.82,
-        coreAlpha: 1.08,
-        rimAlpha: 0.78,
-        ceilingAlpha: 1.35,
-        pulseGain: 0.08,
-        eventWindowMs: 1600,
+        breatheRate: 0.00013,
+        breatheDepth: 0.005,
+        audioBreathe: 0.008,
+        driftXRate: 0.000038,
+        driftYRate: 0.000031,
+        driftX: 0.038,
+        driftY: 0.030,
+        outerScale: 2.92,
+        innerScale: 1.96,
+        coreScale: 1.10,
+        outerAlpha: 1.18,
+        innerAlpha: 0.74,
+        coreAlpha: 1.12,
+        rimAlpha: 0.64,
+        ceilingAlpha: 1.48,
+        pulseGain: 0.05,
+        eventWindowMs: 3000,
         eventAlpha: 0
       };
     }
@@ -1415,7 +1507,14 @@ function createAudioEngine() {
     if (profile.orderedPhraseCells && profile.orderedPhraseCells.length) {
       const orderedCell = profile.orderedPhraseCells[musicMemory.phraseIndex % profile.orderedPhraseCells.length] || [1];
       const filteredOrderedCell = orderedCell.filter(withinLimits);
-      if (filteredOrderedCell.length) return filteredOrderedCell.slice(0, profile.maxEvents);
+      if (filteredOrderedCell.length) {
+        if (profile.style === 'field') {
+          const freshRatios = filteredOrderedCell.filter((ratio) => !ratioInMemory(ratio, profile.repeatMemory));
+          const fieldCell = freshRatios.length ? freshRatios : filteredOrderedCell;
+          return fieldCell.slice(0, profile.maxEvents);
+        }
+        return filteredOrderedCell.slice(0, profile.maxEvents);
+      }
       if (profile.style === 'wake-chorale') {
         const fallbackCell = getWakeChoraleFallbackCell(getCurrentWakePhase().atMinute, musicMemory.phraseIndex).filter(withinLimits);
         return (fallbackCell.length ? fallbackCell : [1.498]).slice(0, profile.maxEvents);
@@ -1690,10 +1789,10 @@ function createAudioEngine() {
     audioState.activeNodes += 4;
     updateActiveOscillatorCount();
   }
-  function startSleepSpaceEnvelope(modeName, soundMode, profile) {
+  function startSpaceEnvelope(modeName, soundMode, profile) {
     const config = profile.spaceEnvelope;
-    if (!ctx || !modeGain || profile.style !== 'sleep-nest' || !config?.enabled) return;
-    const ratios = (config.voiceRatios || []).slice(0, clamp(config.maxVoices || 6, 1, 6));
+    if (!ctx || !modeGain || !config?.enabled) return;
+    const ratios = (config.voiceRatios || []).slice(0, clamp(config.maxVoices || 6, 1, 8));
     const cycles = Array.isArray(config.cyclesSeconds) && config.cyclesSeconds.length ? config.cyclesSeconds : [89, 144, 233];
     const at = ctx.currentTime;
     const baseGain = modeName === 'bedside' ? (config.bedsideGain || config.gain || 0.022) : (config.gain || 0.030);
@@ -1707,7 +1806,8 @@ function createAudioEngine() {
       const attack = randomBetween(config.attackSeconds, 34) + index * 2.7;
       const release = randomBetween(config.releaseSeconds, 120);
       const cycle = cycles[index % cycles.length];
-      const voiceGain = (baseGain / Math.sqrt(index + 1)) * (ratio <= 1 ? 0.72 : ratio >= 2 ? 0.34 : 0.52);
+      const isBassVoice = ratio <= 1 || frequency < 150;
+      const voiceGain = (baseGain / Math.sqrt(index + 1)) * (isBassVoice ? 0.72 : ratio >= 2 ? 0.34 : 0.52);
       const targetGain = modeName === 'bedside' ? voiceGain * 0.74 : voiceGain;
       const lowpassRange = Array.isArray(config.lowpassHz) ? config.lowpassHz : [260, 520];
 
@@ -1737,10 +1837,9 @@ function createAudioEngine() {
 
       if (pan) {
         const drift = config.panDrift || 0.16;
-        const startsCentered = ratio <= 1 || frequency < 150;
-        const initialPan = startsCentered ? 0 : (index % 2 === 0 ? -drift : drift) * (0.30 + Math.random() * 0.45);
+        const initialPan = isBassVoice ? 0 : (index % 2 === 0 ? -drift : drift) * (0.30 + Math.random() * 0.45);
         pan.pan.setValueAtTime(initialPan, at);
-        if (!startsCentered) {
+        if (!isBassVoice) {
           let panAt = at;
           for (let step = 0; step < 8; step += 1) {
             panAt += cycle * (0.75 + Math.random() * 0.50);
@@ -1769,7 +1868,7 @@ function createAudioEngine() {
     const at = ctx.currentTime;
     let haloVoiceCount = 0;
     if (profile.style === 'sleep-nest') startSleepNoiseBed(modeName, profile);
-    if (profile.style === 'sleep-nest') startSleepSpaceEnvelope(modeName, soundMode, profile);
+    if (profile.spaceEnvelope?.enabled) startSpaceEnvelope(modeName, soundMode, profile);
     ratios.forEach((ratio, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -1876,7 +1975,7 @@ function createAudioEngine() {
         const offset = index === 0 ? randomBetween([0, isLongToneStyle(profile.style) ? 1700 : 650], 0) : eventGap * index * (0.82 + Math.random() * 0.42);
         window.setTimeout(() => {
           if (nextSessionId !== sessionId || !ctx || !modeGain) return;
-          const innerSkipProbability = profile.style === 'wake-chorale' ? 0.12 : 0.42;
+          const innerSkipProbability = profile.style === 'wake-chorale' || profile.style === 'field' ? 0.12 : 0.42;
           if (ratioInMemory(ratio, profile.repeatMemory) && index > 0 && Math.random() < innerSkipProbability) return;
           scheduleResonantEvent(modeName, world, soundMode, ratio, modeName === 'ringing' ? 1.2 : 1);
         }, offset);
@@ -1900,7 +1999,9 @@ function createAudioEngine() {
       audioState.currentAudioSessionId = nextSessionId;
       stopScheduledNodes('mode_crossfade_internal', wasPlaying ? 0.06 : 0.02);
       const world = getWorld(options.worldId || state.selectedWorldId);
-      const soundMode = modeName === 'ringing' ? getWakeSoundMode(world) : getEffectiveSoundMode(world);
+      const soundMode = options.soundModeId
+        ? getSoundMode(options.soundModeId)
+        : modeName === 'ringing' || options.nativeSound ? getWakeSoundMode(world) : getEffectiveSoundMode(world);
       audioState.currentWorldId = world.id;
       audioState.currentMode = modeName;
       audioState.currentSoundModeId = soundMode.id;
@@ -2032,7 +2133,7 @@ function playSoundFromGesture(event, modeName, options = {}) { return ensureAudi
 function startSoundFromGesture(event, modeName, options = {}) { return ensureAudioEngine().startModeFromGesture(event, modeName, options); }
 function playWakePreviewFromGesture(event) {
   wakePreviewActive = true;
-  return startSoundFromGesture(event, 'object', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 0.46 });
+  return startSoundFromGesture(event, 'object', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 0.46, nativeSound: true });
 }
 function stopWakePreview() {
   if (!wakePreviewActive) return;
@@ -2044,13 +2145,45 @@ function playWakeSoundFromGesture(event) {
   return startSoundFromGesture(event, 'ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 });
 }
 function playCurrentSoundFromGesture(event) {
+  const bedSession = getSelectedBedSessionOption();
+  if (state.currentMode === 'bedside' && bedSession.type === 'program') {
+    const phase = resolveProgramPhase(NIGHT_PASSAGE_PROGRAM.phases[0]);
+    const started = startSoundFromGesture(event, 'bedside', {
+      worldId: phase.worldId,
+      soundModeId: phase.soundModeId,
+      intensity: phase.targetGain
+    });
+    if (started) { bedsideSessionActive = true; startBedsideSessionTimer(); }
+    return started;
+  }
   if (state.currentMode === 'bedside') return startSoundFromGesture(event, 'bedside');
   if (state.currentMode === 'wakeSet') return playWakePreviewFromGesture(event);
   if (state.currentMode === 'ringing') return playWakeSoundFromGesture(event);
   return startSoundFromGesture(event, 'object', { worldId: state.selectedWorldId, intensity: 1 });
 }
-function stopSoundExplicit() { const result = ensureAudioEngine().stopExplicit(); updateSoundControls(); return result; }
-function startBedsideSound() { return ensureAudioEngine().startMode('bedside', { intensity: 0.72 }); }
+function stopSoundExplicit() {
+  clearProgramPreviewTimers();
+  clearProgramPhaseTimers();
+  if (audioState.currentMode === 'bedside') bedsideSessionActive = false;
+  programState.activeProgramId = null;
+  programState.activePhaseId = null;
+  const result = ensureAudioEngine().stopExplicit();
+  updateSoundControls();
+  return result;
+}
+function startBedsideSound() {
+  const bedSession = getSelectedBedSessionOption();
+  if (bedSession.type === 'program') {
+    const phase = resolveProgramPhase(NIGHT_PASSAGE_PROGRAM.phases[0]);
+    const started = ensureAudioEngine().startMode('bedside', {
+      worldId: phase.worldId,
+      soundModeId: phase.soundModeId,
+      intensity: phase.targetGain
+    });
+    return started;
+  }
+  return ensureAudioEngine().startMode('bedside', { intensity: 0.72 });
+}
 function startObjectSound() { return ensureAudioEngine().startMode('object', { intensity: 1 }); }
 function startWakeSequence() {
   wakePreviewActive = false;
@@ -2058,6 +2191,120 @@ function startWakeSequence() {
   return ensureAudioEngine().startMode('ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 });
 }
 function getAudioDiagnostics() { return ensureAudioEngine().getAudioDiagnostics(); }
+
+function clearProgramPreviewTimers() {
+  programPreviewTimers.forEach((timer) => window.clearTimeout(timer));
+  programPreviewTimers = [];
+}
+
+function clearProgramPhaseTimers() {
+  programPhaseTimers.forEach((timer) => window.clearTimeout(timer));
+  programPhaseTimers = [];
+}
+
+function getNightPassagePlan() {
+  return clone(NIGHT_PASSAGE_PROGRAM);
+}
+
+function crossfadeToProgramPhase(phase) {
+  try {
+    const resolvedPhase = resolveProgramPhase(phase);
+    if (!resolvedPhase || !resolvedPhase.worldId || !resolvedPhase.soundModeId) throw new Error('Program phase is missing worldId or soundModeId.');
+    const world = getWorld(resolvedPhase.worldId);
+    const soundMode = getSoundMode(resolvedPhase.soundModeId);
+    programState.activeProgramId = NIGHT_PASSAGE_PROGRAM.id;
+    programState.activePhaseId = resolvedPhase.id;
+    programState.activePhaseLabel = resolvedPhase.label || resolvedPhase.id;
+    programState.nextPhaseId = null;
+    programState.currentWorldId = world.id;
+    programState.currentSoundModeId = soundMode.id;
+    programState.currentTargetGain = clamp(Number(resolvedPhase.targetGain) || 0.0001, 0.0001, 1);
+    programState.lastError = null;
+    visualState.audioIntensity = clamp(Number(resolvedPhase.visualIntensity) || 0, 0, 1);
+    if (state.currentMode === 'ringing') visualState.wakeVisualIntensity = visualState.audioIntensity;
+    if (renderer) {
+      renderer.setWorld(world.id);
+      setActiveVisualWorld(world.id);
+    }
+    const engine = ensureAudioEngine();
+    const started = engine.startMode(audioState.currentMode === 'bedside' ? 'bedside' : 'object', {
+      worldId: world.id,
+      soundModeId: soundMode.id,
+      intensity: programState.currentTargetGain
+    });
+    if (!started) programState.lastError = audioState.lastAudioError || 'Audio did not start. Tap once to unlock sound, then run previewNightPassage().';
+    return {
+      phaseId: programState.activePhaseId,
+      worldId: programState.currentWorldId,
+      soundModeId: programState.currentSoundModeId,
+      targetGain: programState.currentTargetGain,
+      audioStarted: Boolean(started)
+    };
+  } catch (error) {
+    programState.lastError = recordError('crossfadeToProgramPhase', error);
+    return { error: programState.lastError };
+  }
+}
+
+function previewNightPassage() {
+  clearProgramPreviewTimers();
+  wakePreviewActive = false;
+  const previewPhases = [
+    { ...NIGHT_PASSAGE_PROGRAM.phases[0], previewSeconds: 20 },
+    { ...NIGHT_PASSAGE_PROGRAM.phases[1], previewSeconds: 25 },
+    { ...NIGHT_PASSAGE_PROGRAM.phases[2], previewSeconds: 20 },
+    { ...NIGHT_PASSAGE_PROGRAM.phases[3], previewSeconds: 20 },
+    { ...NIGHT_PASSAGE_PROGRAM.phases[4], previewSeconds: 40 }
+  ];
+  let offsetMs = 0;
+  previewPhases.forEach((phase, index) => {
+    const run = () => crossfadeToProgramPhase(phase);
+    if (index === 0) run();
+    else programPreviewTimers.push(window.setTimeout(run, offsetMs));
+    offsetMs += phase.previewSeconds * 1000;
+  });
+  programPreviewTimers.push(window.setTimeout(() => {
+    programPreviewTimers = [];
+  }, offsetMs));
+  return {
+    programId: NIGHT_PASSAGE_PROGRAM.id,
+    phases: previewPhases.map((phase) => ({
+      id: phase.id,
+      worldId: phase.worldId,
+      soundModeId: phase.soundModeId,
+      previewSeconds: phase.previewSeconds
+    })),
+    totalPreviewSeconds: offsetMs / 1000
+  };
+}
+
+function getProgramDiagnostics() {
+  return {
+    activeProgram: programState.activeProgramId,
+    activePhase: programState.activePhaseId,
+    currentWorldId: programState.currentWorldId || audioState.currentWorldId || state.selectedWorldId,
+    currentSoundModeId: programState.currentSoundModeId || audioState.currentSoundModeId,
+    currentTargetGain: programState.currentTargetGain,
+    currentMode: state.currentMode,
+    lastError: programState.lastError || audioState.lastAudioError
+  };
+}
+
+function getBedSessionDiagnostics() {
+  const session = getSelectedBedSessionOption();
+  const wakeWorld = getWorld(state.wakeWorldId || 'phi-dawn');
+  return {
+    selectedSessionOption: session,
+    sessionType: session.type,
+    activeProgramId: programState.activeProgramId,
+    currentPhaseId: programState.activePhaseId,
+    wakeEnabled: Boolean(state.alarm.enabled),
+    wakeTime: state.alarm.time,
+    wakeWorldId: wakeWorld.id,
+    wakeWorldName: wakeWorld.name,
+    activeSoundModeId: audioState.currentSoundModeId
+  };
+}
 
 function setMode(mode, options = {}) {
   const previous = state.currentMode;
@@ -2078,7 +2325,7 @@ function setMode(mode, options = {}) {
     if (mode !== 'worlds') renderer.setWorld(visualWorldId);
     setActiveVisualWorld(visualWorldId);
   }
-  if (mode === 'bedside') { revealBedsideControls(); startBedsideSessionTimer(); } else { document.body.classList.remove('bedside-idle'); clearBedsideIdleTimer(); clearBedsideSessionTimer(); }
+  if (mode === 'bedside') { revealBedsideControls(); } else { document.body.classList.remove('bedside-idle'); clearBedsideIdleTimer(); clearBedsideSessionTimer(); clearProgramPhaseTimers(); }
   if (mode === 'ringing') startWakeCurve();
   else if (previous === 'ringing') stopWakeCurve();
   if (mode === 'wakeSet') { wakeSetState.wakeStep = 'time'; syncWakeStateFromAlarm(); clearWakeSetterFocus(); }
@@ -2102,9 +2349,13 @@ function formatClockDate(date) {
 function updateClocks() {
   const current = formatClockDate(new Date());
   [dom.objectTime, dom.bedsideTime, dom.ringingTime].forEach((el) => { if (el) el.textContent = current; });
-  if (dom.nextWake) dom.nextWake.textContent = state.alarm.time;
+  if (dom.nextWake) dom.nextWake.textContent = getWakeLabel();
+  if (dom.bedsideWakeMemory) dom.bedsideWakeMemory.textContent = getWakeLabel();
+  if (dom.wakeSetConfirmButton) dom.wakeSetConfirmButton.textContent = state.alarm.enabled ? 'OFF' : 'ON';
   if (dom.wakeWorldMemory) dom.wakeWorldMemory.textContent = state.alarm.time;
-  if (dom.wakeWorldName) dom.wakeWorldName.textContent = getWorld(state.wakeWorldId || state.selectedWorldId).name;
+  if (dom.wakeWorldName) dom.wakeWorldName.textContent = getWakeWorldTrackLabel();
+  if (dom.wakeWorldSelector) dom.wakeWorldSelector.classList.toggle('is-wake-on', Boolean(state.alarm.enabled));
+  updateBedsideProgramControls();
   const parsed = parseTime(state.alarm.time);
   if (dom.wakeHourValue) dom.wakeHourValue.textContent = pad2(parsed.hour);
   if (dom.wakeMinuteValue) dom.wakeMinuteValue.textContent = pad2(parsed.minute);
@@ -2164,29 +2415,87 @@ function startAlarmWatcher() { if (alarmTimer) window.clearInterval(alarmTimer);
 
 function updateDurationRow() {
   if (!dom.durationRow) return;
-  const selectedIndex = BED_DURATION_OPTIONS.findIndex((option) => option.id === state.bedsideDuration);
+  const selectedIndex = BED_SESSION_OPTIONS.findIndex((option) => option.id === state.bedsideSessionId);
   const activeIndex = selectedIndex === -1 ? 0 : selectedIndex;
-  const total = BED_DURATION_OPTIONS.length;
-  [...dom.durationRow.querySelectorAll('[data-duration]')].forEach((button) => {
-    const index = BED_DURATION_OPTIONS.findIndex((option) => option.id === button.dataset.duration);
+  const total = BED_SESSION_OPTIONS.length;
+  [...dom.durationRow.querySelectorAll('[data-session]')].forEach((button) => {
+    const index = BED_SESSION_OPTIONS.findIndex((option) => option.id === button.dataset.session);
     const rawOffset = index - activeIndex;
     const offset = Math.abs(rawOffset) > total / 2 ? rawOffset - Math.sign(rawOffset) * total : rawOffset;
-    const selected = button.dataset.duration === state.bedsideDuration;
+    const selected = button.dataset.session === state.bedsideSessionId;
     button.style.setProperty('--duration-offset', String(offset));
     button.classList.toggle('is-selected', selected);
     button.classList.toggle('is-near', Math.abs(offset) === 1);
     button.classList.toggle('is-far', Math.abs(offset) > 1);
     button.setAttribute('aria-pressed', String(selected));
   });
+  updateBedsideProgramControls();
+}
+
+function updateBedsideProgramControls() {
+  const session = getSelectedBedSessionOption();
+  const currentWorld = getWorld(state.selectedWorldId);
+  if (dom.bedsideWakeMemory) dom.bedsideWakeMemory.textContent = getWakeLabel();
+  if (dom.bedSessionSummary) {
+    const title = dom.bedSessionSummary.querySelector('span');
+    const detail = dom.bedSessionSummary.querySelector('small');
+    const programActive = session.type === 'program';
+    dom.bedSessionSummary.hidden = false;
+    dom.bedSessionSummary.classList.toggle('is-selected', programActive);
+    if (programActive) {
+      if (title) title.textContent = 'Night Passage';
+      if (detail) {
+        const nowLine = programState.activePhaseLabel ? `Now: ${programState.activePhaseLabel}` : 'Now: Blue Lullaby';
+        const dawnLine = state.alarm.enabled ? `Dawn: ${getWorld(state.wakeWorldId || currentWorld.id).name} · ${state.alarm.time}` : 'Wake off';
+        detail.textContent = `${nowLine}\n${dawnLine}`;
+      }
+    } else {
+      if (title) title.textContent = currentWorld.name;
+      if (detail) detail.textContent = session.id === 'infinite' ? '∞ until stopped' : `${session.label} session`;
+    }
+  }
+}
+
+function selectBedSession(sessionId) {
+  if (!BED_SESSION_OPTIONS.some((option) => option.id === sessionId)) return;
+  state.bedsideSessionId = sessionId;
+  saveState();
+  updateDurationRow();
+  if (bedsideSessionActive) startBedsideSessionTimer();
+  revealBedsideControls();
+  const session = getSelectedBedSessionOption();
+  showToast(session.type === 'program' ? 'Night Passage selected' : `Bed session selected: ${session.label}`, 1400);
+}
+
+function startBedSession() {
+  bedsideSessionActive = true;
+  saveState();
+  updateDurationRow();
+  const option = getSelectedBedSessionOption();
+  if (option.type === 'program') startBedsideSessionTimer();
+  else {
+    startBedsideSound();
+    startBedsideSessionTimer();
+  }
+  revealBedsideControls();
+  showToast(option.type === 'program' ? 'Night Passage started' : `Bed session started: ${option.label}`, 1400);
+}
+
+function stopBedSessionAndClose() {
+  bedsideSessionActive = false;
+  clearBedsideSessionTimer();
+  clearProgramPhaseTimers();
+  if (audioState.userFacingAudioState === 'PLAYING' && audioState.currentMode === 'bedside') ensureAudioEngine().stopExplicit();
+  setMode('object', { keepAudio: true });
 }
 
 function changeBedsideDuration(step) {
-  const index = BED_DURATION_OPTIONS.findIndex((option) => option.id === state.bedsideDuration);
-  const next = BED_DURATION_OPTIONS[modulo((index === -1 ? 0 : index) + step, BED_DURATION_OPTIONS.length)];
-  state.bedsideDuration = next.id;
+  const index = BED_SESSION_OPTIONS.findIndex((option) => option.id === state.bedsideSessionId);
+  const next = BED_SESSION_OPTIONS[modulo((index === -1 ? 0 : index) + step, BED_SESSION_OPTIONS.length)];
+  state.bedsideSessionId = next.id;
   saveState();
   updateDurationRow();
-  startBedsideSessionTimer();
+  if (bedsideSessionActive) startBedsideSessionTimer();
 }
 function stepDurationWheel(step) {
   if (!step) return;
@@ -2210,13 +2519,15 @@ function revealBedsideControls() {
   document.body.classList.remove('bedside-idle');
   dom.bedsideRail.classList.add('is-revealed');
   dom.durationRow.classList.add('is-revealed');
+  if (dom.bedSessionSummary) dom.bedSessionSummary.classList.add('is-revealed');
   clearBedsideIdleTimer();
   bedsideIdleTimer = window.setTimeout(() => {
     if (state.currentMode !== 'bedside') return;
     document.body.classList.add('bedside-idle');
     dom.bedsideRail.classList.remove('is-revealed');
     dom.durationRow.classList.remove('is-revealed', 'is-focused');
-  }, 3600);
+    if (dom.bedSessionSummary) dom.bedSessionSummary.classList.remove('is-revealed');
+  }, 5200);
 }
 
 function focusDurationControl() {
@@ -2226,11 +2537,57 @@ function focusDurationControl() {
   if (selected && typeof selected.focus === 'function') selected.focus({ preventScroll: true });
 }
 
+function scheduleProgramPhase(phase, delayMs) {
+  const timer = window.setTimeout(() => {
+    if (state.currentMode !== 'bedside' || getSelectedBedSessionOption().type !== 'program') return;
+    crossfadeToProgramPhase(phase);
+    updateBedsideProgramControls();
+  }, Math.max(0, delayMs));
+  programPhaseTimers.push(timer);
+}
+
+function startNightPassageSession() {
+  clearProgramPhaseTimers();
+  const phases = NIGHT_PASSAGE_PROGRAM.phases;
+  programState.activeProgramId = NIGHT_PASSAGE_PROGRAM.id;
+  programState.wakeTargetAt = state.alarm.enabled ? getWakeTargetDate().toISOString() : null;
+  const firstPhase = phases[0];
+  crossfadeToProgramPhase(firstPhase);
+  if (state.alarm.enabled) {
+    const untilWakeMs = Math.max(0, getWakeTargetDate() - new Date());
+    const preDawnAt = Math.max(0, untilWakeMs - 21 * 60 * 1000);
+    const sinkAt = Math.min(18 * 60 * 1000, untilWakeMs * 0.22);
+    const holdAt = Math.min(55 * 60 * 1000, Math.max(sinkAt + 10 * 60 * 1000, untilWakeMs * 0.48));
+    scheduleProgramPhase(phases[1], sinkAt);
+    scheduleProgramPhase(phases[2], holdAt);
+    if (untilWakeMs > 6 * 60 * 1000) scheduleProgramPhase(phases[3], preDawnAt);
+    scheduleProgramPhase(phases[4], untilWakeMs);
+  } else {
+    scheduleProgramPhase(phases[1], 18 * 60 * 1000);
+    scheduleProgramPhase(phases[2], 55 * 60 * 1000);
+  }
+  updateBedsideProgramControls();
+}
+
 function startBedsideSessionTimer() {
   clearBedsideSessionTimer();
+  clearProgramPhaseTimers();
+  if (!bedsideSessionActive) return;
   if (state.currentMode !== 'bedside') return;
-  const option = BED_DURATION_OPTIONS.find((candidate) => candidate.id === state.bedsideDuration);
-  if (!option || option.ms == null) return;
+  const option = getSelectedBedSessionOption();
+  if (option.type === 'program') {
+    startNightPassageSession();
+    return;
+  }
+  programState.activeProgramId = null;
+  programState.activePhaseId = null;
+  programState.activePhaseLabel = null;
+  programState.nextPhaseId = null;
+  programState.wakeTargetAt = null;
+  if (audioState.userFacingAudioState === 'PLAYING' && audioState.currentMode === 'bedside') {
+    ensureAudioEngine().startMode('bedside', { worldId: state.selectedWorldId, intensity: 0.72 });
+  }
+  if (option.ms == null) return;
   bedsideSessionTimer = window.setTimeout(() => {
     if (state.currentMode !== 'bedside') return;
     ensureAudioEngine().stopForDurationExpiry();
@@ -2412,12 +2769,12 @@ function markWakeInteraction() {
   if (wakeSetState.activePart) scheduleWakeFocusSettle();
 }
 
-function confirmWakeSet() {
+function toggleWakeSet() {
   if (isWakeEntryGuardActive()) return;
+  state.alarm.enabled = !state.alarm.enabled;
   saveState();
-  showToast(`Wake ${state.alarm.time}`, 1100);
-  stopWakePreview();
-  setMode('object', { keepAudio: true });
+  updateClocks();
+  showToast(state.alarm.enabled ? `Wake ${state.alarm.time} on` : 'Wake off', 1100);
 }
 
 function closeWakeSet() {
@@ -2452,7 +2809,7 @@ function setWakeWorldByStep(step) {
   setActiveVisualWorld(next.id);
   if (renderer && state.currentMode === 'wakeSet') renderer.setWorld(next.id);
   if (state.currentMode === 'wakeSet' && wakePreviewActive && audioState.userFacingAudioState === 'PLAYING') {
-    ensureAudioEngine().startMode('object', { worldId: next.id, intensity: 0.46 });
+    ensureAudioEngine().startMode('object', { worldId: next.id, intensity: 0.46, nativeSound: true });
   } else if (state.currentMode === 'wakeSet' && audioState.userFacingAudioState === 'PLAYING' && audioState.currentMode === 'ringing') {
     ensureAudioEngine().startMode('ringing', { worldId: next.id, intensity: 1 });
   }
@@ -2675,7 +3032,7 @@ function updateSoundControls() {
   document.body.dataset.audio = isPlaying ? 'playing' : 'stopped';
   if (!dom.soundToggleButton) return;
   dom.soundToggleButton.classList.toggle('is-on', isPlaying);
-  dom.soundToggleButton.textContent = isPlaying ? 'ON' : 'OFF';
+  dom.soundToggleButton.innerHTML = isPlaying ? SPEAKER_ON_ICON : SPEAKER_OFF_ICON;
   dom.soundToggleButton.setAttribute('aria-pressed', String(isPlaying));
   dom.soundToggleButton.setAttribute('aria-label', isPlaying ? 'Sound on. Tap to stop.' : 'Sound off. Tap to play.');
 }
@@ -2730,7 +3087,7 @@ function populateSoundModes() {
   defaultOption.value = WORLD_DEFAULT_SOUND_MODE;
   defaultOption.textContent = 'Built-in world track';
   dom.soundModeSelect.appendChild(defaultOption);
-  SOUND_MODES.filter((mode) => mode.id !== 'phi-dawn-chorale').forEach((mode) => {
+  SOUND_MODES.forEach((mode) => {
     const option = document.createElement('option'); option.value = mode.id; option.textContent = mode.name; dom.soundModeSelect.appendChild(option);
   });
 }
@@ -2817,15 +3174,22 @@ function bindEvents() {
   dom.railWake.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); });
   dom.railWake.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
   dom.railWake.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
+  [dom.nextWake, dom.bedsideWakeMemory].forEach((wakeLabel) => {
+    if (!wakeLabel) return;
+    wakeLabel.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); });
+    wakeLabel.addEventListener('pointerup', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
+    wakeLabel.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); enterWakeFromGesture(event); });
+  });
   if (dom.railWorld) dom.railWorld.addEventListener('pointerdown', (event) => { event.preventDefault(); enterWorldFromGesture(event); });
   dom.railSet.addEventListener('click', () => setMode('settings', { keepAudio: true }));
   dom.soundToggleButton.addEventListener('pointerdown', (event) => { event.preventDefault(); handleGlobalSoundToggle(event); });
 
   if (dom.bedsideDurationButton) dom.bedsideDurationButton.addEventListener('click', () => { focusDurationControl(); revealBedsideControls(); });
-  dom.bedsideExitButton.addEventListener('click', () => setMode('object', { keepAudio: true }));
+  if (dom.bedsideSetButton) dom.bedsideSetButton.addEventListener('click', startBedSession);
+  dom.bedsideExitButton.addEventListener('click', stopBedSessionAndClose);
   dom.durationRow.addEventListener('pointerdown', (event) => {
-    const direct = event.target.closest && event.target.closest('[data-duration]');
-    durationPointer = { x: event.clientX, y: event.clientY, lastStepX: event.clientX, at: nowMs(), moved: false, downDuration: direct ? direct.dataset.duration : null };
+    const direct = event.target.closest && event.target.closest('[data-session]');
+    durationPointer = { x: event.clientX, y: event.clientY, lastStepX: event.clientX, at: nowMs(), moved: false, downSession: direct ? direct.dataset.session : null };
     dom.durationRow.classList.add('is-focused');
     revealBedsideControls();
     try { dom.durationRow.setPointerCapture(event.pointerId); } catch (error) { /* capture optional */ }
@@ -2843,12 +3207,12 @@ function bindEvents() {
   dom.durationRow.addEventListener('pointerup', (event) => {
     if (!durationPointer) return;
     try { dom.durationRow.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
-    const direct = event.target.closest && event.target.closest('[data-duration]');
-    const tappedDuration = durationPointer.downDuration || (direct ? direct.dataset.duration : null);
+    const direct = event.target.closest && event.target.closest('[data-session]');
+    const tappedSession = durationPointer.downSession || (direct ? direct.dataset.session : null);
     const dx = event.clientX - durationPointer.x;
-    if (tappedDuration && !durationPointer.moved && nowMs() - durationPointer.at < 520 && Math.abs(dx) < 20) state.bedsideDuration = tappedDuration;
+    if (tappedSession && !durationPointer.moved && nowMs() - durationPointer.at < 520 && Math.abs(dx) < 20) state.bedsideSessionId = tappedSession;
     else if (!durationPointer.moved && Math.abs(dx) > 22) stepDurationWheel(dx < 0 ? 1 : -1);
-    saveState(); updateDurationRow(); revealBedsideControls(); window.setTimeout(() => dom.durationRow && dom.durationRow.classList.remove('is-focused'), 1800); durationPointer = null;
+    saveState(); updateDurationRow(); if (bedsideSessionActive) startBedsideSessionTimer(); revealBedsideControls(); window.setTimeout(() => dom.durationRow && dom.durationRow.classList.remove('is-focused'), 1800); durationPointer = null;
   });
   dom.durationRow.addEventListener('pointercancel', (event) => {
     if (!durationPointer) return;
@@ -2858,8 +3222,7 @@ function bindEvents() {
   });
 
   dom.wakeCloseButton.addEventListener('click', closeWakeSet);
-  dom.wakeRailClose.addEventListener('click', closeWakeSet);
-  dom.wakeSetConfirmButton.addEventListener('click', confirmWakeSet);
+  dom.wakeSetConfirmButton.addEventListener('click', toggleWakeSet);
   dom.wakeHour.addEventListener('click', () => setActiveSetter('hour'));
   dom.wakeMinute.addEventListener('click', () => setActiveSetter('minute'));
   [dom.wakeHour, dom.wakeMinute].forEach((zone) => {
@@ -3018,6 +3381,10 @@ function init() {
   window.startWakeSequence = startWakeSequence;
   window.stopSoundExplicit = stopSoundExplicit;
   window.getAudioDiagnostics = getAudioDiagnostics;
+  window.previewNightPassage = previewNightPassage;
+  window.getNightPassagePlan = getNightPassagePlan;
+  window.getProgramDiagnostics = getProgramDiagnostics;
+  window.getBedSessionDiagnostics = getBedSessionDiagnostics;
   window.computeConstellationGeometry = computeConstellationGeometry;
   window.wakeSetState = wakeSetState;
   window.worldSelectionState = worldSelectionState;
