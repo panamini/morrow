@@ -956,8 +956,8 @@ body[data-mode="bedside"].bedside-idle.desktop-pointer-active .bedside-world-edg
 .digit-zone.is-selected .digit-value { opacity: .98; filter: blur(0); transform: scale(1); }
 .wake-stage[data-active-ring="hour"] #wakeMinute .digit-value,
 .wake-stage[data-active-ring="minute"] #wakeHour .digit-value { opacity: .36; filter: blur(1.3px); transform: scale(.985); }
-.digit-colon { width: var(--wake-colon-width); margin: 0 .015em; text-align: center; font-size: var(--wake-time-size); line-height: .92; letter-spacing: 0; font-weight: var(--clock-weight); color: var(--chrome-soft); transform: none; transition: color .26s ease, opacity .26s ease, filter .26s ease; }
-.wake-stage[data-active-ring] .digit-colon { color: var(--chrome-muted); }
+.digit-colon { width: var(--wake-colon-width); margin: 0; text-align: center; font-size: var(--wake-time-size); line-height: .92; letter-spacing: 0; font-weight: var(--clock-weight); color: var(--ink); opacity: .90; transform: none; text-shadow: 0 22px 94px rgba(0,0,0,.24); transition: color .26s ease, opacity .26s ease, filter .26s ease; }
+.wake-stage[data-active-ring] .digit-colon { color: var(--ink); opacity: .72; }
 .wake-rail .world-word { color: var(--ink); }
 .inline-world-selector {
   position: absolute;
