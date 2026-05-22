@@ -1634,7 +1634,6 @@ function createApertureRenderer(canvas) {
   const ctx = canvas.getContext('2d', { alpha: false });
   let width = 0; let height = 0; let dpr = 1; let rafId = 0; let running = false;
   let mode = 'object'; let worldId = state.selectedWorldId; let displayWorldId = worldId; let crossfade = 1; let crossfadeStart = 0; const crossfadeMs = 900;
-  let grainPattern = null;
   function resizeCanvasToDisplaySize() {
     const rect = canvas.getBoundingClientRect();
     const nextDpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
@@ -1735,13 +1734,13 @@ function createApertureRenderer(canvas) {
         driftX: 0.018,
         driftY: 0.016,
         outerScale: 2.245,
-        innerScale: 1.682,
-        coreScale: 1.335,
-        outerAlpha: 0.66,
-        innerAlpha: 0.86,
-        coreAlpha: 1.18,
-        rimAlpha: 0.54,
-        ceilingAlpha: 0.48,
+        innerScale: 1.498,
+        coreScale: 1.189,
+        outerAlpha: 0.72,
+        innerAlpha: 0.82,
+        coreAlpha: 1.10,
+        rimAlpha: 0.62,
+        ceilingAlpha: 0.52,
         pulseGain: 0.04,
         eventWindowMs: 9000,
         eventAlpha: 0.10
@@ -1894,48 +1893,6 @@ function createApertureRenderer(canvas) {
     const raw = clamp(1 - age / profile.eventWindowMs, 0, 1);
     return raw * raw * (3 - 2 * raw);
   }
-  function motionIsReduced() {
-    return Boolean(state.settings.reduceMotion || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches));
-  }
-  function materialProfileFor(score) {
-    const base = {
-      wallAlpha: 0.050,
-      wallShadowAlpha: 0.040,
-      veilAlpha: 0.018,
-      depthAlpha: 0.16,
-      rimAlpha: 0.70,
-      grainAlpha: 0.020
-    };
-    if (score === 'blue-bowl') return { ...base, wallAlpha: 0.064, depthAlpha: 0.13, rimAlpha: 0.86, grainAlpha: 0.018 };
-    if (score === 'night-nest') return { ...base, wallAlpha: 0.032, wallShadowAlpha: 0.030, veilAlpha: 0.010, depthAlpha: 0.11, rimAlpha: 0.46, grainAlpha: 0.006 };
-    if (score === 'paper-sun') return { ...base, wallAlpha: 0.070, wallShadowAlpha: 0.052, depthAlpha: 0.14, rimAlpha: 0.66, grainAlpha: 0.030 };
-    if (score === 'phi-dawn') return { ...base, wallAlpha: 0.076, wallShadowAlpha: 0.036, veilAlpha: 0.024, depthAlpha: 0.10, rimAlpha: 0.82, grainAlpha: 0.018 };
-    if (score === 'human-return') return { ...base, wallAlpha: 0.038, wallShadowAlpha: 0.030, veilAlpha: 0.012, depthAlpha: 0.12, rimAlpha: 0.42, grainAlpha: 0.016 };
-    if (score === 'space-field') return { ...base, wallAlpha: 0.042, wallShadowAlpha: 0.058, veilAlpha: 0.012, depthAlpha: 0.21, rimAlpha: 0.62, grainAlpha: 0.010 };
-    return base;
-  }
-  function ensureGrainPattern() {
-    if (grainPattern) return grainPattern;
-    const grainCanvas = document.createElement('canvas');
-    const grainSize = 128;
-    grainCanvas.width = grainSize;
-    grainCanvas.height = grainSize;
-    const grainCtx = grainCanvas.getContext('2d');
-    const image = grainCtx.createImageData(grainSize, grainSize);
-    for (let y = 0; y < grainSize; y += 1) {
-      for (let x = 0; x < grainSize; x += 1) {
-        const index = (y * grainSize + x) * 4;
-        const value = Math.floor(112 + (((Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1 + 1) % 1) * 34);
-        image.data[index] = value;
-        image.data[index + 1] = value;
-        image.data[index + 2] = value;
-        image.data[index + 3] = 255;
-      }
-    }
-    grainCtx.putImageData(image, 0, 0);
-    grainPattern = ctx.createPattern(grainCanvas, 'repeat');
-    return grainPattern;
-  }
   function fillCircle(cx, cy, radius, stops, composite = 'source-over') {
     ctx.save();
     ctx.globalCompositeOperation = composite;
@@ -1947,80 +1904,112 @@ function createApertureRenderer(canvas) {
     ctx.fill();
     ctx.restore();
   }
-  function fillField(cx, cy, radius, stops, composite = 'source-over') {
-    ctx.save();
-    ctx.globalCompositeOperation = composite;
-    const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(1, radius));
-    stops.forEach(([at, color]) => gradient.addColorStop(at, color));
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width / dpr, height / dpr);
-    ctx.restore();
-  }
-  function drawWallField(cx, cy, r, palette, material, glow, brightness, driftX, driftY) {
-    const wallRadius = Math.max(width / dpr, height / dpr) * 0.86 + r * 0.32;
-    fillField(cx + driftX * 0.20, cy + driftY * 0.16, wallRadius, [
-      [0, rgba(palette.spill, 0.010 * glow * material.wallAlpha)],
-      [0.22, rgba(palette.outer, 0.070 * glow * material.wallAlpha)],
-      [0.47, rgba(palette.spill, 0.100 * glow * material.wallAlpha)],
-      [0.73, rgba(palette.inner, 0.040 * glow * material.wallAlpha)],
+  function drawMilkBlueLightStudy(cx, cy, r, palette, visualProfile, glow, brightness, driftX, driftY, eventPulse, pulseEase, tapPulse) {
+    const roomGlow = glow * visualProfile.outerAlpha;
+    const membraneGlow = glow * visualProfile.rimAlpha;
+    const slowShiftX = driftX * 0.28;
+    const slowShiftY = driftY * 0.22;
+
+    fillCircle(cx + slowShiftX, cy + slowShiftY, r * 2.92, [
+      [0, rgba(palette.spill, 0.018 * roomGlow)],
+      [0.19, rgba(palette.core2, 0.032 * roomGlow)],
+      [0.43, rgba(palette.spill, 0.062 * roomGlow)],
+      [0.68, rgba(palette.outer, 0.030 * roomGlow)],
+      [0.87, rgba(palette.spill, 0.012 * roomGlow)],
       [1, rgba(palette.spill, 0)]
     ], 'screen');
-    fillField(cx - driftX * 0.18, cy - driftY * 0.12, wallRadius * 1.08, [
+
+    fillCircle(cx - slowShiftX * 0.52, cy - slowShiftY * 0.44, r * 2.34, [
+      [0, rgba(palette.core, 0.012 * brightness)],
+      [0.29, rgba(palette.core2, 0.026 * brightness)],
+      [0.56, rgba(palette.spill, 0.020 * roomGlow)],
+      [0.78, rgba(palette.shadow, 0.018 * brightness)],
+      [1, rgba(palette.shadow, 0)]
+    ], 'multiply');
+
+    fillCircle(cx + driftX * 0.18, cy + driftY * 0.16, r * 1.48, [
+      [0, rgba(palette.core2, 0.040 * glow)],
+      [0.21, rgba(palette.core, 0.110 * brightness)],
+      [0.47, rgba(palette.spill, 0.105 * glow)],
+      [0.69, rgba(palette.outer, 0.082 * membraneGlow)],
+      [0.86, rgba(palette.inner, 0.038 * membraneGlow)],
+      [1, rgba(palette.outer, 0)]
+    ], 'screen');
+
+    fillCircle(cx + driftX * 0.10, cy + driftY * 0.08, r * 1.06, [
+      [0, rgba(palette.core, 0.580 * brightness)],
+      [0.18, rgba(palette.core2, 0.560 * brightness)],
+      [0.39, rgba(palette.core2, 0.390 * brightness)],
+      [0.58, rgba(palette.spill, 0.250 * glow)],
+      [0.74, rgba(palette.inner, 0.210 * glow)],
+      [0.86, rgba(palette.outer, 0.155 * membraneGlow)],
+      [0.94, rgba(palette.outer, 0.052 * membraneGlow)],
+      [1, rgba(palette.outer, 0)]
+    ]);
+
+    fillCircle(cx - driftX * 0.18, cy - driftY * 0.14, r * 0.74, [
+      [0, rgba(palette.core2, 0.420 * brightness)],
+      [0.23, rgba(palette.core, 0.250 * brightness)],
+      [0.51, rgba(palette.spill, 0.160 * glow)],
+      [0.73, rgba(palette.inner, 0.088 * glow)],
+      [0.91, rgba(palette.outer, 0.026 * membraneGlow)],
+      [1, rgba(palette.outer, 0)]
+    ], 'screen');
+
+    fillCircle(cx + driftX * 0.06, cy + driftY * 0.05, r * 0.46, [
+      [0, rgba(palette.core2, 0.320 * brightness)],
+      [0.27, rgba(palette.core, 0.300 * brightness)],
+      [0.54, rgba(palette.core2, 0.170 * brightness)],
+      [0.78, rgba(palette.spill, 0.070 * glow)],
+      [1, rgba(palette.core, 0)]
+    ], 'screen');
+
+    fillCircle(cx, cy, r * 1.10, [
+      [0, rgba(palette.outer, 0)],
+      [0.68, rgba(palette.outer, 0.000)],
+      [0.758, rgba(palette.inner, 0.070 * membraneGlow)],
+      [0.812, rgba(palette.outer, 0.155 * membraneGlow)],
+      [0.862, rgba(palette.inner, 0.070 * membraneGlow)],
+      [0.928, rgba(palette.spill, 0.024 * roomGlow)],
+      [1, rgba(palette.outer, 0)]
+    ], 'screen');
+
+    fillCircle(cx - driftX * 0.38, cy - driftY * 0.34, r * 0.98, [
+      [0, rgba(palette.shadow, 0.000)],
+      [0.34, rgba(palette.shadow, 0.016 * brightness)],
+      [0.63, rgba(palette.core, 0.044 * brightness)],
+      [0.82, rgba(palette.shadow, 0.034 * brightness)],
+      [1, rgba(palette.shadow, 0)]
+    ], 'multiply');
+
+    fillCircle(cx, cy, r * 2.72, [
       [0, rgba(palette.shadow, 0)],
-      [0.50, rgba(palette.shadow, 0.010 * brightness * material.wallShadowAlpha)],
-      [0.78, rgba(palette.shadow, 0.105 * brightness * material.wallShadowAlpha)],
-      [1, rgba(palette.shadow, 0.220 * brightness * material.wallShadowAlpha)]
+      [0.55, rgba(palette.shadow, 0)],
+      [0.76, rgba(palette.shadow, 0.034 * brightness)],
+      [0.91, rgba(palette.shadow, 0.070 * brightness)],
+      [1, rgba(palette.shadow, 0.118 * brightness)]
     ], 'multiply');
-  }
-  function drawChromaticVeil(cx, cy, r, palette, material, glow, driftX, driftY, reduceMotion) {
-    const shift = reduceMotion ? 0 : 1;
-    fillField(cx - driftX * 0.06 * shift, cy + driftY * 0.05 * shift, r * 2.20, [
-      [0, rgba(palette.outer, 0)],
-      [0.31, rgba(palette.inner, 0.030 * glow * material.veilAlpha)],
-      [0.57, rgba(palette.spill, 0.100 * glow * material.veilAlpha)],
-      [0.86, rgba(palette.outer, 0.028 * glow * material.veilAlpha)],
-      [1, rgba(palette.outer, 0)]
-    ], 'screen');
-  }
-  function drawSoftRim(cx, cy, r, palette, material, glow, visualProfile) {
-    fillCircle(cx, cy, r * (visualProfile.innerScale + 0.28), [
-      [0, rgba(palette.outer, 0)],
-      [0.50, rgba(palette.outer, 0)],
-      [0.67, rgba(palette.inner, 0.020 * glow * material.rimAlpha)],
-      [0.79, rgba(palette.outer, 0.052 * glow * material.rimAlpha)],
-      [0.88, rgba(palette.spill, 0.030 * glow * material.rimAlpha)],
-      [1, rgba(palette.outer, 0)]
-    ], 'screen');
-  }
-  function drawDepthCore(cx, cy, r, palette, material, visualScore, brightness, glow, driftX, driftY) {
-    if (visualScore === 'phi-dawn') {
-      fillCircle(cx + driftX * 0.02, cy + driftY * 0.02, r * 0.78, [
-        [0, rgba(palette.outer, 0.110 * glow)],
-        [0.32, rgba(palette.spill, 0.086 * glow)],
-        [0.64, rgba(palette.core2, 0.030 * brightness)],
-        [1, rgba(palette.core, 0)]
+
+    if (eventPulse > 0) {
+      const eventAlpha = eventPulse * visualProfile.eventAlpha * glow;
+      fillCircle(cx + driftX * 0.10, cy + driftY * 0.09, r * 1.16, [
+        [0, rgba(palette.outer, 0)],
+        [0.62, rgba(palette.inner, 0.006 * eventAlpha)],
+        [0.78, rgba(palette.outer, 0.034 * eventAlpha)],
+        [0.90, rgba(palette.spill, 0.014 * eventAlpha)],
+        [1, rgba(palette.outer, 0)]
       ], 'screen');
-      return;
     }
-    const depthColor = visualScore === 'human-return' ? palette.core2 : visualScore === 'paper-sun' ? palette.core2 : visualScore === 'blue-bowl' ? palette.core : palette.shadow;
-    const depthGlow = visualScore === 'night-nest' ? palette.core2 : visualScore === 'space-field' ? palette.inner : palette.core;
-    fillCircle(cx - driftX * 0.18, cy - driftY * 0.16, r * 0.74, [
-      [0, rgba(depthColor, 0.040 * brightness * material.depthAlpha)],
-      [0.28, rgba(depthGlow, 0.165 * brightness * material.depthAlpha)],
-      [0.57, rgba(depthColor, 0.240 * brightness * material.depthAlpha)],
-      [0.84, rgba(palette.shadow, 0.090 * brightness * material.depthAlpha)],
-      [1, rgba(depthColor, 0)]
-    ], 'multiply');
-  }
-  function drawMaterialGrain(material, brightness) {
-    const pattern = ensureGrainPattern();
-    if (!pattern) return;
-    ctx.save();
-    ctx.globalCompositeOperation = 'overlay';
-    ctx.globalAlpha = clamp(material.grainAlpha * (0.72 + brightness * 0.34), 0, 0.038);
-    ctx.fillStyle = pattern;
-    ctx.fillRect(0, 0, width / dpr, height / dpr);
-    ctx.restore();
+
+    if (tapPulse > 0) {
+      fillCircle(cx, cy, r * (1.04 + (1 - tapPulse) * 0.30), [
+        [0, rgba(palette.outer, 0.030 * pulseEase)],
+        [0.46, rgba(palette.inner, 0.062 * pulseEase)],
+        [0.72, rgba(palette.spill, 0.036 * pulseEase)],
+        [0.90, rgba(palette.outer, 0.014 * pulseEase)],
+        [1, rgba(palette.spill, 0)]
+      ], 'screen');
+    }
   }
   function draw(time = performance.now()) {
     resizeCanvasToDisplaySize();
@@ -2029,8 +2018,6 @@ function createApertureRenderer(canvas) {
     const palette = mixedPalette(time);
     const visualScore = currentVisualScore();
     const visualProfile = visualProfileFor(visualScore);
-    const materialProfile = materialProfileFor(visualScore);
-    const reduceMotion = motionIsReduced();
     const eventPulse = currentEventPulse(visualProfile);
     const wakeBoost = mode === 'ringing' ? visualState.wakeVisualIntensity : 0;
     const brightness = clamp(state.settings.visualBrightness + wakeBoost * 0.18, 0.08, 1);
@@ -2040,21 +2027,23 @@ function createApertureRenderer(canvas) {
     const cy = mode === 'object' ? cssH * 0.49 : mode === 'bedside' ? cssH * 0.49 : cssH * 0.50;
     const minDim = Math.min(cssW, cssH);
     const radius = mode === 'worlds' ? minDim * 0.24 : mode === 'wakeSet' ? minDim * 0.36 : mode === 'bedside' ? minDim * 0.62 : minDim * 0.45;
-    const breathe = reduceMotion ? 1 + visualState.audioIntensity * visualProfile.audioBreathe * 0.20 : 1 + Math.sin(time * visualProfile.breatheRate) * visualProfile.breatheDepth + visualState.audioIntensity * visualProfile.audioBreathe;
+    const breathe = 1 + Math.sin(time * visualProfile.breatheRate) * visualProfile.breatheDepth + visualState.audioIntensity * visualProfile.audioBreathe;
     const r = radius * breathe;
-    const driftX = (reduceMotion ? 0.18 : 1) * Math.sin(time * visualProfile.driftXRate) * r * visualProfile.driftX;
-    const driftY = (reduceMotion ? 0.18 : 1) * Math.cos(time * visualProfile.driftYRate) * r * visualProfile.driftY;
+    const driftX = Math.sin(time * visualProfile.driftXRate) * r * visualProfile.driftX;
+    const driftY = Math.cos(time * visualProfile.driftYRate) * r * visualProfile.driftY;
     const innerOffsetY = r * (visualProfile.innerOffsetY || 0);
     const coreOffsetY = r * (visualProfile.coreOffsetY || 0);
     const bedDim = mode === 'bedside' ? 0.72 : 1;
     const tapPulse = mode === 'object' ? clamp((visualState.objectTapPulseUntil - time) / 620, 0, 1) : 0;
     const pulseEase = tapPulse * tapPulse * (3 - 2 * tapPulse);
     const glow = brightness * bedDim * (1 + wakeBoost * 0.24 + pulseEase * visualProfile.pulseGain);
-    const motionDriftX = driftX;
-    const motionDriftY = driftY;
 
-    drawWallField(cx, cy, r, palette, materialProfile, glow, brightness, motionDriftX, motionDriftY);
-    drawChromaticVeil(cx, cy, r, palette, materialProfile, glow, motionDriftX, motionDriftY, reduceMotion);
+    if (visualScore === 'blue-bowl') {
+      drawMilkBlueLightStudy(cx, cy, r, palette, visualProfile, glow, brightness, driftX, driftY, eventPulse, pulseEase, tapPulse);
+      if (gridOverlayEnabled) setRootCenter(cssW / 2, cssH / 2, r);
+      if (running) rafId = window.requestAnimationFrame(draw);
+      return;
+    }
 
     fillCircle(cx, cy, r * visualProfile.outerScale, [
       [0, rgba(palette.spill, 0.030 * glow * visualProfile.outerAlpha)],
@@ -2070,31 +2059,14 @@ function createApertureRenderer(canvas) {
       [1, rgba(palette.spill, 0)]
     ], 'screen');
 
-    if (visualScore === 'human-return') {
-      fillCircle(cx, cy + coreOffsetY, r * visualProfile.coreScale, [
-        [0, rgba(palette.core2, 0.46 * brightness * visualProfile.coreAlpha)],
-        [0.20, rgba(palette.inner, 0.40 * brightness * visualProfile.coreAlpha)],
-        [0.42, rgba(palette.core2, 0.30 * brightness * visualProfile.coreAlpha)],
-        [0.64, rgba(palette.outer, 0.20 * glow * visualProfile.innerAlpha)],
-        [0.84, rgba(palette.spill, 0.085 * glow * visualProfile.rimAlpha)],
-        [1, rgba(palette.outer, 0)]
-      ]);
-      fillCircle(cx + driftX * 0.04, cy + driftY * 0.04 + coreOffsetY, r * 0.75, [
-        [0, rgba(palette.core2, 0.22 * brightness)],
-        [0.44, rgba(palette.inner, 0.18 * brightness)],
-        [0.70, rgba(palette.core2, 0.10 * brightness)],
-        [1, rgba(palette.core2, 0)]
-      ]);
-    } else {
-      fillCircle(cx, cy + coreOffsetY, r * visualProfile.coreScale, [
-        [0, rgba(palette.core, 0.92 * brightness * visualProfile.coreAlpha)],
-        [0.30, rgba(palette.core2, 0.78 * brightness * visualProfile.coreAlpha)],
-        [0.56, rgba(palette.inner, 0.52 * glow * visualProfile.innerAlpha)],
-        [0.76, rgba(palette.outer, 0.34 * glow * visualProfile.rimAlpha)],
-        [0.91, rgba(palette.outer, 0.075 * glow * visualProfile.rimAlpha)],
-        [1, rgba(palette.outer, 0)]
-      ]);
-    }
+    fillCircle(cx, cy + coreOffsetY, r * visualProfile.coreScale, [
+      [0, rgba(palette.core, 0.92 * brightness * visualProfile.coreAlpha)],
+      [0.30, rgba(palette.core2, 0.78 * brightness * visualProfile.coreAlpha)],
+      [0.56, rgba(palette.inner, 0.52 * glow * visualProfile.innerAlpha)],
+      [0.76, rgba(palette.outer, 0.34 * glow * visualProfile.rimAlpha)],
+      [0.91, rgba(palette.outer, 0.075 * glow * visualProfile.rimAlpha)],
+      [1, rgba(palette.outer, 0)]
+    ]);
 
     if (visualScore === 'paper-sun') {
       fillCircle(cx + driftX * 0.08, cy + driftY * 0.08, r * 0.54, [
@@ -2125,8 +2097,6 @@ function createApertureRenderer(canvas) {
       ], 'multiply');
     }
 
-    drawDepthCore(cx, cy + coreOffsetY, r, palette, materialProfile, visualScore, brightness, glow, motionDriftX, motionDriftY);
-
     fillCircle(cx - driftX * 0.55, cy - driftY * 0.55 + coreOffsetY, r * 0.88, [
       [0, rgba(palette.shadow, 0.10)],
       [0.44, rgba(palette.core, 0.18 * brightness)],
@@ -2139,8 +2109,6 @@ function createApertureRenderer(canvas) {
       [0.82, rgba(palette.spill, 0.022 * glow * visualProfile.ceilingAlpha)],
       [1, rgba(palette.outer, 0)]
     ], 'screen');
-
-    drawSoftRim(cx, cy, r, palette, materialProfile, glow, visualProfile);
 
     if (visualScore === 'space-field') {
       const ceilingDrift = Math.sin(time * 0.000035) * r * 0.018;
@@ -2205,8 +2173,6 @@ function createApertureRenderer(canvas) {
         [1, rgba(palette.spill, 0)]
       ], 'screen');
     }
-
-    drawMaterialGrain(materialProfile, brightness);
 
     if (gridOverlayEnabled) setRootCenter(cssW / 2, cssH / 2, r);
     if (running) rafId = window.requestAnimationFrame(draw);
