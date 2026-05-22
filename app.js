@@ -5,6 +5,8 @@ const STORAGE_KEY = 'dawnChamberV4State';
 const MASTER_GAIN_CEILING = 1;
 const OUTPUT_GAIN_BOOST = 2.15;
 const OUTPUT_GAIN_CEILING = 1.85;
+const BEAT_OFFSET_MIN_HZ = 1;
+const BEAT_OFFSET_MAX_HZ = 14;
 const WAKE_FOCUS_SETTLE_MS = 1900;
 const GRID_GEOMETRY_HARD_RULE = 'If the constellation cannot fit, shrink the orbit';
 const POINTER_MOVE_THRESHOLD = 8;
@@ -227,17 +229,17 @@ const SOUND_MODES = [
       style: 'human',
       phraseGapsMs: {
         bedside: [55000, 144000],
-        object: [21000, 89000],
+        object: [18000, 72000],
         ringing: [13000, 55000]
       },
       phraseGapSequenceMs: {
         bedside: [89000, 144000, 55000, 89000, 233000],
-        object: [21000, 34000, 55000, 34000, 89000],
+        object: [18000, 29000, 47000, 34000, 72000],
         ringing: [13000, 21000, 34000, 21000, 55000]
       },
       restProbability: {
         bedside: 0.78,
-        object: 0.46,
+        object: 0.36,
         ringing: 0.24
       },
       maxEventsPerPhrase: {
@@ -272,6 +274,19 @@ const SOUND_MODES = [
         detuneCents: 2.4,
         lowpassHz: [240, 520],
         highpassHz: 32
+      },
+      waveMotion: {
+        enabled: true,
+        gain: 0.012,
+        bedsideGain: 0.007,
+        voiceRatios: [1, 1.189, 1.498, 2],
+        maxVoices: 4,
+        cyclesSeconds: [55, 89, 144, 233],
+        gainDepth: 0.34,
+        panDrift: 0.12,
+        detuneCents: 1.8,
+        lowpassHz: [220, 500],
+        highpassHz: 30
       },
       orderedPhraseCells: [
         [1.498],
@@ -795,8 +810,8 @@ const SOUND_MODES = [
       droneVoiceLimit: 4,
       spaceEnvelope: {
         enabled: true,
-        gain: 0.026,
-        bedsideGain: 0.014,
+        gain: 0.024,
+        bedsideGain: 0.012,
         voiceRatios: [
           1,
           1.260,
@@ -811,10 +826,23 @@ const SOUND_MODES = [
         attackSeconds: [18, 46],
         releaseSeconds: [55, 150],
         cyclesSeconds: [34, 55, 89, 144, 233],
-        panDrift: 0.14,
-        detuneCents: 2.8,
-        lowpassHz: [360, 780],
-        highpassHz: 46
+        panDrift: 0.10,
+        detuneCents: 2.2,
+        lowpassHz: [420, 860],
+        highpassHz: 54
+      },
+      waveMotion: {
+        enabled: true,
+        gain: 0.008,
+        bedsideGain: 0.004,
+        voiceRatios: [1, 1.335, 1.682],
+        maxVoices: 3,
+        cyclesSeconds: [34, 55, 89, 144],
+        gainDepth: 0.24,
+        panDrift: 0.08,
+        detuneCents: 1.4,
+        lowpassHz: [460, 900],
+        highpassHz: 58
       },
       orderedPhraseCells: [
         [1.335],
@@ -1060,11 +1088,24 @@ const SOUND_MODES = [
         maxVoices: 6,
         attackSeconds: [22, 55],
         releaseSeconds: [70, 180],
-        cyclesSeconds: [55, 89, 144, 233, 377],
-        panDrift: 0.16,
+        cyclesSeconds: [34, 55, 89, 144, 233],
+        panDrift: 0.20,
         detuneCents: 4,
-        lowpassHz: [260, 520],
+        lowpassHz: [220, 560],
         highpassHz: 28
+      },
+      waveMotion: {
+        enabled: true,
+        gain: 0.010,
+        bedsideGain: 0.008,
+        voiceRatios: [0.5, 1, 1.498],
+        maxVoices: 3,
+        cyclesSeconds: [34, 55, 89, 144, 233],
+        gainDepth: 0.28,
+        panDrift: 0.18,
+        detuneCents: 1.6,
+        lowpassHz: [180, 520],
+        highpassHz: 26
       },
       orderedPhraseCells: [
         [1.498],
@@ -1096,7 +1137,7 @@ const WORLDS = [
   { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', visualScore: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
   { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'afternoon-glass', visualScore: 'afternoon-glass', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
-  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
+  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#eadfc9', spill: '#f4cf45', outer: '#f7e7a8', inner: '#e8742d', core: '#4b1b13', core2: '#c6281a', shadow: '#2a0d05' }, bedside: { wall: '#181109', spill: '#3d2408', outer: '#9b652a', inner: '#b64a25', core: '#190905', core2: '#4a1809', shadow: '#030100' }, wake: { wall: '#eadfc9', spill: '#f0cf63', outer: '#f7e7ad', inner: '#e98a30', core: '#5d2012', core2: '#c9341c', shadow: '#361006' } } },
   { id: 'phi-dawn', name: 'Golden Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'night-nest', name: 'Night Nest', mood: 'low blue shelter, soft breath, sleep return', soundMode: 'night-nest', visualScore: 'night-nest', palettes: { object: { wall: '#020714', spill: '#061a3d', outer: '#2d7286', inner: '#3b8a88', core: '#01040b', core2: '#071226', shadow: '#000104' }, bedside: { wall: '#00030a', spill: '#031026', outer: '#164355', inner: '#1f5b5c', core: '#000207', core2: '#040b17', shadow: '#000000' }, wake: { wall: '#07111f', spill: '#0b2a55', outer: '#3a8794', inner: '#4fa09a', core: '#020713', core2: '#0b1d34', shadow: '#000207' } } },
   { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
@@ -1420,7 +1461,7 @@ function validateState(candidate) {
     next.settings.audio[key] = Number.isFinite(value) ? clamp(value, 0, 1) : DEFAULT_STATE.settings.audio[key];
   });
   next.settings.audio.limiterCeiling = clamp(Number(next.settings.audio.limiterCeiling) || MASTER_GAIN_CEILING, 0, MASTER_GAIN_CEILING);
-  next.settings.audio.binauralDeltaHz = clamp(Number(next.settings.audio.binauralDeltaHz) || 2, 1, 4);
+  next.settings.audio.binauralDeltaHz = clamp(Number(next.settings.audio.binauralDeltaHz) || 2, BEAT_OFFSET_MIN_HZ, BEAT_OFFSET_MAX_HZ);
   const savedSchema = Number(candidate.schemaVersion) || 0;
   const soundModeIsValid = next.settings.audio.soundMode === WORLD_DEFAULT_SOUND_MODE || SOUND_MODES.some((mode) => mode.id === next.settings.audio.soundMode);
   if (!soundModeIsValid || savedSchema < 9) next.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
@@ -1605,24 +1646,24 @@ function createApertureRenderer(canvas) {
 
     if (score === 'paper-sun') {
       return {
-        breatheRate: 0.00018,
-        breatheDepth: 0.0055,
-        audioBreathe: 0.010,
-        driftXRate: 0.000058,
-        driftYRate: 0.000046,
-        driftX: 0.026,
-        driftY: 0.018,
-        outerScale: 2.50,
-        innerScale: 1.62,
-        coreScale: 1.12,
-        outerAlpha: 1.02,
-        innerAlpha: 0.92,
-        coreAlpha: 1.02,
-        rimAlpha: 0.86,
-        ceilingAlpha: 0.92,
-        pulseGain: 0.05,
-        eventWindowMs: 7000,
-        eventAlpha: 0.10
+        breatheRate: 0.00012,
+        breatheDepth: 0.0038,
+        audioBreathe: 0.006,
+        driftXRate: 0.000034,
+        driftYRate: 0.000027,
+        driftX: 0.018,
+        driftY: 0.012,
+        outerScale: 2.30,
+        innerScale: 1.44,
+        coreScale: 1.02,
+        outerAlpha: 0.78,
+        innerAlpha: 0.76,
+        coreAlpha: 0.96,
+        rimAlpha: 0.50,
+        ceilingAlpha: 0.54,
+        pulseGain: 0.035,
+        eventWindowMs: 9000,
+        eventAlpha: 0.07
       };
     }
 
@@ -2106,6 +2147,7 @@ function createAudioEngine() {
       wakeRatioCeilings: custom.wakeRatioCeilings || null,
       sleepNoise: custom.sleepNoise || null,
       spaceEnvelope: custom.spaceEnvelope || null,
+      waveMotion: custom.waveMotion || null,
       phraseGapSequenceMs: custom.phraseGapSequenceMs || null,
       orderedPhraseCells: custom.orderedPhraseCells || null,
       phraseCells: custom.phraseCells || buildDefaultPhraseCells(soundMode)
@@ -2485,6 +2527,71 @@ function createAudioEngine() {
     });
     updateActiveOscillatorCount();
   }
+  function startWaveMotion(modeName, soundMode, profile) {
+    const config = profile.waveMotion;
+    if (!ctx || !modeGain || !config?.enabled || !isLongToneStyle(profile.style)) return;
+    const ratios = (config.voiceRatios || []).slice(0, clamp(config.maxVoices || 3, 1, 5));
+    const cycles = Array.isArray(config.cyclesSeconds) && config.cyclesSeconds.length ? config.cyclesSeconds : [55, 89, 144];
+    const lowpassRange = Array.isArray(config.lowpassHz) ? config.lowpassHz : [220, 520];
+    const at = ctx.currentTime;
+    const baseGain = modeName === 'bedside' ? (config.bedsideGain || config.gain || 0.006) : (config.gain || 0.010);
+    const depth = clamp(Number(config.gainDepth) || 0.28, 0.08, 0.48);
+    ratios.forEach((ratio, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const lowpass = ctx.createBiquadFilter();
+      const highpass = ctx.createBiquadFilter();
+      const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      const cycle = cycles[index % cycles.length];
+      const frequency = soundMode.baseFrequency * ratio;
+      const voiceGain = (baseGain / Math.sqrt(index + 1)) * (frequency < 150 ? 0.72 : 0.46);
+
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      if (osc.detune) osc.detune.value = (Math.random() - 0.5) * (config.detuneCents || 1.8);
+      highpass.type = 'highpass';
+      highpass.frequency.value = config.highpassHz || 28;
+      highpass.Q.value = 0.14;
+      lowpass.type = 'lowpass';
+      lowpass.frequency.setValueAtTime(randomBetween(lowpassRange, 360), at);
+      lowpass.Q.value = 0.10;
+      gain.gain.setValueAtTime(0.0001, at);
+      gain.gain.linearRampToValueAtTime(voiceGain, at + 18 + index * 5);
+
+      let gainAt = at + 18 + index * 5;
+      for (let step = 0; step < 12; step += 1) {
+        gainAt += cycle * (0.82 + Math.random() * 0.36);
+        gain.gain.linearRampToValueAtTime(voiceGain * (1 - depth + Math.random() * depth * 1.6), gainAt);
+      }
+      gain.gain.setTargetAtTime(voiceGain * 0.55, at + 22 * 60, 240);
+
+      let filterAt = at;
+      for (let step = 0; step < 12; step += 1) {
+        filterAt += cycle * (0.70 + Math.random() * 0.55);
+        lowpass.frequency.linearRampToValueAtTime(randomBetween(lowpassRange, 360), filterAt);
+      }
+
+      if (pan) {
+        const drift = config.panDrift || 0.12;
+        const initialPan = frequency < 130 ? 0 : (index % 2 === 0 ? -drift : drift) * 0.38;
+        pan.pan.setValueAtTime(initialPan, at);
+        if (frequency >= 130) {
+          let panAt = at;
+          for (let step = 0; step < 8; step += 1) {
+            panAt += cycle * (0.90 + Math.random() * 0.50);
+            pan.pan.linearRampToValueAtTime((Math.random() - 0.5) * drift, panAt);
+          }
+        }
+        osc.connect(highpass); highpass.connect(lowpass); lowpass.connect(gain); gain.connect(pan); pan.connect(modeGain);
+      } else {
+        osc.connect(highpass); highpass.connect(lowpass); lowpass.connect(gain); gain.connect(modeGain);
+      }
+      osc.start(at);
+      droneOscillators.push(osc);
+      audioState.activeNodes += pan ? 5 : 4;
+    });
+    updateActiveOscillatorCount();
+  }
   function startDrones(modeName, world, soundMode) {
     if (!ctx || !modeGain) return;
     const profile = getV2Profile(modeName, soundMode);
@@ -2498,6 +2605,7 @@ function createAudioEngine() {
     let haloVoiceCount = 0;
     if (profile.style === 'sleep-nest') startSleepNoiseBed(modeName, profile);
     if (profile.spaceEnvelope?.enabled) startSpaceEnvelope(modeName, soundMode, profile);
+    if (profile.waveMotion?.enabled) startWaveMotion(modeName, soundMode, profile);
     ratios.forEach((ratio, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -2520,7 +2628,7 @@ function createAudioEngine() {
         const rightOsc = ctx.createOscillator();
         const rightGain = ctx.createGain();
         const rightPan = ctx.createStereoPanner();
-        const deltaHz = clamp(Number(audioState.deltaHz || soundMode.binaural.deltaHz) || 2, 1, 4);
+        const deltaHz = clamp(Number(audioState.deltaHz || soundMode.binaural.deltaHz) || 2, BEAT_OFFSET_MIN_HZ, BEAT_OFFSET_MAX_HZ);
         osc.frequency.value = frequency;
         rightOsc.type = 'sine';
         rightOsc.frequency.value = frequency + deltaHz;
@@ -2742,6 +2850,7 @@ function createAudioEngine() {
       lastSelectedPhraseCell: musicMemory.lastSelectedCell,
       lastOrderedPhraseCell: musicMemory.lastOrderedCell,
       spaceEnvelopeEnabled: Boolean(diagnosticsProfile.spaceEnvelope?.enabled),
+      waveMotionEnabled: Boolean(diagnosticsProfile.waveMotion?.enabled),
       sleepNoiseEnabled: Boolean(diagnosticsProfile.sleepNoise?.enabled),
       crossfadeActive: fadingLayerCount > 0,
       activeAudioLayerCount: 1 + fadingLayerCount,
@@ -2751,6 +2860,8 @@ function createAudioEngine() {
       lastEventAt: audioState.lastEventAt,
       modeGain: Number(audioState.modeGainValue.toFixed(4)),
       masterGainTarget: Number(audioState.masterGainValue.toFixed(4)),
+      beatOffsetHz: audioState.deltaHz,
+      beatOffsetRangeHz: [BEAT_OFFSET_MIN_HZ, BEAT_OFFSET_MAX_HZ],
       compressorEnabled: audioState.compressorEnabled,
       activeNodes: audioState.activeNodes,
       activeOscillators: audioState.activeOscillators,
@@ -4035,6 +4146,7 @@ function refreshDiagnostics(immediate = false) {
       lastSelectedPhraseCell: diagnostics.lastSelectedPhraseCell,
       lastOrderedPhraseCell: diagnostics.lastOrderedPhraseCell,
       spaceEnvelopeEnabled: diagnostics.spaceEnvelopeEnabled,
+      waveMotionEnabled: diagnostics.waveMotionEnabled,
       sleepNoiseEnabled: diagnostics.sleepNoiseEnabled,
       crossfadeActive: diagnostics.crossfadeActive,
       activeAudioLayerCount: diagnostics.activeAudioLayerCount,
@@ -4047,6 +4159,8 @@ function refreshDiagnostics(immediate = false) {
       lastEventAt: diagnostics.lastEventAt,
       modeGain: diagnostics.modeGain,
       masterGainTarget: diagnostics.masterGainTarget,
+      beatOffsetHz: diagnostics.beatOffsetHz,
+      beatOffsetRangeHz: diagnostics.beatOffsetRangeHz,
       compressorEnabled: diagnostics.compressorEnabled,
       activeNodes: diagnostics.activeNodes,
       activeOscillators: diagnostics.activeOscillators,
