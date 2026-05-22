@@ -146,27 +146,6 @@ const SOUND_MODES = [
         lowpassHz: [280, 560],
         highpassHz: 34
       },
-      spaceEnvelope: {
-        enabled: true,
-        gain: 0.018,
-        bedsideGain: 0.012,
-        voiceRatios: [
-          1,
-          1.189,
-          1.498,
-          1.682,
-          2,
-          2.245
-        ],
-        maxVoices: 5,
-        attackSeconds: [24, 64],
-        releaseSeconds: [70, 190],
-        cyclesSeconds: [55, 89, 144, 233],
-        panDrift: 0.10,
-        detuneCents: 2.8,
-        lowpassHz: [240, 460],
-        highpassHz: 32
-      },
       orderedPhraseCells: [
         [1.498],
         [1.682, 1.498],
@@ -272,6 +251,28 @@ const SOUND_MODES = [
       foregroundGainScale: 0.64,
       repeatMemory: 10,
       droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.020,
+        bedsideGain: 0.012,
+        voiceRatios: [
+          1,
+          1.189,
+          1.335,
+          1.498,
+          1.682,
+          2,
+          2.245
+        ],
+        maxVoices: 5,
+        attackSeconds: [24, 64],
+        releaseSeconds: [70, 190],
+        cyclesSeconds: [55, 89, 144, 233],
+        panDrift: 0.12,
+        detuneCents: 2.4,
+        lowpassHz: [240, 520],
+        highpassHz: 32
+      },
       orderedPhraseCells: [
         [1.498],
         [1.682, 1.498],
@@ -2744,6 +2745,7 @@ function createAudioEngine() {
       sleepNoiseEnabled: Boolean(diagnosticsProfile.sleepNoise?.enabled),
       crossfadeActive: fadingLayerCount > 0,
       activeAudioLayerCount: 1 + fadingLayerCount,
+      activeNodeCountApproximate: fadingLayerCount > 0,
       droneVoiceLimit: diagnosticsProfile.droneVoiceLimit || null,
       lastPhraseAt: audioState.lastPhraseAt,
       lastEventAt: audioState.lastEventAt,
@@ -4036,6 +4038,7 @@ function refreshDiagnostics(immediate = false) {
       sleepNoiseEnabled: diagnostics.sleepNoiseEnabled,
       crossfadeActive: diagnostics.crossfadeActive,
       activeAudioLayerCount: diagnostics.activeAudioLayerCount,
+      activeNodeCountApproximate: diagnostics.activeNodeCountApproximate,
       activeProgramId: programState.activeProgramId,
       activeProgramPhaseId: programState.activePhaseId,
       activeProgramPhaseLabel: programState.activePhaseLabel,
