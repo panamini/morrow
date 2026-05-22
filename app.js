@@ -566,16 +566,21 @@ const SOUND_MODES = [
         object: 1,
         ringing: 2
       },
-      attackSeconds: [0.18, 1.4],
-      releaseSeconds: [8, 26],
-      gainScale: 1.18,
-      foregroundGainScale: 1.35,
+      attackSeconds: [1.8, 5.8],
+      releaseSeconds: [12, 34],
+      gainScale: 0.58,
+      foregroundGainScale: 0.66,
+      firstPhraseDelayMs: {
+        object: [1800, 4200],
+        bedside: [5000, 14000],
+        ringing: [900, 2600]
+      },
       repeatMemory: 7,
       droneVoiceLimit: 2,
       spaceEnvelope: {
         enabled: true,
-        gain: 0.012,
-        bedsideGain: 0.007,
+        gain: 0.007,
+        bedsideGain: 0.005,
         voiceRatios: [
           0.5,
           1.194,
@@ -1136,8 +1141,8 @@ const WORLDS = [
   { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-afterglow', visualScore: 'ember-afterglow', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
   { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', visualScore: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
-  { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'afternoon-glass', visualScore: 'afternoon-glass', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
-  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#eadfc9', spill: '#f4cf45', outer: '#f7e7a8', inner: '#e8742d', core: '#4b1b13', core2: '#c6281a', shadow: '#2a0d05' }, bedside: { wall: '#181109', spill: '#3d2408', outer: '#9b652a', inner: '#b64a25', core: '#190905', core2: '#4a1809', shadow: '#030100' }, wake: { wall: '#eadfc9', spill: '#f0cf63', outer: '#f7e7ad', inner: '#e98a30', core: '#5d2012', core2: '#c9341c', shadow: '#361006' } } },
+  { id: 'mineral-green', name: 'Mineral Green', mood: 'grey wall, cyan green glass body, quiet mineral light', soundMode: 'afternoon-glass', visualScore: 'afternoon-glass', palettes: { object: { wall: '#8e9188', spill: '#6f8b7d', outer: '#74f2c9', inner: '#5fe19b', core: '#55d184', core2: '#72e9bd', shadow: '#4f5b52' }, bedside: { wall: '#071005', spill: '#1b2b21', outer: '#4b9a79', inner: '#3d8c62', core: '#143024', core2: '#23624b', shadow: '#000201' }, wake: { wall: '#9ca096', spill: '#7fa291', outer: '#86ffd7', inner: '#69eba7', core: '#5edb8f', core2: '#82f1ca', shadow: '#59655c' } } },
+  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#064fc8', spill: '#2456bd', outer: '#6c58ad', inner: '#f0717b', core: '#ff604f', core2: '#b86cac', shadow: '#03195e' }, bedside: { wall: '#181109', spill: '#3d2408', outer: '#9b652a', inner: '#b64a25', core: '#190905', core2: '#4a1809', shadow: '#030100' }, wake: { wall: '#0755d0', spill: '#2d61c4', outer: '#7764b8', inner: '#ff7a7f', core: '#ff6650', core2: '#c374b5', shadow: '#041f69' } } },
   { id: 'phi-dawn', name: 'Golden Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'night-nest', name: 'Night Nest', mood: 'low blue shelter, soft breath, sleep return', soundMode: 'night-nest', visualScore: 'night-nest', palettes: { object: { wall: '#020714', spill: '#061a3d', outer: '#2d7286', inner: '#3b8a88', core: '#01040b', core2: '#071226', shadow: '#000104' }, bedside: { wall: '#00030a', spill: '#031026', outer: '#164355', inner: '#1f5b5c', core: '#000207', core2: '#040b17', shadow: '#000000' }, wake: { wall: '#07111f', spill: '#0b2a55', outer: '#3a8794', inner: '#4fa09a', core: '#020713', core2: '#0b1d34', shadow: '#000207' } } },
   { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
@@ -1538,9 +1543,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000052,
         driftX: 0.030,
         driftY: 0.024,
-        outerScale: 2.50,
-        innerScale: 1.62,
-        coreScale: 1.16,
+        outerScale: 2.52,
+        innerScale: 1.682,
+        coreScale: 1,
         outerAlpha: 1.04,
         innerAlpha: 0.96,
         coreAlpha: 1.06,
@@ -1561,9 +1566,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000031,
         driftX: 0.038,
         driftY: 0.030,
-        outerScale: 2.92,
-        innerScale: 1.96,
-        coreScale: 1.10,
+        outerScale: 2.997,
+        innerScale: 2,
+        coreScale: 1.122,
         outerAlpha: 1.18,
         innerAlpha: 0.74,
         coreAlpha: 1.12,
@@ -1584,9 +1589,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000082,
         driftX: 0.034,
         driftY: 0.026,
-        outerScale: 2.22,
-        innerScale: 1.56,
-        coreScale: 1.10,
+        outerScale: 2.245,
+        innerScale: 1.498,
+        coreScale: 1.122,
         outerAlpha: 0.92,
         innerAlpha: 1.06,
         coreAlpha: 1.04,
@@ -1607,9 +1612,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000036,
         driftX: 0.018,
         driftY: 0.016,
-        outerScale: 2.35,
-        innerScale: 1.50,
-        coreScale: 1.08,
+        outerScale: 2.245,
+        innerScale: 1.498,
+        coreScale: 1.189,
         outerAlpha: 0.72,
         innerAlpha: 0.82,
         coreAlpha: 1.10,
@@ -1630,14 +1635,14 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000054,
         driftX: 0.030,
         driftY: 0.022,
-        outerScale: 2.48,
-        innerScale: 1.64,
-        coreScale: 1.13,
-        outerAlpha: 1.00,
-        innerAlpha: 0.94,
-        coreAlpha: 1.04,
-        rimAlpha: 0.96,
-        ceilingAlpha: 0.82,
+        outerScale: 2.997,
+        innerScale: 2.245,
+        coreScale: 1.498,
+        outerAlpha: 0.72,
+        innerAlpha: 0.86,
+        coreAlpha: 1.18,
+        rimAlpha: 0.54,
+        ceilingAlpha: 0.56,
         pulseGain: 0.07,
         eventWindowMs: 5200,
         eventAlpha: 0.16
@@ -1653,14 +1658,16 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000027,
         driftX: 0.018,
         driftY: 0.012,
-        outerScale: 2.30,
-        innerScale: 1.44,
-        coreScale: 1.02,
-        outerAlpha: 0.78,
-        innerAlpha: 0.76,
-        coreAlpha: 0.96,
-        rimAlpha: 0.50,
-        ceilingAlpha: 0.54,
+        outerScale: 2.245,
+        innerScale: 1.782,
+        coreScale: 1.122,
+        coreOffsetY: 0,
+        innerOffsetY: 0,
+        outerAlpha: 0.90,
+        innerAlpha: 1.16,
+        coreAlpha: 1.34,
+        rimAlpha: 0.78,
+        ceilingAlpha: 0.68,
         pulseGain: 0.035,
         eventWindowMs: 9000,
         eventAlpha: 0.07
@@ -1676,9 +1683,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000033,
         driftX: 0.020,
         driftY: 0.017,
-        outerScale: 2.40,
-        innerScale: 1.55,
-        coreScale: 1.10,
+        outerScale: 2.397,
+        innerScale: 1.5,
+        coreScale: 1.125,
         outerAlpha: 0.92,
         innerAlpha: 0.86,
         coreAlpha: 1.08,
@@ -1699,9 +1706,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000046,
         driftX: 0.024,
         driftY: 0.020,
-        outerScale: 2.58,
-        innerScale: 1.70,
-        coreScale: 1.14,
+        outerScale: 2.618,
+        innerScale: 1.682,
+        coreScale: 1.122,
         outerAlpha: 1.10,
         innerAlpha: 0.94,
         coreAlpha: 1.04,
@@ -1722,9 +1729,9 @@ function createApertureRenderer(canvas) {
         driftYRate: 0.000021,
         driftX: 0.020,
         driftY: 0.016,
-        outerScale: 2.72,
-        innerScale: 1.72,
-        coreScale: 1.03,
+        outerScale: 2.667,
+        innerScale: 1.682,
+        coreScale: 1,
         outerAlpha: 0.66,
         innerAlpha: 0.72,
         coreAlpha: 1.10,
@@ -1744,9 +1751,11 @@ function createApertureRenderer(canvas) {
       driftYRate: 0.00011,
       driftX: 0.045,
       driftY: 0.035,
-      outerScale: 2.45,
-      innerScale: 1.72,
-      coreScale: 1.22,
+      outerScale: 2.5,
+      innerScale: 1.667,
+      coreScale: 1.25,
+      coreOffsetY: 0,
+      innerOffsetY: 0,
       outerAlpha: 1,
       innerAlpha: 1,
       coreAlpha: 1,
@@ -1794,6 +1803,8 @@ function createApertureRenderer(canvas) {
     const r = radius * breathe;
     const driftX = Math.sin(time * visualProfile.driftXRate) * r * visualProfile.driftX;
     const driftY = Math.cos(time * visualProfile.driftYRate) * r * visualProfile.driftY;
+    const innerOffsetY = r * (visualProfile.innerOffsetY || 0);
+    const coreOffsetY = r * (visualProfile.coreOffsetY || 0);
     const bedDim = mode === 'bedside' ? 0.72 : 1;
     const tapPulse = mode === 'object' ? clamp((visualState.objectTapPulseUntil - time) / 620, 0, 1) : 0;
     const pulseEase = tapPulse * tapPulse * (3 - 2 * tapPulse);
@@ -1806,14 +1817,14 @@ function createApertureRenderer(canvas) {
       [1, rgba(palette.spill, 0)]
     ], 'screen');
 
-    fillCircle(cx + driftX, cy + driftY, r * visualProfile.innerScale, [
+    fillCircle(cx + driftX, cy + driftY + innerOffsetY, r * visualProfile.innerScale, [
       [0, rgba(palette.inner, 0.030 * glow * visualProfile.innerAlpha)],
       [0.44, rgba(palette.outer, 0.085 * glow * visualProfile.rimAlpha)],
       [0.78, rgba(palette.spill, 0.070 * glow * visualProfile.innerAlpha)],
       [1, rgba(palette.spill, 0)]
     ], 'screen');
 
-    fillCircle(cx, cy, r * visualProfile.coreScale, [
+    fillCircle(cx, cy + coreOffsetY, r * visualProfile.coreScale, [
       [0, rgba(palette.core, 0.92 * brightness * visualProfile.coreAlpha)],
       [0.30, rgba(palette.core2, 0.78 * brightness * visualProfile.coreAlpha)],
       [0.56, rgba(palette.inner, 0.52 * glow * visualProfile.innerAlpha)],
@@ -1822,7 +1833,36 @@ function createApertureRenderer(canvas) {
       [1, rgba(palette.outer, 0)]
     ]);
 
-    fillCircle(cx - driftX * 0.55, cy - driftY * 0.55, r * 0.88, [
+    if (visualScore === 'paper-sun') {
+      fillCircle(cx + driftX * 0.08, cy + driftY * 0.08, r * 0.54, [
+        [0, rgba(palette.core, 0.78 * brightness)],
+        [0.42, rgba(palette.core, 0.52 * brightness)],
+        [0.72, rgba(palette.inner, 0.22 * glow)],
+        [1, rgba(palette.core2, 0)]
+      ]);
+      fillCircle(cx + driftX * 0.18, cy + driftY * 0.18, r * 1.02, [
+        [0, rgba(palette.core, 0.46 * brightness)],
+        [0.30, rgba(palette.inner, 0.30 * glow)],
+        [0.54, rgba(palette.core2, 0.20 * glow)],
+        [0.78, rgba(palette.outer, 0.055 * glow)],
+        [1, rgba(palette.outer, 0)]
+      ]);
+      fillCircle(cx - driftX * 0.32, cy - driftY * 0.24, r * 1.36, [
+        [0, rgba(palette.outer, 0)],
+        [0.46, rgba(palette.core2, 0.030 * glow)],
+        [0.66, rgba(palette.inner, 0.080 * glow)],
+        [0.84, rgba(palette.outer, 0.052 * glow)],
+        [1, rgba(palette.spill, 0)]
+      ], 'screen');
+      fillCircle(cx + driftX * 0.10, cy + driftY * 0.10, r * 0.74, [
+        [0, rgba(palette.core, 0)],
+        [0.48, rgba(palette.core, 0.040 * brightness)],
+        [0.78, rgba(palette.shadow, 0.055 * brightness)],
+        [1, rgba(palette.shadow, 0)]
+      ], 'multiply');
+    }
+
+    fillCircle(cx - driftX * 0.55, cy - driftY * 0.55 + coreOffsetY, r * 0.88, [
       [0, rgba(palette.shadow, 0.10)],
       [0.44, rgba(palette.core, 0.18 * brightness)],
       [1, rgba(palette.core, 0)]
@@ -2000,8 +2040,13 @@ function createAudioEngine() {
     eventTimer = null;
     if (oldTimer) window.clearTimeout(oldTimer);
 
-    oldModeGain.gain.cancelScheduledValues(at);
-    oldModeGain.gain.setTargetAtTime(0.0001, at, fadeSeconds);
+    const heldValue = Math.max(0.0001, Number(oldModeGain.gain.value) || audioState.modeGainValue || 0.0001);
+    if (typeof oldModeGain.gain.cancelAndHoldAtTime === 'function') oldModeGain.gain.cancelAndHoldAtTime(at);
+    else {
+      oldModeGain.gain.cancelScheduledValues(at);
+      oldModeGain.gain.setValueAtTime(heldValue, at);
+    }
+    oldModeGain.gain.exponentialRampToValueAtTime(0.0001, at + fadeSeconds);
     if (isCrossfade) fadingLayerCount += 1;
 
     window.setTimeout(() => {
@@ -2144,6 +2189,7 @@ function createAudioEngine() {
       foregroundGainScale: custom.foregroundGainScale || defaultForegroundGain,
       repeatMemory: custom.repeatMemory || 4,
       droneVoiceLimit: custom.droneVoiceLimit,
+      firstPhraseDelayMs: custom.firstPhraseDelayMs || null,
       wakeRatioCeilings: custom.wakeRatioCeilings || null,
       sleepNoise: custom.sleepNoise || null,
       spaceEnvelope: custom.spaceEnvelope || null,
@@ -2775,7 +2821,11 @@ function createAudioEngine() {
           eventTimer = window.setTimeout(scheduleNextStrike, 70);
         } else {
           const isThread = soundMode.engineV2?.style === 'thread';
-          const firstPhraseDelay = isThread
+          const profile = getV2Profile(modeName, soundMode);
+          const customFirstPhraseDelay = profile.firstPhraseDelayMs?.[modeName];
+          const firstPhraseDelay = Array.isArray(customFirstPhraseDelay)
+            ? randomBetween(customFirstPhraseDelay, customFirstPhraseDelay[0])
+            : isThread
             ? (modeName === 'bedside' ? randomBetween([1200, 3600], 2200) : modeName === 'ringing' ? 250 : randomBetween([80, 360], 180))
             : modeName === 'bedside' ? randomBetween([5000, 14000], 9000) : modeName === 'ringing' ? 500 : randomBetween([300, 1300], 700);
           audioState.activeTimers = 1;
@@ -2827,9 +2877,17 @@ function createAudioEngine() {
   function stopExplicit() { stopScheduledNodes('explicit_stop', 0.28); return true; }
   function stopForDurationExpiry() { stopScheduledNodes('duration_expiry', 1.2); return true; }
   function stopForWakeDismiss() { stopScheduledNodes('wake_dismiss', 0.3); return true; }
-  function crossfadeToWorld(world) {
+  function crossfadeToWorld(world, modeName = audioState.currentMode || 'object', options = {}) {
     if (!ctx || audioState.userFacingAudioState !== 'PLAYING') return;
-    startMode(audioState.currentMode || 'object', { worldId: world.id, intensity: 0.92, crossfadeSeconds: 1.8, fadeInSeconds: 1.1 });
+    const targetSoundModeId = options.nativeSound ? world.soundMode : getEffectiveSoundMode(world).id;
+    if (audioState.currentWorldId === world.id && audioState.currentMode === modeName && audioState.currentSoundModeId === targetSoundModeId) return;
+    startMode(modeName, {
+      worldId: world.id,
+      soundModeId: targetSoundModeId,
+      intensity: modeName === 'bedside' ? 0.72 : 0.92,
+      crossfadeSeconds: 2.4,
+      fadeInSeconds: 1.35
+    });
   }
   function getAudioDiagnostics() {
     updateContextState();
@@ -3761,10 +3819,11 @@ function handleMobileBackSwipeCancel(event) {
   mobileBackSwipe = null;
 }
 
-function applyWorld(world) {
+function applyWorld(world, options = {}) {
   if (!world) return null;
   state.selectedWorldId = world.id;
   state.settings.audio.soundMode = WORLD_DEFAULT_SOUND_MODE;
+  if (options.nativeSound !== false) delete state.settings.audio.worldSoundModes[world.id];
   worldSelectionState.activeWorld = world.id;
   worldSelectionState.selectedWorld = world.id;
   worldSelectionState.focusedWorld = world.id;
@@ -3772,7 +3831,7 @@ function applyWorld(world) {
   saveState();
   setActiveVisualWorld(world.id);
   if (renderer) renderer.setWorld(world.id);
-  if (audioState.userFacingAudioState === 'PLAYING') ensureAudioEngine().crossfadeToWorld(world);
+  if (audioState.userFacingAudioState === 'PLAYING') ensureAudioEngine().crossfadeToWorld(world, options.audioMode, { nativeSound: options.nativeSound !== false });
   syncSettingsControls(false);
   updateWorldReadout();
   return world;
@@ -3806,8 +3865,9 @@ function shouldStartWorldAudioFromGesture(context) {
 }
 
 function startWorldAudioFromGesture(event, context) {
-  if (!event || context !== 'worlds') return;
-  startSoundFromGesture(event, 'object', { worldId: state.selectedWorldId, intensity: 1 });
+  if (!event) return;
+  const modeName = context === 'bedside' ? 'bedside' : 'object';
+  startSoundFromGesture(event, modeName, { worldId: state.selectedWorldId, intensity: modeName === 'bedside' ? 0.72 : 1, nativeSound: true });
 }
 
 function enterWorldFromGesture(event) {
@@ -3834,9 +3894,11 @@ function setWorldByStep(step, context = state.currentMode, event = null) {
   const next = WORLDS[modulo(index + step, WORLDS.length)];
   if (!next) return null;
   if (context === 'bedside' || context === 'object') {
-    applyWorld(next);
+    const wasPlaying = audioState.userFacingAudioState === 'PLAYING';
+    applyWorld(next, { audioMode: context });
+    if (!wasPlaying) startWorldAudioFromGesture(event, context);
   } else {
-    applyWorld(next);
+    applyWorld(next, { audioMode: 'object' });
     renderWorlds();
     startWorldAudioFromGesture(event, context);
   }
@@ -3970,7 +4032,7 @@ function worldFromConstellationPointer(event) {
 }
 function selectWorldCandidate(worldId, { stage = true, event = null } = {}) {
   const world = getWorld(worldId);
-  applyWorld(world);
+  applyWorld(world, { audioMode: 'object' });
   renderWorlds();
   startWorldAudioFromGesture(event, 'worlds');
 }
@@ -4043,7 +4105,7 @@ function handleSensoryPointerEnd(event) {
   const dy = event.clientY - sensoryPointer.y;
   const isHorizontalWorldGesture = Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.2;
   if (isHorizontalWorldGesture && (sensoryPointer.mode === 'object' || sensoryPointer.mode === 'bedside')) {
-    setWorldByStep(dx < 0 ? 1 : -1, sensoryPointer.mode);
+    setWorldByStep(dx < 0 ? 1 : -1, sensoryPointer.mode, event);
   } else if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) * 1.4 && sensoryPointer.mode === 'bedside') {
     const next = clamp(state.settings.visualBrightness + (dy < 0 ? 0.08 : -0.08), 0.08, 1);
     state.settings.visualBrightness = next;
