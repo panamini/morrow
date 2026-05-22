@@ -820,6 +820,27 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
 .world-step-button:active, .world-screen-step:active { transform: scale(.96); }
 .wake-world-edge:active { transform: translateY(-50%) scale(.96); }
 
+@media (hover: hover) and (pointer: fine) {
+  .bedside-world-edge,
+  .wake-world-edge {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  body.desktop-pointer-active .bedside-world-edge,
+  body.desktop-pointer-active .wake-world-edge,
+  .bedside-panel:hover .bedside-world-edge,
+  .bedside-panel:focus-within .bedside-world-edge,
+  .wake-set-panel:hover .wake-world-edge,
+  .wake-set-panel:focus-within .wake-world-edge,
+  .bedside-world-edge:hover,
+  .bedside-world-edge:focus-visible,
+  .wake-world-edge:hover,
+  .wake-world-edge:focus-visible {
+    opacity: .92;
+    filter: blur(0);
+  }
+}
+
 /* World constellation. */
 .worlds-panel { overflow: visible; }
 .world-constellation {

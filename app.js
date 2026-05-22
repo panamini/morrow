@@ -11,6 +11,7 @@ const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
 const WORLD_DEFAULT_SOUND_MODE = 'world-default';
 const TUNING_A4_HZ = 432;
+const DESKTOP_POINTER_IDLE_MS = 1200;
 const SPEAKER_ON_ICON = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>';
 const SPEAKER_OFF_ICON = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>';
 
@@ -732,6 +733,7 @@ let sensoryPointer = null;
 let durationPointer = null;
 let wakePointer = null;
 let wakeWorldPointer = null;
+let desktopPointerIdleTimer = null;
 let wakeSettleTimer = null;
 let wakeEntryGuardUntil = 0;
 let wakeLastEntryAt = 0;
@@ -846,6 +848,19 @@ function getWakeWorldTrackLabel() {
 }
 function getVisualScore(world = getWorld()) {
   return world.visualScore || 'default';
+}
+function clearDesktopPointerIdleTimer() {
+  if (desktopPointerIdleTimer) window.clearTimeout(desktopPointerIdleTimer);
+  desktopPointerIdleTimer = null;
+}
+function armDesktopPointerActivity() {
+  if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  document.body.classList.add('desktop-pointer-active');
+  clearDesktopPointerIdleTimer();
+  desktopPointerIdleTimer = window.setTimeout(() => {
+    document.body.classList.remove('desktop-pointer-active');
+    desktopPointerIdleTimer = null;
+  }, DESKTOP_POINTER_IDLE_MS);
 }
 function getSelectedBedSessionOption() {
   return BED_SESSION_OPTIONS.find((option) => option.id === state.bedsideSessionId) || BED_SESSION_OPTIONS[2];
@@ -3163,6 +3178,11 @@ function refreshDiagnostics(immediate = false) {
 function toggleDebugGrid() { gridOverlayEnabled = !gridOverlayEnabled; document.body.classList.toggle('debug-grid', gridOverlayEnabled); refreshDiagnostics(); }
 
 function bindEvents() {
+  window.addEventListener('pointermove', (event) => { if (event.pointerType === 'mouse') armDesktopPointerActivity(); });
+  window.addEventListener('mousemove', armDesktopPointerActivity);
+  window.addEventListener('pointerdown', (event) => { if (event.pointerType === 'mouse') armDesktopPointerActivity(); });
+  window.addEventListener('blur', clearDesktopPointerIdleTimer);
+
   dom.objectGestureSurface.addEventListener('pointerdown', (event) => handleSensoryPointerStart(event, 'object'));
   dom.objectGestureSurface.addEventListener('pointermove', handleSensoryPointerMove);
   dom.objectGestureSurface.addEventListener('pointerup', handleSensoryPointerEnd);
