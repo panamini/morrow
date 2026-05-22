@@ -12,6 +12,7 @@ const WORLD_LABEL_HIDE_SAFE_MIN = 540;
 const WORLD_DEFAULT_SOUND_MODE = 'world-default';
 const TUNING_A4_HZ = 432;
 const DESKTOP_POINTER_IDLE_MS = 1200;
+const UI_IDLE_MS = 4000;
 const SPEAKER_ON_ICON = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>';
 const SPEAKER_OFF_ICON = '<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M7.5 8.25 12 4.5v15l-4.5-3.75H4.5A1.5 1.5 0 0 1 3 14.25v-4.5a1.5 1.5 0 0 1 1.5-1.5h3Z"/></svg>';
 
@@ -318,6 +319,130 @@ const SOUND_MODES = [
     }
   },
   {
+    id: 'afternoon-glass',
+    name: 'G Afternoon Glass',
+    referenceHz: 'G / suspended 6/9 reset field',
+    description: 'Clear G reset field: mineral breath, suspended fifths, soft daytime clarity.',
+    baseFrequency: Number(equalTemperamentHzFromMidi(43).toFixed(2)), // G2 = 96.22 at A432
+    partialRatios: [
+      0.5,
+      1,
+      1.122,
+      1.260,
+      1.335,
+      1.498,
+      1.682,
+      2,
+      2.245,
+      2.520,
+      2.670,
+      2.997,
+      3.364,
+      4
+    ],
+    droneRatios: [
+      1,
+      1.498,
+      2,
+      2.245
+    ],
+    strikeGrammar: [
+      { ratio: 1.498, weight: 10 },
+      { ratio: 2, weight: 8 },
+      { ratio: 1.122, weight: 6 },
+      { ratio: 1.260, weight: 5 },
+      { ratio: 1.682, weight: 4.5 },
+      { ratio: 2.245, weight: 4 },
+      { ratio: 2.520, weight: 3.2 },
+      { ratio: 1.335, weight: 2.2 },
+      { ratio: 2.997, weight: 1.8 },
+      { ratio: 2.670, weight: 0.9 },
+      { ratio: 3.364, weight: 0.7 },
+      { ratio: 4, weight: 0.18 },
+      { ratio: 0.5, weight: 0.2 }
+    ],
+    bowlDensity: 0.030,
+    shimmerProbability: 0.002,
+    nightSafeCutoff: 620,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'G daytime reset field tuned from A=432',
+    engineV2: {
+      style: 'day-reset',
+      phraseGapsMs: {
+        bedside: [34000, 89000],
+        object: [8000, 34000],
+        ringing: [8000, 28000]
+      },
+      phraseGapSequenceMs: {
+        bedside: [34000, 55000, 89000, 55000, 144000],
+        object: [8000, 13000, 21000, 13000, 34000, 21000],
+        ringing: [8000, 13000, 21000, 13000, 34000]
+      },
+      restProbability: {
+        bedside: 0.64,
+        object: 0.18,
+        ringing: 0.16
+      },
+      maxEventsPerPhrase: {
+        bedside: 1,
+        object: 3,
+        ringing: 3
+      },
+      attackSeconds: [1.8, 7.2],
+      releaseSeconds: [14, 52],
+      gainScale: 0.54,
+      foregroundGainScale: 0.82,
+      repeatMemory: 7,
+      droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.024,
+        bedsideGain: 0.016,
+        voiceRatios: [
+          1,
+          1.122,
+          1.498,
+          1.682,
+          2,
+          2.245,
+          2.520,
+          2.997
+        ],
+        maxVoices: 6,
+        attackSeconds: [16, 42],
+        releaseSeconds: [45, 130],
+        cyclesSeconds: [34, 55, 89, 144, 233],
+        panDrift: 0.18,
+        detuneCents: 3,
+        lowpassHz: [420, 980],
+        highpassHz: 48
+      },
+      orderedPhraseCells: [
+        [1.498],
+        [1.122, 1.260],
+        [1.682, 1.498],
+        [2, 2.245],
+        [1.335, 1.260],
+        [2.520, 2.245],
+        [2.997, 2.520],
+        [1.498, 1]
+      ],
+      phraseCells: [
+        [1.498],
+        [1.122, 1.260],
+        [1.682, 1.498],
+        [2, 2.245],
+        [1.335, 1.260],
+        [2.520, 2.245],
+        [2.997, 2.520],
+        [1.498, 1],
+        [1.260, 1.498, 2],
+        [2.245, 2.520, 2.997],
+        [1]
+      ]
+    }
+  },
+  {
     id: 'neroli-thread',
     name: 'E Neroli Thread',
     referenceHz: 'E / Phrygian thread',
@@ -620,7 +745,7 @@ const WORLDS = [
   { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-human', visualScore: 'default', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
   { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', visualScore: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
-  { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'still-water', visualScore: 'default', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
+  { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'afternoon-glass', visualScore: 'afternoon-glass', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
   { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', visualScore: 'default', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'phi-dawn', name: 'Phi Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'night-nest', name: 'Night Nest', mood: 'low blue shelter, soft breath, sleep return', soundMode: 'night-nest', visualScore: 'night-nest', palettes: { object: { wall: '#020714', spill: '#061a3d', outer: '#2d7286', inner: '#3b8a88', core: '#01040b', core2: '#071226', shadow: '#000104' }, bedside: { wall: '#00030a', spill: '#031026', outer: '#164355', inner: '#1f5b5c', core: '#000207', core2: '#040b17', shadow: '#000000' }, wake: { wall: '#07111f', spill: '#0b2a55', outer: '#3a8794', inner: '#4fa09a', core: '#020713', core2: '#0b1d34', shadow: '#000207' } } },
@@ -734,6 +859,7 @@ let durationPointer = null;
 let wakePointer = null;
 let wakeWorldPointer = null;
 let desktopPointerIdleTimer = null;
+let uiIdleTimer = null;
 let wakeSettleTimer = null;
 let wakeEntryGuardUntil = 0;
 let wakeLastEntryAt = 0;
@@ -862,6 +988,25 @@ function armDesktopPointerActivity() {
     desktopPointerIdleTimer = null;
   }, DESKTOP_POINTER_IDLE_MS);
 }
+function clearUiIdleTimer() {
+  if (uiIdleTimer) window.clearTimeout(uiIdleTimer);
+  uiIdleTimer = null;
+}
+function revealInterfaceFromActivity() {
+  document.body.classList.remove('ui-idle');
+  clearUiIdleTimer();
+  uiIdleTimer = window.setTimeout(() => {
+    document.body.classList.add('ui-idle');
+    uiIdleTimer = null;
+  }, UI_IDLE_MS);
+}
+function bindInterfaceIdle() {
+  ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
+    window.addEventListener(eventName, revealInterfaceFromActivity, { passive: true });
+  });
+  window.addEventListener('blur', clearUiIdleTimer);
+  revealInterfaceFromActivity();
+}
 function getSelectedBedSessionOption() {
   return BED_SESSION_OPTIONS.find((option) => option.id === state.bedsideSessionId) || BED_SESSION_OPTIONS[2];
 }
@@ -945,7 +1090,7 @@ function setActiveVisualWorld(worldId = state.selectedWorldId) {
 function cacheDom() {
   [
     'apertureCanvas', 'grain', 'debugGridOverlay', 'toast', 'soundToggleButton', 'objectPanel', 'objectGestureSurface', 'objectTime', 'nextWake', 'objectRail', 'railBed', 'railWake', 'railWorld', 'railSet',
-    'bedsidePanel', 'bedsideGestureSurface', 'bedsideTime', 'bedsideWakeMemory', 'bedSessionSummary', 'bedsideSoundBreath', 'bedsideWorldPrev', 'bedsideWorldNext', 'durationRow', 'bedsideSetButton', 'bedsideRail', 'bedsideDurationButton', 'bedsideExitButton',
+    'bedsidePanel', 'bedsideGestureSurface', 'bedsideTime', 'bedsideWakeMemory', 'bedSessionSummary', 'bedsideProgramSteps', 'bedsideWorldPrev', 'bedsideWorldNext', 'durationRow', 'bedsideSetButton', 'bedsideRail', 'bedsideDurationButton', 'bedsideExitButton',
     'wakeSetPanel', 'wakeCloseButton', 'wakeGestureArea', 'hourRing', 'minuteRing', 'wakeHour', 'wakeMinute', 'wakeHourValue', 'wakeMinuteValue', 'wakeColon', 'wakeWorldSelector', 'wakeWorldPrev', 'wakeWorldName', 'wakeWorldNext', 'wakeRail', 'wakeSetConfirmButton',
     'worldsPanel', 'worldsCloseButton', 'wakeWorldMemory', 'worldConstellation', 'worldPrevButton', 'worldNextButton', 'worldCopy', 'worldConstellationName', 'worldHint', 'worldRail', 'worldBackButton',
     'settingsPanel', 'settingsBackdrop', 'settingsSheet', 'settingsCloseButton', 'soundModeSelect', 'soundModeDescription', 'binauralToggle', 'deltaReadout', 'deltaSlider', 'masterVolumeReadout', 'masterVolume', 'bedsideVolumeReadout', 'bedsideVolume', 'objectVolumeReadout', 'objectVolume', 'wakeVolumeReadout', 'wakeVolume', 'airVolumeReadout', 'airVolume', 'strikeVolumeReadout', 'strikeVolume', 'shimmerReadout', 'shimmerAmount', 'softTestButton', 'mediumTestButton', 'wakeTestButton', 'stopAudioButton', 'brightnessReadout', 'brightnessSlider', 'reduceMotionToggle', 'use24hToggle', 'openSafetyButton', 'openDiagnosticsButton', 'diagGridButton',
@@ -1077,6 +1222,29 @@ function createApertureRenderer(canvas) {
         pulseGain: 0.04,
         eventWindowMs: 9000,
         eventAlpha: 0.10
+      };
+    }
+
+    if (score === 'afternoon-glass') {
+      return {
+        breatheRate: 0.00020,
+        breatheDepth: 0.006,
+        audioBreathe: 0.010,
+        driftXRate: 0.000070,
+        driftYRate: 0.000054,
+        driftX: 0.030,
+        driftY: 0.022,
+        outerScale: 2.48,
+        innerScale: 1.64,
+        coreScale: 1.13,
+        outerAlpha: 1.00,
+        innerAlpha: 0.94,
+        coreAlpha: 1.04,
+        rimAlpha: 0.96,
+        ceilingAlpha: 0.82,
+        pulseGain: 0.07,
+        eventWindowMs: 5200,
+        eventAlpha: 0.16
       };
     }
 
@@ -1269,6 +1437,17 @@ function createApertureRenderer(canvas) {
       ], 'screen');
     }
 
+    if (visualScore === 'afternoon-glass' && eventPulse > 0) {
+      const ringAlpha = eventPulse * visualProfile.eventAlpha * glow;
+      fillCircle(cx + driftX * 0.12, cy + driftY * 0.12, r * (1.18 + eventPulse * 0.10), [
+        [0, rgba(palette.outer, 0)],
+        [0.48, rgba(palette.inner, 0.010 * ringAlpha)],
+        [0.70, rgba(palette.outer, 0.048 * ringAlpha)],
+        [0.88, rgba(palette.spill, 0.018 * ringAlpha)],
+        [1, rgba(palette.outer, 0)]
+      ], 'screen');
+    }
+
     if (tapPulse > 0) {
       fillCircle(cx, cy, r * (1.05 + (1 - tapPulse) * 0.42), [
         [0, rgba(palette.outer, 0.060 * pulseEase)],
@@ -1423,7 +1602,7 @@ function createAudioEngine() {
     return range[0] + Math.random() * (range[1] - range[0]);
   }
   function isLongToneStyle(style) {
-    return style === 'field' || style === 'thread' || style === 'bowl' || style === 'lullaby' || style === 'human' || style === 'wake-chorale' || style === 'sleep-nest';
+    return style === 'field' || style === 'thread' || style === 'bowl' || style === 'lullaby' || style === 'human' || style === 'wake-chorale' || style === 'sleep-nest' || style === 'day-reset';
   }
   function updateActiveOscillatorCount() {
     audioState.activeOscillators = droneOscillators.length + transientOscillators.length;
@@ -1628,6 +1807,7 @@ function createAudioEngine() {
     const isHuman = profile.style === 'human';
     const isWakeChorale = profile.style === 'wake-chorale';
     const isSleepNest = profile.style === 'sleep-nest';
+    const isDayReset = profile.style === 'day-reset';
     const wakeMinute = isWakeChorale && modeName === 'ringing' ? getCurrentWakePhase().atMinute : 0;
     const at = ctx.currentTime;
     const wakeEmphasis = modeName === 'ringing' ? 0.62 + getWakeDensity(modeName) * 0.84 : 1;
@@ -1635,6 +1815,8 @@ function createAudioEngine() {
       ? randomBetween(profile.attackSeconds, 16)
       : isWakeChorale
       ? randomBetween(profile.attackSeconds, 2.4)
+      : isDayReset
+      ? randomBetween(profile.attackSeconds, 3.5)
       : isHuman
       ? randomBetween(profile.attackSeconds, 9)
       : isLullaby
@@ -1646,6 +1828,8 @@ function createAudioEngine() {
       ? randomBetween(profile.releaseSeconds, 90)
       : isWakeChorale
       ? randomBetween(profile.releaseSeconds, 18)
+      : isDayReset
+      ? randomBetween(profile.releaseSeconds, 28)
       : isHuman
       ? randomBetween(profile.releaseSeconds, 70)
       : isLullaby
@@ -1657,6 +1841,8 @@ function createAudioEngine() {
       ? randomBetween([12, 36], 18)
       : isWakeChorale
       ? randomBetween(wakeMinute >= 13 ? [3.5, 11] : [1.5, 6.5], 4)
+      : isDayReset
+      ? randomBetween([2, 8], 4.5)
       : isHuman
       ? randomBetween([6, 14], 9)
       : isLullaby
@@ -1670,26 +1856,28 @@ function createAudioEngine() {
     if ((isLullaby || isHuman) && modeName === 'bedside' && ratio > 2.997) return;
     if (isWakeChorale && modeName === 'ringing' && ratio >= 4 && wakeMinute < 8) return;
     if (isSleepNest && ((modeName === 'bedside' && ratio > 2) || (modeName === 'object' && ratio > 2.997) || ratio > 3.364)) return;
+    if (isDayReset && modeName === 'bedside' && ratio > 2.997) return;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    const modeScale = isSleepNest ? (modeName === 'bedside' ? 0.20 : modeName === 'ringing' ? 0.34 : 0.26) : isWakeChorale ? (modeName === 'ringing' ? 0.46 : 0.38) : isHuman ? (modeName === 'bedside' ? 0.28 : modeName === 'ringing' ? 0.58 : 0.46) : isLullaby ? (modeName === 'bedside' ? 0.34 : modeName === 'ringing' ? 0.68 : 0.56) : isBowl ? (modeName === 'bedside' ? 0.36 : modeName === 'ringing' ? 0.74 : 0.62) : modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
-    const fieldScale = isSleepNest ? 0.030 : isWakeChorale ? 0.046 : isHuman ? 0.044 : isLullaby ? 0.052 : isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
+    const modeScale = isSleepNest ? (modeName === 'bedside' ? 0.20 : modeName === 'ringing' ? 0.34 : 0.26) : isWakeChorale ? (modeName === 'ringing' ? 0.46 : 0.38) : isDayReset ? (modeName === 'bedside' ? 0.36 : modeName === 'ringing' ? 0.62 : 0.58) : isHuman ? (modeName === 'bedside' ? 0.28 : modeName === 'ringing' ? 0.58 : 0.46) : isLullaby ? (modeName === 'bedside' ? 0.34 : modeName === 'ringing' ? 0.68 : 0.56) : isBowl ? (modeName === 'bedside' ? 0.36 : modeName === 'ringing' ? 0.74 : 0.62) : modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
+    const fieldScale = isSleepNest ? 0.030 : isWakeChorale ? 0.046 : isDayReset ? 0.058 : isHuman ? 0.044 : isLullaby ? 0.052 : isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
     const wakePhaseScale = isWakeChorale ? clamp(0.34 + getWakeDensity(modeName) * 0.82, 0.30, wakeMinute >= 13 ? 0.98 : 0.74) : 1;
-    const highToneScale = isSleepNest && ratio >= 2.997 ? 0.22 : isSleepNest && ratio >= 2.378 ? 0.36 : isSleepNest && ratio >= 2 ? 0.56 : isWakeChorale && ratio >= 4 ? (wakeMinute >= 13 ? 0.38 : 0.26) : isWakeChorale && ratio >= 3.364 ? 0.54 : isWakeChorale && ratio >= 2.997 ? 0.72 : (isLullaby || isHuman) && ratio >= 2.997 ? 0.52 : (isLullaby || isHuman) && ratio >= 2.52 ? 0.72 : 1;
-    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * wakePhaseScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isSleepNest ? (modeName === 'bedside' ? 0.010 : modeName === 'object' ? 0.020 : 0.018) : isWakeChorale ? 0.044 : isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
-    const detuneCents = (Math.random() - 0.5) * (isSleepNest ? 0.9 : isWakeChorale ? 1.8 : isHuman ? 1.6 : isLullaby ? 2.2 : isLongTone ? 5 : 10);
+    const highToneScale = isSleepNest && ratio >= 2.997 ? 0.22 : isSleepNest && ratio >= 2.378 ? 0.36 : isSleepNest && ratio >= 2 ? 0.56 : isWakeChorale && ratio >= 4 ? (wakeMinute >= 13 ? 0.38 : 0.26) : isWakeChorale && ratio >= 3.364 ? 0.54 : isWakeChorale && ratio >= 2.997 ? 0.72 : isDayReset && ratio >= 4 ? 0.10 : isDayReset && ratio >= 3.364 ? 0.28 : isDayReset && ratio >= 2.997 ? 0.50 : (isLullaby || isHuman) && ratio >= 2.997 ? 0.52 : (isLullaby || isHuman) && ratio >= 2.52 ? 0.72 : 1;
+    const dayResetPeakCap = modeName === 'bedside' ? 0.022 : modeName === 'ringing' ? 0.050 : 0.055;
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * wakePhaseScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isSleepNest ? (modeName === 'bedside' ? 0.010 : modeName === 'object' ? 0.020 : 0.018) : isWakeChorale ? 0.044 : isDayReset ? dayResetPeakCap : isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const detuneCents = (Math.random() - 0.5) * (isSleepNest ? 0.9 : isWakeChorale ? 1.8 : isDayReset ? 1.4 : isHuman ? 1.6 : isLullaby ? 2.2 : isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
     const bowlTouch = isBowl && ratio >= 4;
 
-    osc.type = isSleepNest ? 'sine' : isWakeChorale ? (wakeMinute >= 13 && ratio < 3 && Math.random() > 0.96 ? 'triangle' : 'sine') : (isLullaby || isHuman) ? 'sine' : isBowl ? (Math.random() > 0.84 ? 'triangle' : 'sine') : Math.random() > 0.72 && !isLongTone ? 'triangle' : 'sine';
+    osc.type = isSleepNest ? 'sine' : isWakeChorale ? (wakeMinute >= 13 && ratio < 3 && Math.random() > 0.96 ? 'triangle' : 'sine') : (isDayReset || isLullaby || isHuman) ? 'sine' : isBowl ? (Math.random() > 0.84 ? 'triangle' : 'sine') : Math.random() > 0.72 && !isLongTone ? 'triangle' : 'sine';
     osc.frequency.setValueAtTime(rawFrequency, at);
     if (osc.detune) osc.detune.setValueAtTime(detuneCents, at);
     filter.type = 'lowpass';
-    filter.frequency.value = Math.max(120, isSleepNest ? Math.min(cutoff, modeName === 'bedside' ? 320 : 360) : isWakeChorale ? Math.min(cutoff, ratio >= 4 ? 660 : 720) : isHuman ? Math.min(cutoff, modeName === 'ringing' ? 540 : 430) : isLullaby ? Math.min(cutoff, modeName === 'ringing' ? 620 : 520) : isBowl ? Math.min(cutoff, modeName === 'bedside' ? 920 : 1800) : cutoff);
-    filter.Q.value = isSleepNest ? 0.10 : isWakeChorale ? 0.16 : isHuman ? 0.18 : isLullaby ? 0.22 : isBowl ? 0.28 : isLongTone ? 0.32 : 0.45;
+    filter.frequency.value = Math.max(120, isSleepNest ? Math.min(cutoff, modeName === 'bedside' ? 320 : 360) : isWakeChorale ? Math.min(cutoff, ratio >= 4 ? 660 : 720) : isDayReset ? Math.min(cutoff, ratio >= 3.364 ? 520 : 620) : isHuman ? Math.min(cutoff, modeName === 'ringing' ? 540 : 430) : isLullaby ? Math.min(cutoff, modeName === 'ringing' ? 620 : 520) : isBowl ? Math.min(cutoff, modeName === 'bedside' ? 920 : 1800) : cutoff);
+    filter.Q.value = isSleepNest ? 0.10 : isWakeChorale ? 0.16 : isDayReset ? 0.16 : isHuman ? 0.18 : isLullaby ? 0.22 : isBowl ? 0.28 : isLongTone ? 0.32 : 0.45;
     gain.gain.value = 0.0001;
     gain.gain.setValueAtTime(0.0001, at);
     if (isSleepNest) {
@@ -1698,6 +1886,9 @@ function createAudioEngine() {
     } else if (isWakeChorale) {
       gain.gain.linearRampToValueAtTime(peak, at + Math.max(0.8, attack));
       gain.gain.setTargetAtTime(0.0001, at + Math.max(0.8, attack) + hold, Math.max(8, release / 2.2));
+    } else if (isDayReset) {
+      gain.gain.linearRampToValueAtTime(peak, at + Math.max(1.8, attack));
+      gain.gain.setTargetAtTime(0.0001, at + Math.max(1.8, attack) + hold, Math.max(10, release / 2.4));
     } else if (isHuman) {
       gain.gain.linearRampToValueAtTime(peak, at + Math.max(3.6, attack));
       gain.gain.setTargetAtTime(0.0001, at + Math.max(3.6, attack) + hold, Math.max(14, release / 2.1));
@@ -1713,7 +1904,7 @@ function createAudioEngine() {
     }
 
     if (pan) {
-      pan.pan.value = isSleepNest ? (ratio >= 2.378 ? (Math.random() - 0.5) * 0.04 : 0) : isWakeChorale ? (ratio >= 2.997 ? (Math.random() - 0.5) * 0.10 : 0) : isHuman ? (upperTone ? (Math.random() - 0.5) * 0.06 : 0) : isLullaby ? (upperTone ? (Math.random() - 0.5) * 0.12 : 0) : bowlTouch ? (Math.random() - 0.5) * (modeName === 'bedside' ? 0.08 : 0.14) : upperTone ? (Math.random() - 0.5) * (isLongTone ? (isThread ? 0.18 : 0.24) : 0.42) : 0;
+      pan.pan.value = isSleepNest ? (ratio >= 2.378 ? (Math.random() - 0.5) * 0.04 : 0) : isWakeChorale ? (ratio >= 2.997 ? (Math.random() - 0.5) * 0.10 : 0) : isDayReset ? (upperTone ? (Math.random() - 0.5) * 0.10 : 0) : isHuman ? (upperTone ? (Math.random() - 0.5) * 0.06 : 0) : isLullaby ? (upperTone ? (Math.random() - 0.5) * 0.12 : 0) : bowlTouch ? (Math.random() - 0.5) * (modeName === 'bedside' ? 0.08 : 0.14) : upperTone ? (Math.random() - 0.5) * (isLongTone ? (isThread ? 0.18 : 0.24) : 0.42) : 0;
       if (upperTone) pan.pan.setTargetAtTime(-pan.pan.value * 0.72, at + attack + hold, release * 0.55);
       osc.connect(filter); filter.connect(gain); gain.connect(pan); pan.connect(modeGain);
     } else {
@@ -1727,7 +1918,7 @@ function createAudioEngine() {
     musicMemory.lastEventAt = nowMs();
     audioState.lastEventAt = musicMemory.lastEventAt;
     registerTransientOscillator(osc, pan ? 4 : 3, Math.ceil((stopAt - at) * 1000) + 200);
-    if (isSleepNest || isWakeChorale || isLullaby || isHuman) return;
+    if (isSleepNest || isWakeChorale || isDayReset || isLullaby || isHuman) return;
     maybeScheduleBloom(modeName, soundMode, emphasis * wakeEmphasis * 0.6);
   }
   function scheduleStrike(modeName, world, soundMode, emphasis = 1) {
@@ -2457,6 +2648,8 @@ function updateBedsideProgramControls() {
     const programActive = session.type === 'program';
     dom.bedSessionSummary.hidden = false;
     dom.bedSessionSummary.classList.toggle('is-selected', programActive);
+    dom.bedSessionSummary.classList.toggle('is-program-active', programActive);
+    if (dom.bedsideWakeMemory) dom.bedsideWakeMemory.hidden = programActive;
     if (programActive) {
       if (title) title.textContent = 'Night Passage';
       if (detail) {
@@ -2467,10 +2660,29 @@ function updateBedsideProgramControls() {
     } else {
       if (title) title.textContent = currentWorld.name;
       if (detail) detail.textContent = session.id === 'infinite' ? '∞ until stopped' : `${session.label} session`;
+      if (dom.bedsideWakeMemory) dom.bedsideWakeMemory.hidden = false;
     }
   }
+  renderNightPassageSteps(session);
 }
 
+function renderNightPassageSteps(session = getSelectedBedSessionOption()) {
+  if (!dom.bedsideProgramSteps) return;
+  const isProgram = session.type === 'program';
+  dom.bedsideProgramSteps.hidden = !isProgram;
+  dom.bedsideProgramSteps.replaceChildren();
+  if (!isProgram) return;
+  const phases = NIGHT_PASSAGE_PROGRAM.phases;
+  const activeIndex = Math.max(0, phases.findIndex((phase) => phase.id === programState.activePhaseId));
+  const visiblePhases = phases.slice(activeIndex);
+  visiblePhases.forEach((phase, index) => {
+    const step = document.createElement('span');
+    step.className = `bedside-program-step${index === 0 ? ' is-active' : ' is-upcoming'}`;
+    step.dataset.phaseId = phase.id;
+    step.textContent = phase.id === 'hold' ? 'Deep Night' : phase.label;
+    dom.bedsideProgramSteps.appendChild(step);
+  });
+}
 function selectBedSession(sessionId) {
   if (!BED_SESSION_OPTIONS.some((option) => option.id === sessionId)) return;
   state.bedsideSessionId = sessionId;
@@ -3097,6 +3309,7 @@ function handleSensoryPointerEnd(event) {
 function revealObjectHint() { dom.objectRail.classList.add('show-labels'); window.setTimeout(() => dom.objectRail.classList.remove('show-labels'), 1400); }
 
 function populateSoundModes() {
+  if (!dom.soundModeSelect) return;
   dom.soundModeSelect.textContent = '';
   const defaultOption = document.createElement('option');
   defaultOption.value = WORLD_DEFAULT_SOUND_MODE;
@@ -3107,6 +3320,7 @@ function populateSoundModes() {
   });
 }
 function syncSettingsControls(save = false) {
+  if (dom.soundModeSelect && !dom.soundModeSelect.querySelector('option[value="afternoon-glass"]')) populateSoundModes();
   const audio = state.settings.audio;
   const currentWorld = getWorld(state.selectedWorldId);
   const effectiveSoundMode = getEffectiveSoundMode(currentWorld);
@@ -3178,6 +3392,7 @@ function refreshDiagnostics(immediate = false) {
 function toggleDebugGrid() { gridOverlayEnabled = !gridOverlayEnabled; document.body.classList.toggle('debug-grid', gridOverlayEnabled); refreshDiagnostics(); }
 
 function bindEvents() {
+  bindInterfaceIdle();
   window.addEventListener('pointermove', (event) => { if (event.pointerType === 'mouse') armDesktopPointerActivity(); });
   window.addEventListener('mousemove', armDesktopPointerActivity);
   window.addEventListener('pointerdown', (event) => { if (event.pointerType === 'mouse') armDesktopPointerActivity(); });

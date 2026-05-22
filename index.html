@@ -10,7 +10,7 @@
   <meta name="description" content="Dawn Chamber — an orbital chromatic bedside object for light, sound, sleep and waking.">
   <title>Dawn Chamber</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=20260522-no-speaker-dot">
+  <link rel="stylesheet" href="styles.css?v=20260522-night-program-safe-width">
 </head>
 <body data-mode="object" data-audio="stopped">
   <canvas id="apertureCanvas" aria-hidden="true"></canvas>
@@ -31,20 +31,20 @@
         <button id="railBed" class="rail-word" type="button" aria-label="Enter bedside">BED</button>
         <button id="railWake" class="rail-word" type="button" aria-label="Set wake">WAKE</button>
       </nav>
-      <button id="railSet" class="corner-set-button" type="button" aria-label="Open settings">SET</button>
+      <button id="railSet" class="corner-set-button" type="button" aria-label="Open settings"><svg class="ui-icon phosphor-icon" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M48,104a8,8,0,0,0-8,8v32a8,8,0,0,0,16,0V112A8,8,0,0,0,48,104Zm40-56a8,8,0,0,0-8,8V200a8,8,0,0,0,16,0V56A8,8,0,0,0,88,48Zm40,24a8,8,0,0,0-8,8v96a8,8,0,0,0,16,0V80A8,8,0,0,0,128,72Zm40-40a8,8,0,0,0-8,8V216a8,8,0,0,0,16,0V40A8,8,0,0,0,168,32Zm40,72a8,8,0,0,0-8,8v32a8,8,0,0,0,16,0V112A8,8,0,0,0,208,104Z"/></svg></button>
     </section>
 
     <section id="bedsidePanel" class="panel bedside-panel immersive" aria-label="Bedside mode" hidden>
       <button id="bedsideGestureSurface" class="gesture-surface" type="button" aria-label="Bedside. Tap to reveal controls. Swipe vertically for brightness.">
         <time id="bedsideTime" class="bedside-clock">--:--</time>
         <span id="bedsideWakeMemory" class="bedside-wake-memory">WAKE -- · ON</span>
-        <span id="bedsideSoundBreath" class="breath-dot" aria-hidden="true"></span>
       </button>
       <button id="bedsideWorldPrev" class="world-step-button bedside-world-edge bedside-world-edge-prev" type="button" aria-label="Previous bedside world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 19.5-7.5-7.5 7.5-7.5"/></svg></button>
       <button id="bedsideWorldNext" class="world-step-button bedside-world-edge bedside-world-edge-next" type="button" aria-label="Next bedside world"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
       <div id="bedSessionSummary" class="bedside-program-button" aria-live="polite">
         <span>Current World</span>
         <small>continuous or timed</small>
+        <div id="bedsideProgramSteps" class="bedside-program-steps" aria-hidden="true"></div>
       </div>
       <div id="durationRow" class="duration-row" role="group" aria-label="Bedside session. Swipe or tap to change.">
         <button class="duration-option" data-session="infinite" type="button">∞</button>
@@ -220,6 +220,6 @@
       if (event.persisted) window.location.reload();
     });
   </script>
-  <script src="app.js?v=20260522-refresh-icons-nocache"></script>
+  <script src="app.js?v=20260522-night-program-safe-width"></script>
 </body>
 </html>
