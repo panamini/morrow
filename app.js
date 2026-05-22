@@ -2,7 +2,9 @@
 
 const APP_SCHEMA_VERSION = 9;
 const STORAGE_KEY = 'dawnChamberV4State';
-const MASTER_GAIN_CEILING = 0.72;
+const MASTER_GAIN_CEILING = 1;
+const OUTPUT_GAIN_BOOST = 1.55;
+const OUTPUT_GAIN_CEILING = 1.35;
 const GRID_GEOMETRY_HARD_RULE = 'If the constellation cannot fit, shrink the orbit';
 const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
@@ -154,7 +156,7 @@ const DEFAULT_STATE = {
       airVolume: 0.55,
       strikeVolume: 0.72,
       shimmerAmount: 0.34,
-      limiterCeiling: 0.72,
+      limiterCeiling: 1,
       binauralEnabled: true,
       binauralDeltaHz: 2,
       soundMode: WORLD_DEFAULT_SOUND_MODE,
@@ -587,13 +589,14 @@ function createAudioEngine() {
     if (!ctx || !masterGain || !modeGain) return;
     const audio = state.settings.audio;
     const master = clamp(audio.masterVolume, 0, 1) * MASTER_GAIN_CEILING;
+    const output = clamp(master * OUTPUT_GAIN_BOOST, 0.0001, OUTPUT_GAIN_CEILING);
     const modeVolume = modeName === 'bedside' ? audio.bedsideVolume : modeName === 'ringing' ? audio.wakeVolume : audio.objectVolume;
     const target = clamp(master * modeVolume * intensity, 0.0001, MASTER_GAIN_CEILING);
     masterGain.gain.cancelScheduledValues(ctx.currentTime);
-    masterGain.gain.setTargetAtTime(clamp(master, 0.0001, MASTER_GAIN_CEILING), ctx.currentTime, ramp);
+    masterGain.gain.setTargetAtTime(output, ctx.currentTime, ramp);
     modeGain.gain.cancelScheduledValues(ctx.currentTime);
     modeGain.gain.setTargetAtTime(target, ctx.currentTime, ramp);
-    audioState.masterGainValue = clamp(master, 0, MASTER_GAIN_CEILING);
+    audioState.masterGainValue = output;
     audioState.modeGainValue = target;
   }
   function syncWakePhase(phase = getCurrentWakePhase()) {
@@ -936,7 +939,7 @@ function createAudioEngine() {
       audioState.currentSoundModeId = soundMode.id;
       audioState.binauralEnabled = Boolean(state.settings.audio.binauralEnabled && soundMode.binaural.allowed);
       audioState.deltaHz = state.settings.audio.binauralDeltaHz;
-      audioState.engineStyle = options.engine === 'legacy' ? 'legacy' : 'v2-field';
+      audioState.engineStyle = options.engine === 'legacy' ? 'legacy' : `v2-${soundMode.engineV2?.style || 'canonical'}`;
       if (modeName === 'ringing') currentWakePhase = getCurrentWakePhase();
       window.setTimeout(() => {
         if (nextSessionId !== sessionId) return;
@@ -1035,7 +1038,9 @@ function createAudioEngine() {
       lastAudioError: audioState.lastAudioError,
       lastAudioStopReason: audioState.lastAudioStopReason,
       currentAudioSessionId: audioState.currentAudioSessionId,
-      limiterCeiling: MASTER_GAIN_CEILING
+      limiterCeiling: MASTER_GAIN_CEILING,
+      outputGainBoost: OUTPUT_GAIN_BOOST,
+      outputGainCeiling: OUTPUT_GAIN_CEILING
     };
   }
   return { unlockAudioFromGesture, playFromGesture, startModeFromGesture, startMode, stopExplicit, stopForDurationExpiry, stopForWakeDismiss, crossfadeToWorld, getAudioDiagnostics, setMasterTarget, syncWakePhase };
