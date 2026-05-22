@@ -28,6 +28,27 @@ const BED_SESSION_OPTIONS = [
   { id: 'night-passage', label: 'night', type: 'program', programId: 'night-passage' }
 ];
 
+const WORLD_NATIVE_SOUND_MODE_IDS = [
+  'blue-bowl',
+  'night-nest',
+  'phi-dawn-chorale',
+  'human-return',
+  'space-field',
+  'afternoon-glass',
+  'neroli-thread',
+  'paper-sun-morning',
+  'ember-afterglow'
+];
+const LEGACY_SOUND_MODE_IDS = [
+  'still-water',
+  'limestone-harmonic',
+  'night-temple',
+  'glass-orbit',
+  'deep-return',
+  'ember-human',
+  'near-silent'
+];
+
 const SOUND_MODES = [
   { id: 'still-water', name: '432 Still Water', referenceHz: '432 Hz', description: 'A=432-style consonance: 216 Hz bed with 432 Hz octave bloom, calm and rounded.', baseFrequency: 216, partialRatios: [0.5, 1, 1.25, 1.5, 2, 2.5], droneRatios: [0.5, 1, 2], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 2, weight: 6 }, { ratio: 1.5, weight: 5 }, { ratio: 1.25, weight: 2 }, { ratio: 2.5, weight: 1 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.20, shimmerProbability: 0.10, nightSafeCutoff: 720, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '432 Hz musical tuning reference' },
   {
@@ -83,12 +104,12 @@ const SOUND_MODES = [
         ringing: [8000, 34000]
       },
       phraseGapSequenceMs: {
-        bedside: [55000, 89000, 34000, 55000, 144000],
+        bedside: [55000, 76000, 34000, 55000, 89000],
         object: [10000, 16000, 26000, 16000, 42000],
         ringing: [8000, 13000, 21000, 13000, 34000]
       },
       restProbability: {
-        bedside: 0.72,
+        bedside: 0.64,
         object: 0.24,
         ringing: 0.18
       },
@@ -124,6 +145,27 @@ const SOUND_MODES = [
         detuneCents: 2.5,
         lowpassHz: [280, 560],
         highpassHz: 34
+      },
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.018,
+        bedsideGain: 0.012,
+        voiceRatios: [
+          1,
+          1.189,
+          1.498,
+          1.682,
+          2,
+          2.245
+        ],
+        maxVoices: 5,
+        attackSeconds: [24, 64],
+        releaseSeconds: [70, 190],
+        cyclesSeconds: [55, 89, 144, 233],
+        panDrift: 0.10,
+        detuneCents: 2.8,
+        lowpassHz: [240, 460],
+        highpassHz: 32
       },
       orderedPhraseCells: [
         [1.498],
@@ -514,6 +556,26 @@ const SOUND_MODES = [
       foregroundGainScale: 1.35,
       repeatMemory: 7,
       droneVoiceLimit: 2,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.012,
+        bedsideGain: 0.007,
+        voiceRatios: [
+          0.5,
+          1.194,
+          1.789,
+          2.127,
+          2.397
+        ],
+        maxVoices: 4,
+        attackSeconds: [18, 48],
+        releaseSeconds: [40, 110],
+        cyclesSeconds: [34, 55, 89, 144],
+        panDrift: 0.18,
+        detuneCents: 2.2,
+        lowpassHz: [300, 620],
+        highpassHz: 58
+      },
       phraseCells: [
         [2.127],
         [1.789],
@@ -530,9 +592,9 @@ const SOUND_MODES = [
   },
   {
     id: 'phi-dawn-chorale',
-    name: 'Phi Dawn Chorale',
+    name: 'Golden Dawn Chorale',
     referenceHz: 'C / Lydian 6/9 wake chorale',
-    description: 'Peaceful melodic alarm: C Lydian 6/9, Fibonacci pacing, soft C5 presence, no harsh beeps.',
+    description: 'Peaceful melodic alarm: C Lydian 6/9, gradual dawn pacing, soft C5 presence, no harsh beeps.',
     baseFrequency: Number(equalTemperamentHzFromMidi(48).toFixed(2)), // C3 = 128.43 at A432
     partialRatios: [
       0.5,
@@ -574,7 +636,7 @@ const SOUND_MODES = [
     shimmerProbability: 0.004,
     nightSafeCutoff: 760,
     binaural: { allowed: false, deltaHz: 2 },
-    ritualLabel: 'C Lydian wake chorale tuned from A=432',
+    ritualLabel: 'Golden Dawn wake chorale tuned from A=432',
     engineV2: {
       style: 'wake-chorale',
       phraseGapsMs: {
@@ -601,6 +663,28 @@ const SOUND_MODES = [
       foregroundGainScale: 0.78,
       repeatMemory: 7,
       droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.022,
+        bedsideGain: 0.012,
+        voiceRatios: [
+          1,
+          1.498,
+          1.682,
+          2,
+          2.245,
+          2.520,
+          2.997
+        ],
+        maxVoices: 6,
+        attackSeconds: [18, 50],
+        releaseSeconds: [50, 150],
+        cyclesSeconds: [34, 55, 89, 144, 233],
+        panDrift: 0.14,
+        detuneCents: 2.4,
+        lowpassHz: [360, 760],
+        highpassHz: 44
+      },
       wakeRatioCeilings: [
         { atMinute: 0, maxRatio: 2.245 },
         { atMinute: 2, maxRatio: 2.520 },
@@ -630,6 +714,249 @@ const SOUND_MODES = [
         [2.245, 2.520, 2.997],
         [4, 3.364, 2.997],
         [2.997, 2.520, 2]
+      ]
+    }
+  },
+  {
+    id: 'paper-sun-morning',
+    name: 'Paper Sun Morning',
+    referenceHz: 'F / suspended morning field',
+    description: 'Warm paper-light morning field: soft suspended thirds and sixths, calm but awake, not an alarm.',
+    baseFrequency: Number(equalTemperamentHzFromMidi(41).toFixed(2)), // F2 at A432
+    partialRatios: [
+      0.5,
+      1,
+      1.122,
+      1.260,
+      1.335,
+      1.498,
+      1.682,
+      2,
+      2.245,
+      2.520,
+      2.670,
+      2.997,
+      3.364,
+      4
+    ],
+    droneRatios: [
+      1,
+      1.335,
+      1.498,
+      2
+    ],
+    strikeGrammar: [
+      { ratio: 1.335, weight: 10 },
+      { ratio: 1.498, weight: 9 },
+      { ratio: 1.682, weight: 6 },
+      { ratio: 2, weight: 5 },
+      { ratio: 1.260, weight: 4 },
+      { ratio: 2.245, weight: 3.2 },
+      { ratio: 2.520, weight: 2.0 },
+      { ratio: 1.122, weight: 1.4 },
+      { ratio: 2.997, weight: 0.7 },
+      { ratio: 3.364, weight: 0.22 },
+      { ratio: 4, weight: 0.10 },
+      { ratio: 0.5, weight: 0.18 }
+    ],
+    bowlDensity: 0.026,
+    shimmerProbability: 0.001,
+    nightSafeCutoff: 560,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'Paper morning field tuned from A=432',
+    engineV2: {
+      style: 'day-reset',
+      phraseGapsMs: {
+        bedside: [42000, 110000],
+        object: [12000, 42000],
+        ringing: [9000, 32000]
+      },
+      phraseGapSequenceMs: {
+        bedside: [55000, 89000, 42000, 76000, 110000],
+        object: [13000, 21000, 34000, 21000, 55000],
+        ringing: [9000, 13000, 21000, 13000, 32000]
+      },
+      restProbability: {
+        bedside: 0.68,
+        object: 0.24,
+        ringing: 0.18
+      },
+      maxEventsPerPhrase: {
+        bedside: 1,
+        object: 2,
+        ringing: 2
+      },
+      attackSeconds: [3.2, 10.5],
+      releaseSeconds: [22, 72],
+      gainScale: 0.50,
+      foregroundGainScale: 0.68,
+      repeatMemory: 8,
+      droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.026,
+        bedsideGain: 0.014,
+        voiceRatios: [
+          1,
+          1.260,
+          1.335,
+          1.498,
+          1.682,
+          2,
+          2.245,
+          2.520
+        ],
+        maxVoices: 6,
+        attackSeconds: [18, 46],
+        releaseSeconds: [55, 150],
+        cyclesSeconds: [34, 55, 89, 144, 233],
+        panDrift: 0.14,
+        detuneCents: 2.8,
+        lowpassHz: [360, 780],
+        highpassHz: 46
+      },
+      orderedPhraseCells: [
+        [1.335],
+        [1.498, 1.335],
+        [1.260, 1.498],
+        [1.682, 2],
+        [2.245, 2],
+        [2.520, 2.245],
+        [1.122, 1.335],
+        [1.498, 1]
+      ],
+      phraseCells: [
+        [1.335],
+        [1.498, 1.335],
+        [1.260, 1.498],
+        [1.682, 2],
+        [2.245, 2],
+        [2.520, 2.245],
+        [1.122, 1.335],
+        [1.498, 1],
+        [1.335, 1.682, 2],
+        [1]
+      ]
+    }
+  },
+  {
+    id: 'ember-afterglow',
+    name: 'Ember Afterglow',
+    referenceHz: 'C / warm after-sunset field',
+    description: 'Warm after-sunset field: close low-mid motion, ember breath, calm body return without bright glass.',
+    baseFrequency: Number(equalTemperamentHzFromMidi(36).toFixed(2)), // C2 at A432
+    partialRatios: [
+      0.5,
+      1,
+      1.189,
+      1.260,
+      1.335,
+      1.498,
+      1.682,
+      1.782,
+      2,
+      2.378,
+      2.520,
+      2.670,
+      2.997,
+      3.364
+    ],
+    droneRatios: [
+      1,
+      1.335,
+      1.498,
+      2
+    ],
+    strikeGrammar: [
+      { ratio: 1.498, weight: 10 },
+      { ratio: 1.335, weight: 8 },
+      { ratio: 1.682, weight: 6 },
+      { ratio: 1.189, weight: 5 },
+      { ratio: 2, weight: 4.5 },
+      { ratio: 1.782, weight: 3.2 },
+      { ratio: 2.378, weight: 2.0 },
+      { ratio: 1.260, weight: 1.6 },
+      { ratio: 2.670, weight: 0.8 },
+      { ratio: 2.997, weight: 0.35 },
+      { ratio: 3.364, weight: 0.12 },
+      { ratio: 0.5, weight: 0.2 }
+    ],
+    bowlDensity: 0.020,
+    shimmerProbability: 0.001,
+    nightSafeCutoff: 520,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'Ember afterglow field tuned from A=432',
+    engineV2: {
+      style: 'human',
+      phraseGapsMs: {
+        bedside: [52000, 130000],
+        object: [18000, 70000],
+        ringing: [13000, 46000]
+      },
+      phraseGapSequenceMs: {
+        bedside: [76000, 110000, 52000, 89000, 144000],
+        object: [18000, 29000, 46000, 29000, 70000],
+        ringing: [13000, 21000, 34000, 21000, 46000]
+      },
+      restProbability: {
+        bedside: 0.72,
+        object: 0.38,
+        ringing: 0.24
+      },
+      maxEventsPerPhrase: {
+        bedside: 1,
+        object: 2,
+        ringing: 2
+      },
+      attackSeconds: [5, 16],
+      releaseSeconds: [32, 100],
+      gainScale: 0.48,
+      foregroundGainScale: 0.58,
+      repeatMemory: 9,
+      droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.024,
+        bedsideGain: 0.016,
+        voiceRatios: [
+          0.5,
+          1,
+          1.189,
+          1.335,
+          1.498,
+          1.682,
+          2,
+          2.378
+        ],
+        maxVoices: 6,
+        attackSeconds: [24, 58],
+        releaseSeconds: [70, 180],
+        cyclesSeconds: [55, 89, 144, 233, 377],
+        panDrift: 0.12,
+        detuneCents: 3.2,
+        lowpassHz: [220, 520],
+        highpassHz: 30
+      },
+      orderedPhraseCells: [
+        [1.498],
+        [1.335, 1.189],
+        [1.682, 1.498],
+        [2, 1.498],
+        [1.782, 1.682],
+        [2.378, 2],
+        [1.260, 1.335],
+        [1]
+      ],
+      phraseCells: [
+        [1.498],
+        [1.335, 1.189],
+        [1.682, 1.498],
+        [2, 1.498],
+        [1.782, 1.682],
+        [2.378, 2],
+        [1.260, 1.335],
+        [1.498, 1],
+        [1]
       ]
     }
   },
@@ -764,12 +1091,12 @@ const SOUND_MODES = [
 
 const WORLDS = [
   { id: 'milk-blue', name: 'Milk Blue', mood: 'cyan membrane, cobalt depth, quiet wall', soundMode: 'blue-bowl', visualScore: 'blue-bowl', palettes: { object: { wall: '#141d30', spill: '#0937ce', outer: '#5ff0c7', inner: '#79f0dd', core: '#244d9a', core2: '#43a7c2', shadow: '#02030a' }, bedside: { wall: '#020710', spill: '#061f4a', outer: '#2aa982', inner: '#3b7b8f', core: '#081120', core2: '#102439', shadow: '#000204' }, wake: { wall: '#7f563c', spill: '#c7efe2', outer: '#d7fff0', inner: '#a9ffd9', core: '#4a6475', core2: '#81c4c0', shadow: '#1b120d' } } },
-  { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-human', visualScore: 'default', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
+  { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-afterglow', visualScore: 'ember-afterglow', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
   { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', visualScore: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
   { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'afternoon-glass', visualScore: 'afternoon-glass', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
-  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', visualScore: 'default', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
-  { id: 'phi-dawn', name: 'Phi Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
+  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
+  { id: 'phi-dawn', name: 'Golden Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'night-nest', name: 'Night Nest', mood: 'low blue shelter, soft breath, sleep return', soundMode: 'night-nest', visualScore: 'night-nest', palettes: { object: { wall: '#020714', spill: '#061a3d', outer: '#2d7286', inner: '#3b8a88', core: '#01040b', core2: '#071226', shadow: '#000104' }, bedside: { wall: '#00030a', spill: '#031026', outer: '#164355', inner: '#1f5b5c', core: '#000207', core2: '#040b17', shadow: '#000000' }, wake: { wall: '#07111f', spill: '#0b2a55', outer: '#3a8794', inner: '#4fa09a', core: '#020713', core2: '#0b1d34', shadow: '#000207' } } },
   { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
 ];
@@ -804,7 +1131,7 @@ const DEFAULT_STATE = {
   currentMode: 'object',
   previousMode: 'object',
   selectedWorldId: 'milk-blue',
-  wakeWorldId: 'milk-blue',
+  wakeWorldId: 'phi-dawn',
   bedsideSessionId: '30m',
   alarm: { enabled: true, time: '07:30', snoozeMinutes: 9, lastTriggeredKey: '' },
   settings: {
@@ -1275,6 +1602,52 @@ function createApertureRenderer(canvas) {
       };
     }
 
+    if (score === 'paper-sun') {
+      return {
+        breatheRate: 0.00018,
+        breatheDepth: 0.0055,
+        audioBreathe: 0.010,
+        driftXRate: 0.000058,
+        driftYRate: 0.000046,
+        driftX: 0.026,
+        driftY: 0.018,
+        outerScale: 2.50,
+        innerScale: 1.62,
+        coreScale: 1.12,
+        outerAlpha: 1.02,
+        innerAlpha: 0.92,
+        coreAlpha: 1.02,
+        rimAlpha: 0.86,
+        ceilingAlpha: 0.92,
+        pulseGain: 0.05,
+        eventWindowMs: 7000,
+        eventAlpha: 0.10
+      };
+    }
+
+    if (score === 'ember-afterglow') {
+      return {
+        breatheRate: 0.00011,
+        breatheDepth: 0.0048,
+        audioBreathe: 0.008,
+        driftXRate: 0.000038,
+        driftYRate: 0.000033,
+        driftX: 0.020,
+        driftY: 0.017,
+        outerScale: 2.40,
+        innerScale: 1.55,
+        coreScale: 1.10,
+        outerAlpha: 0.92,
+        innerAlpha: 0.86,
+        coreAlpha: 1.08,
+        rimAlpha: 0.72,
+        ceilingAlpha: 0.62,
+        pulseGain: 0.04,
+        eventWindowMs: 9000,
+        eventAlpha: 0.08
+      };
+    }
+
     if (score === 'phi-dawn') {
       return {
         breatheRate: 0.00016,
@@ -1515,31 +1888,38 @@ function createAudioEngine() {
   let droneOscillators = [];
   let transientOscillators = [];
   let sessionId = 0;
+  let fadingLayerCount = 0;
   let currentWakePhase = WAKE_CURVE[0];
   const musicMemory = {
     lastRatios: [],
     phraseIndex: 0,
     lastPhraseAt: 0,
-    lastEventAt: 0
+    lastEventAt: 0,
+    lastSelectedCell: null,
+    lastOrderedCell: null
   };
   function updateContextState() { audioState.audioContextState = ctx ? ctx.state : 'none'; return audioState.audioContextState; }
+  function createModeGainLayer(initialValue = 0.0001) {
+    const gain = ctx.createGain();
+    gain.gain.value = initialValue;
+    gain.connect(compressor);
+    return gain;
+  }
   function initContext() {
     if (ctx) return ctx;
     const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextCtor) throw new Error('AudioContext is not available.');
     ctx = new AudioContextCtor();
     masterGain = ctx.createGain();
-    modeGain = ctx.createGain();
     compressor = ctx.createDynamicsCompressor();
     compressor.threshold.value = -14;
     compressor.knee.value = 22;
     compressor.ratio.value = 5;
     compressor.attack.value = 0.018;
     compressor.release.value = 0.28;
-    modeGain.gain.value = 0.0001;
     masterGain.gain.value = 0.0001;
-    modeGain.connect(compressor);
     compressor.connect(masterGain);
+    modeGain = createModeGainLayer(0.0001);
     masterGain.connect(ctx.destination);
     audioState.compressorEnabled = true;
     updateContextState();
@@ -1565,25 +1945,38 @@ function createAudioEngine() {
   function stopScheduledNodes(reason = 'explicit_stop', fade = 0.22) {
     if (!ctx || !modeGain) return;
     const at = ctx.currentTime;
+    const oldModeGain = modeGain;
     const oldOscillators = droneOscillators.slice();
     const oldTransientOscillators = transientOscillators.slice();
     const oldTimer = eventTimer;
+    const oldActiveNodes = audioState.activeNodes;
+    const fadeSeconds = Math.max(0.02, Number(fade) || 0.22);
+    const isCrossfade = reason === 'mode_crossfade_internal';
+
     droneOscillators = [];
     transientOscillators = [];
     eventTimer = null;
     if (oldTimer) window.clearTimeout(oldTimer);
-    modeGain.gain.cancelScheduledValues(at);
-    modeGain.gain.setTargetAtTime(0.0001, at, fade);
+
+    oldModeGain.gain.cancelScheduledValues(at);
+    oldModeGain.gain.setTargetAtTime(0.0001, at, fadeSeconds);
+    if (isCrossfade) fadingLayerCount += 1;
+
     window.setTimeout(() => {
       oldOscillators.concat(oldTransientOscillators).forEach((osc) => { try { osc.stop(); } catch (error) { /* oscillator may already be stopped */ } });
-      if (reason !== 'mode_crossfade_internal') {
+      try { oldModeGain.disconnect(); } catch (error) { /* layer may already be disconnected */ }
+      if (isCrossfade) {
+        fadingLayerCount = Math.max(0, fadingLayerCount - 1);
+        audioState.activeNodes = Math.max(0, audioState.activeNodes - oldActiveNodes);
+        updateActiveOscillatorCount();
+      } else {
         audioState.activeNodes = 0;
         audioState.activeOscillators = 0;
         audioState.activeTimers = 0;
       }
-    }, Math.max(30, fade * 1000 + 80));
+    }, Math.max(30, fadeSeconds * 1000 + 120));
     audioState.lastAudioStopReason = reason;
-    if (reason !== 'mode_crossfade_internal') {
+    if (!isCrossfade) {
       audioState.audioPlaybackState = 'stopped';
       audioState.userFacingAudioState = 'STOPPED';
       updateSoundControls();
@@ -1727,6 +2120,7 @@ function createAudioEngine() {
     const withinLimits = (ratio) => soundMode.baseFrequency * ratio <= cutoff && ratio <= wakeRatioCeiling;
     if (profile.orderedPhraseCells && profile.orderedPhraseCells.length) {
       const orderedCell = profile.orderedPhraseCells[musicMemory.phraseIndex % profile.orderedPhraseCells.length] || [1];
+      musicMemory.lastOrderedCell = orderedCell.slice();
       const filteredOrderedCell = orderedCell.filter(withinLimits);
       if (filteredOrderedCell.length) {
         if (profile.style === 'field') {
@@ -1743,6 +2137,7 @@ function createAudioEngine() {
       return [1].slice(0, profile.maxEvents);
     }
 
+    musicMemory.lastOrderedCell = null;
     const candidates = profile.phraseCells
       .map((cell) => cell.filter(withinLimits))
       .filter((cell) => cell.length);
@@ -2200,6 +2595,7 @@ function createAudioEngine() {
           cell = [cell[0], chosen];
         }
       }
+      musicMemory.lastSelectedCell = cell.slice();
       const eventCount = Math.min(profile.maxEvents, cell.length);
       const eventGap = isLongToneStyle(profile.style)
         ? randomBetween(modeName === 'ringing' ? [2800, 9800] : [5200, 17000], 9000)
@@ -2230,7 +2626,9 @@ function createAudioEngine() {
       sessionId += 1;
       const nextSessionId = sessionId;
       audioState.currentAudioSessionId = nextSessionId;
-      stopScheduledNodes('mode_crossfade_internal', wasPlaying ? 0.06 : 0.02);
+      const crossfadeSeconds = wasPlaying ? clamp(Number(options.crossfadeSeconds) || 1.6, 0.12, 18) : 0.02;
+      stopScheduledNodes('mode_crossfade_internal', crossfadeSeconds);
+      modeGain = createModeGainLayer(0.0001);
       const world = getWorld(options.worldId || state.selectedWorldId);
       const soundMode = options.soundModeId
         ? getSoundMode(options.soundModeId)
@@ -2248,7 +2646,7 @@ function createAudioEngine() {
       window.setTimeout(() => {
         if (nextSessionId !== sessionId) return;
         if (modeName === 'ringing') syncWakePhase(currentWakePhase);
-        else setMasterTarget(modeName, options.intensity || 1, 0.30);
+        else setMasterTarget(modeName, options.intensity || 1, options.fadeInSeconds || 0.30);
         startDrones(modeName, world, soundMode);
         if (options.engine === 'legacy') {
           const density = options.density || (modeName === 'bedside' ? soundMode.bowlDensity * 0.55 : soundMode.bowlDensity);
@@ -2322,7 +2720,7 @@ function createAudioEngine() {
   function stopForWakeDismiss() { stopScheduledNodes('wake_dismiss', 0.3); return true; }
   function crossfadeToWorld(world) {
     if (!ctx || audioState.userFacingAudioState !== 'PLAYING') return;
-    startMode(audioState.currentMode || 'object', { worldId: world.id, intensity: 0.92 });
+    startMode(audioState.currentMode || 'object', { worldId: world.id, intensity: 0.92, crossfadeSeconds: 1.8, fadeInSeconds: 1.1 });
   }
   function getAudioDiagnostics() {
     updateContextState();
@@ -2339,6 +2737,13 @@ function createAudioEngine() {
       currentSoundModeId: audioState.currentSoundModeId,
       engineStyle: audioState.engineStyle,
       phraseStyle: diagnosticsProfile.style,
+      phraseIndex: musicMemory.phraseIndex,
+      lastSelectedPhraseCell: musicMemory.lastSelectedCell,
+      lastOrderedPhraseCell: musicMemory.lastOrderedCell,
+      spaceEnvelopeEnabled: Boolean(diagnosticsProfile.spaceEnvelope?.enabled),
+      sleepNoiseEnabled: Boolean(diagnosticsProfile.sleepNoise?.enabled),
+      crossfadeActive: fadingLayerCount > 0,
+      activeAudioLayerCount: 1 + fadingLayerCount,
       droneVoiceLimit: diagnosticsProfile.droneVoiceLimit || null,
       lastPhraseAt: audioState.lastPhraseAt,
       lastEventAt: audioState.lastEventAt,
@@ -2421,7 +2826,7 @@ function startObjectSound() { return ensureAudioEngine().startMode('object', { i
 function startWakeSequence() {
   wakePreviewActive = false;
   if (state.currentMode !== 'ringing') setMode('ringing', { keepAudio: true });
-  return ensureAudioEngine().startMode('ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 });
+  return ensureAudioEngine().startMode('ringing', { worldId: state.wakeWorldId || state.selectedWorldId || 'phi-dawn', intensity: 1, crossfadeSeconds: 2.4, fadeInSeconds: 1.6 });
 }
 function getAudioDiagnostics() { return ensureAudioEngine().getAudioDiagnostics(); }
 
@@ -2463,7 +2868,9 @@ function crossfadeToProgramPhase(phase) {
     const started = engine.startMode(audioState.currentMode === 'bedside' ? 'bedside' : 'object', {
       worldId: world.id,
       soundModeId: soundMode.id,
-      intensity: programState.currentTargetGain
+      intensity: programState.currentTargetGain,
+      crossfadeSeconds: resolvedPhase.crossfadeSeconds || (resolvedPhase.id === 'wake' ? 3.2 : 12),
+      fadeInSeconds: resolvedPhase.fadeInSeconds || (resolvedPhase.id === 'wake' ? 2.4 : 8)
     });
     if (!started) programState.lastError = audioState.lastAudioError || 'Audio did not start. Tap once to unlock sound, then run previewNightPassage().';
     return {
@@ -2515,6 +2922,8 @@ function getProgramDiagnostics() {
   return {
     activeProgram: programState.activeProgramId,
     activePhase: programState.activePhaseId,
+    activePhaseLabel: programState.activePhaseLabel,
+    wakeTargetAt: programState.wakeTargetAt,
     currentWorldId: programState.currentWorldId || audioState.currentWorldId || state.selectedWorldId,
     currentSoundModeId: programState.currentSoundModeId || audioState.currentSoundModeId,
     currentTargetGain: programState.currentTargetGain,
@@ -3540,16 +3949,47 @@ function revealObjectHint() { dom.objectRail.classList.add('show-labels'); windo
 function populateSoundModes() {
   if (!dom.soundModeSelect) return;
   dom.soundModeSelect.textContent = '';
+  const defaultGroup = document.createElement('optgroup');
+  defaultGroup.label = 'Built-in world track';
   const defaultOption = document.createElement('option');
   defaultOption.value = WORLD_DEFAULT_SOUND_MODE;
-  defaultOption.textContent = 'Built-in world track';
-  dom.soundModeSelect.appendChild(defaultOption);
-  SOUND_MODES.forEach((mode) => {
-    const option = document.createElement('option'); option.value = mode.id; option.textContent = mode.name; dom.soundModeSelect.appendChild(option);
-  });
+  defaultOption.textContent = 'Current world';
+  defaultGroup.appendChild(defaultOption);
+  dom.soundModeSelect.appendChild(defaultGroup);
+
+  const appendGroup = (label, ids) => {
+    const group = document.createElement('optgroup');
+    group.label = label;
+    ids
+      .map((id) => getSoundMode(id))
+      .filter((mode) => mode && mode.id)
+      .forEach((mode) => {
+        const option = document.createElement('option');
+        option.value = mode.id;
+        option.textContent = mode.name;
+        group.appendChild(option);
+      });
+    if (group.children.length) dom.soundModeSelect.appendChild(group);
+  };
+
+  appendGroup('World-native tracks', WORLD_NATIVE_SOUND_MODE_IDS);
+  appendGroup('Lab / legacy references', LEGACY_SOUND_MODE_IDS);
+  const grouped = new Set([WORLD_DEFAULT_SOUND_MODE].concat(WORLD_NATIVE_SOUND_MODE_IDS, LEGACY_SOUND_MODE_IDS));
+  const remaining = SOUND_MODES.filter((mode) => !grouped.has(mode.id));
+  if (remaining.length) {
+    const group = document.createElement('optgroup');
+    group.label = 'Other';
+    remaining.forEach((mode) => {
+      const option = document.createElement('option');
+      option.value = mode.id;
+      option.textContent = mode.name;
+      group.appendChild(option);
+    });
+    dom.soundModeSelect.appendChild(group);
+  }
 }
 function syncSettingsControls(save = false) {
-  if (dom.soundModeSelect && !dom.soundModeSelect.querySelector('option[value="afternoon-glass"]')) populateSoundModes();
+  if (dom.soundModeSelect && !dom.soundModeSelect.querySelector('option[value="paper-sun-morning"]')) populateSoundModes();
   const audio = state.settings.audio;
   const currentWorld = getWorld(state.selectedWorldId);
   const effectiveSoundMode = getEffectiveSoundMode(currentWorld);
@@ -3588,6 +4028,18 @@ function refreshDiagnostics(immediate = false) {
       currentWakeMinute: diagnostics.currentWakeMinute,
       currentSoundModeId: diagnostics.currentSoundModeId,
       engineStyle: diagnostics.engineStyle,
+      phraseStyle: diagnostics.phraseStyle,
+      phraseIndex: diagnostics.phraseIndex,
+      lastSelectedPhraseCell: diagnostics.lastSelectedPhraseCell,
+      lastOrderedPhraseCell: diagnostics.lastOrderedPhraseCell,
+      spaceEnvelopeEnabled: diagnostics.spaceEnvelopeEnabled,
+      sleepNoiseEnabled: diagnostics.sleepNoiseEnabled,
+      crossfadeActive: diagnostics.crossfadeActive,
+      activeAudioLayerCount: diagnostics.activeAudioLayerCount,
+      activeProgramId: programState.activeProgramId,
+      activeProgramPhaseId: programState.activePhaseId,
+      activeProgramPhaseLabel: programState.activePhaseLabel,
+      wakeTargetAt: programState.wakeTargetAt,
       lastPhraseAt: diagnostics.lastPhraseAt,
       lastEventAt: diagnostics.lastEventAt,
       modeGain: diagnostics.modeGain,
