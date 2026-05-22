@@ -427,12 +427,14 @@ const SOUND_MODES = [
         { atMinute: 13, maxRatio: 4.490 }
       ],
       orderedPhraseCells: [
-        [2],
+        [1.498, 2],
+        [1.682, 1.498],
+        [1.122, 1.260],
         [2.245, 2],
+        [1.260, 1.498, 2],
         [2.520, 2.997],
-        [3.364, 2.997],
         [2.828, 2.997],
-        [2.245, 2.520, 2.997],
+        [3.364, 2.997],
         [4, 3.364, 2.997],
         [2.997, 2.520, 2]
       ],
@@ -496,40 +498,40 @@ const SOUND_MODES = [
     engineV2: {
       style: 'sleep-nest',
       phraseGapsMs: {
-        bedside: [55000, 233000],
-        object: [34000, 144000],
+        bedside: [55000, 180000],
+        object: [18000, 64000],
         ringing: [21000, 89000]
       },
       phraseGapSequenceMs: {
-        bedside: [55000, 89000, 144000, 89000, 233000],
-        object: [34000, 55000, 89000, 55000, 144000],
+        bedside: [55000, 89000, 144000, 89000, 180000],
+        object: [21000, 34000, 55000, 34000, 21000, 89000],
         ringing: [21000, 34000, 55000, 34000, 89000]
       },
       restProbability: {
-        bedside: 0.86,
-        object: 0.64,
+        bedside: 0.80,
+        object: 0.38,
         ringing: 0.42
       },
       maxEventsPerPhrase: {
         bedside: 1,
-        object: 1,
+        object: 2,
         ringing: 2
       },
-      attackSeconds: [8, 28],
-      releaseSeconds: [55, 180],
-      gainScale: 0.42,
-      foregroundGainScale: 0.50,
-      repeatMemory: 12,
+      attackSeconds: [6, 22],
+      releaseSeconds: [42, 150],
+      gainScale: 0.46,
+      foregroundGainScale: 0.58,
+      repeatMemory: 10,
       droneVoiceLimit: 4,
       sleepNoise: {
         enabled: true,
         color: 'pink-brown',
-        gain: 0.018,
-        bedsideGain: 0.024,
-        lowpassHz: 620,
-        highpassHz: 42,
+        gain: 0.014,
+        bedsideGain: 0.020,
+        lowpassHz: 560,
+        highpassHz: 38,
         breathingRateHz: 0.10,
-        breathingDepth: 0.10
+        breathingDepth: 0.08
       },
       orderedPhraseCells: [
         [1.498],
@@ -537,8 +539,10 @@ const SOUND_MODES = [
         [1.682, 1.498],
         [1.189, 1],
         [2, 1.498],
+        [1.335, 1.189],
+        [1.782, 1.682],
         [1],
-        [0.5]
+        [0.5, 1]
       ],
       phraseCells: [
         [1.498],
@@ -546,8 +550,10 @@ const SOUND_MODES = [
         [1.682, 1.498],
         [1.189, 1],
         [2, 1.498],
+        [1.335, 1.189],
+        [1.782, 1.682],
         [1],
-        [0.5]
+        [0.5, 1]
       ]
     }
   }
@@ -1320,6 +1326,33 @@ function createAudioEngine() {
     const high = ranked.find((ratio) => ratio > octave && getRatioWeight(soundMode, ratio) <= getRatioWeight(soundMode, root) * 0.55) || octave;
     return [[root, color], [root, octave], [low, root], [color, octave], [root, color, octave], [root, high]];
   }
+  function getWakeChoraleFallbackCell(wakeMinute, phraseIndex) {
+    const early = [
+      [1.498, 2],
+      [1.682, 1.498],
+      [1.122, 1.260],
+      [2.245, 2],
+      [1.260, 1.498],
+      [1, 1.498]
+    ];
+    const mid = [
+      [2.520, 2.997],
+      [2.245, 2.520, 2.997],
+      [2.828, 2.997],
+      [3.364, 2.997],
+      [2.997, 2.520, 2]
+    ];
+    const late = [
+      [4, 3.364, 2.997],
+      [4, 2.997],
+      [4.490, 4, 3.364],
+      [2.997, 2.520, 2]
+    ];
+    const pool = wakeMinute >= 13 ? early.concat(mid, late)
+      : wakeMinute >= 5 ? early.concat(mid)
+      : early;
+    return pool[phraseIndex % pool.length] || [1.498];
+  }
   function getV2Profile(modeName, soundMode) {
     const custom = soundMode.engineV2 || {};
     const style = custom.style || 'canonical';
@@ -1361,7 +1394,12 @@ function createAudioEngine() {
     if (profile.orderedPhraseCells && profile.orderedPhraseCells.length) {
       const orderedCell = profile.orderedPhraseCells[musicMemory.phraseIndex % profile.orderedPhraseCells.length] || [1];
       const filteredOrderedCell = orderedCell.filter(withinLimits);
-      return (filteredOrderedCell.length ? filteredOrderedCell : [2]).slice(0, profile.maxEvents);
+      if (filteredOrderedCell.length) return filteredOrderedCell.slice(0, profile.maxEvents);
+      if (profile.style === 'wake-chorale') {
+        const fallbackCell = getWakeChoraleFallbackCell(getCurrentWakePhase().atMinute, musicMemory.phraseIndex).filter(withinLimits);
+        return (fallbackCell.length ? fallbackCell : [1.498]).slice(0, profile.maxEvents);
+      }
+      return [1].slice(0, profile.maxEvents);
     }
 
     const candidates = profile.phraseCells
@@ -1506,7 +1544,7 @@ function createAudioEngine() {
     const fieldScale = isSleepNest ? 0.030 : isWakeChorale ? 0.046 : isHuman ? 0.044 : isLullaby ? 0.052 : isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
     const wakePhaseScale = isWakeChorale ? clamp(0.34 + getWakeDensity(modeName) * 0.82, 0.30, wakeMinute >= 13 ? 0.98 : 0.74) : 1;
     const highToneScale = isSleepNest && ratio >= 2.997 ? 0.22 : isSleepNest && ratio >= 2.378 ? 0.36 : isSleepNest && ratio >= 2 ? 0.56 : isWakeChorale && ratio >= 4 ? (wakeMinute >= 13 ? 0.38 : 0.26) : isWakeChorale && ratio >= 3.364 ? 0.54 : isWakeChorale && ratio >= 2.997 ? 0.72 : (isLullaby || isHuman) && ratio >= 2.997 ? 0.52 : (isLullaby || isHuman) && ratio >= 2.52 ? 0.72 : 1;
-    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * wakePhaseScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isSleepNest ? (modeName === 'bedside' ? 0.010 : 0.018) : isWakeChorale ? 0.044 : isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * wakePhaseScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isSleepNest ? (modeName === 'bedside' ? 0.010 : modeName === 'object' ? 0.024 : 0.018) : isWakeChorale ? 0.044 : isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isSleepNest ? 0.9 : isWakeChorale ? 1.8 : isHuman ? 1.6 : isLullaby ? 2.2 : isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
     const bowlTouch = isBowl && ratio >= 4;
@@ -1610,6 +1648,11 @@ function createAudioEngine() {
     lowpass.type = 'lowpass';
     lowpass.frequency.value = config.lowpassHz || 620;
     lowpass.Q.value = 0.12;
+    let filterAt = at;
+    for (let step = 0; step < 16; step += 1) {
+      filterAt += randomBetween([30, 90], 60);
+      lowpass.frequency.linearRampToValueAtTime(randomBetween([420, 620], config.lowpassHz || 560), filterAt);
+    }
     gain.gain.setValueAtTime(0.0001, at);
     gain.gain.linearRampToValueAtTime(baseGain, at + 8);
     let breathAt = at + 8;
@@ -1744,7 +1787,8 @@ function createAudioEngine() {
         const offset = index === 0 ? randomBetween([0, isLongToneStyle(profile.style) ? 1700 : 650], 0) : eventGap * index * (0.82 + Math.random() * 0.42);
         window.setTimeout(() => {
           if (nextSessionId !== sessionId || !ctx || !modeGain) return;
-          if (ratioInMemory(ratio, profile.repeatMemory) && index > 0 && Math.random() < 0.42) return;
+          const innerSkipProbability = profile.style === 'wake-chorale' ? 0.12 : 0.42;
+          if (ratioInMemory(ratio, profile.repeatMemory) && index > 0 && Math.random() < innerSkipProbability) return;
           scheduleResonantEvent(modeName, world, soundMode, ratio, modeName === 'ringing' ? 1.2 : 1);
         }, offset);
       });
