@@ -800,18 +800,42 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   padding: 0;
   transition: width .18s ease, height .18s ease, opacity .18s ease, filter .18s ease, background .18s ease, box-shadow .18s ease;
 }
-.minute-ring .dot { width: 3px; height: 3px; opacity: .44; }
+.minute-ring .dot { width: 3px; height: 3px; opacity: .44; filter: blur(.45px); }
 .minute-ring .dot.major { width: 6px; height: 6px; opacity: .64; }
-.hour-ring .dot { width: 6px; height: 6px; opacity: .46; }
+.hour-ring .dot { width: 6px; height: 6px; opacity: .46; filter: blur(.45px); }
 .hour-ring .dot.major { width: 8px; height: 8px; opacity: .62; }
-.orbital-ring .dot.is-near { width: 8px; height: 8px; opacity: .78; }
-.orbital-ring .dot.is-far { opacity: .26; filter: blur(.8px); }
+.orbital-ring .dot.is-near { width: 8px; height: 8px; opacity: .78; filter: blur(.2px); }
+.orbital-ring .dot.is-far { opacity: .26; filter: blur(1px); }
 .hour-ring .dot.is-active { width: 15px; height: 15px; opacity: .95; background: rgba(250,248,239,.94); box-shadow: 0 0 42px rgba(250,248,239,.32); }
 .minute-ring .dot.is-active { width: 15px; height: 15px; opacity: .96; background: rgba(250,248,239,.96); box-shadow: 0 0 0 1px rgba(250,248,239,.20), 0 0 46px rgba(250,248,239,.36); }
 .wake-stage[data-active-ring="hour"] .hour-ring { opacity: .82; }
 .wake-stage[data-active-ring="minute"] .minute-ring { opacity: .80; }
 .wake-stage[data-active-ring="hour"] .minute-ring { opacity: .36; filter: blur(1.2px); }
 .wake-stage[data-active-ring="minute"] .hour-ring { opacity: .38; filter: blur(1.2px); }
+.wake-stage[data-active-ring="hour"] .hour-ring .dot,
+.wake-stage[data-active-ring="minute"] .minute-ring .dot {
+  opacity: .62;
+  filter: blur(.15px);
+}
+.wake-stage[data-active-ring="hour"] .hour-ring .dot.major,
+.wake-stage[data-active-ring="minute"] .minute-ring .dot.major {
+  opacity: .82;
+  filter: blur(0);
+}
+.wake-stage[data-active-ring="hour"] .minute-ring .dot,
+.wake-stage[data-active-ring="minute"] .hour-ring .dot {
+  opacity: .18;
+  filter: blur(1.8px);
+}
+.wake-stage[data-active-ring="hour"] .minute-ring .dot.major,
+.wake-stage[data-active-ring="minute"] .hour-ring .dot.major {
+  opacity: .26;
+  filter: blur(1.4px);
+}
+.wake-stage[data-active-ring] .orbital-ring .dot.is-active {
+  opacity: .98;
+  filter: blur(0);
+}
 .wake-numerals {
   position: relative;
   z-index: 3;
@@ -977,15 +1001,25 @@ body.desktop-pointer-active .world-screen-step {
   opacity: .86;
   filter: blur(0);
 }
+body.desktop-pointer-active .bedside-world-edge,
+body.desktop-pointer-active .wake-world-edge {
+  opacity: var(--ui-rest-opacity);
+  filter: blur(var(--ui-rest-blur));
+}
 
 @media (hover: hover) and (pointer: fine) {
   .bedside-world-edge,
   .wake-world-edge {
-    opacity: 0;
-    filter: blur(4px);
+    opacity: var(--ui-rest-opacity);
+    filter: blur(var(--ui-rest-blur));
   }
   body.desktop-pointer-active .bedside-world-edge,
   body.desktop-pointer-active .wake-world-edge,
+  body:not(.ui-idle):not(.desktop-pointer-active) .bedside-world-edge,
+  body:not(.ui-idle):not(.desktop-pointer-active) .wake-world-edge {
+    opacity: var(--ui-rest-opacity);
+    filter: blur(var(--ui-rest-blur));
+  }
   .bedside-panel:focus-within .bedside-world-edge,
   .wake-set-panel:focus-within .wake-world-edge,
   .bedside-world-edge:hover,
@@ -997,8 +1031,8 @@ body.desktop-pointer-active .world-screen-step {
   }
   body:not(.desktop-pointer-active) .bedside-panel:hover .bedside-world-edge:not(:hover):not(:focus-visible),
   body:not(.desktop-pointer-active) .wake-set-panel:hover .wake-world-edge:not(:hover):not(:focus-visible) {
-    opacity: 0;
-    filter: blur(4px);
+    opacity: var(--ui-rest-opacity);
+    filter: blur(var(--ui-rest-blur));
   }
 }
 
