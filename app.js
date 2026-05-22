@@ -130,6 +130,105 @@ const SOUND_MODES = [
   { id: 'ember-human', name: '639 Ember Human', referenceHz: '639 Hz', description: '639 Hz upper bloom from 213 Hz: warm midrange, closer, more human and present.', baseFrequency: 213, partialRatios: [0.5, 1, 1.125, 1.5, 2, 3], droneRatios: [0.5, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 1.5, weight: 6 }, { ratio: 3, weight: 5 }, { ratio: 2, weight: 3 }, { ratio: 1.125, weight: 2 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.30, shimmerProbability: 0.18, nightSafeCutoff: 860, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '639 Hz symbolic frequency reference' },
   { id: 'near-silent', name: '7.83 Quiet Field', referenceHz: '7.83 Hz', description: 'Near-silent air with optional 7.83 Hz-style delta reference: minimal notes, maximum space.', baseFrequency: 98, partialRatios: [1, 1.5, 2, 3], droneRatios: [0.5, 1], strikeGrammar: [{ ratio: 1, weight: 9 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 3, weight: 1 }], bowlDensity: 0.08, shimmerProbability: 0.02, nightSafeCutoff: 380, binaural: { allowed: true, deltaHz: 7.83 }, ritualLabel: '7.83 Hz symbolic binaural reference' },
   {
+    id: 'human-return',
+    name: 'D Human Return',
+    referenceHz: 'D / Dorian 6/9 field',
+    description: 'Low D human field: breath-like pedal, Dorian 6/9 compassion, slow tension and release.',
+    baseFrequency: Number(equalTemperamentHzFromMidi(38).toFixed(2)), // D2 at A432
+    partialRatios: [
+      0.5,
+      1,
+      1.122,
+      1.189,
+      1.335,
+      1.498,
+      1.682,
+      2,
+      2.245,
+      2.378,
+      2.670,
+      2.997,
+      3.364,
+      4
+    ],
+    droneRatios: [
+      1,
+      1.498,
+      2,
+      2.245
+    ],
+    strikeGrammar: [
+      { ratio: 1.498, weight: 10 },
+      { ratio: 2, weight: 8 },
+      { ratio: 1.682, weight: 7 },
+      { ratio: 2.245, weight: 5 },
+      { ratio: 1.189, weight: 4 },
+      { ratio: 1, weight: 3.5 },
+      { ratio: 2.997, weight: 2.4 },
+      { ratio: 2.378, weight: 1.8 },
+      { ratio: 1.335, weight: 1.3 },
+      { ratio: 3.364, weight: 1.0 },
+      { ratio: 4, weight: 0.20 },
+      { ratio: 0.5, weight: 0.15 }
+    ],
+    bowlDensity: 0.018,
+    shimmerProbability: 0.001,
+    nightSafeCutoff: 430,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'D Dorian human-return field tuned from A=432',
+    engineV2: {
+      style: 'human',
+      phraseGapsMs: {
+        bedside: [55000, 144000],
+        object: [21000, 89000],
+        ringing: [13000, 55000]
+      },
+      phraseGapSequenceMs: {
+        bedside: [89000, 144000, 55000, 89000, 233000],
+        object: [21000, 34000, 55000, 34000, 89000],
+        ringing: [13000, 21000, 34000, 21000, 55000]
+      },
+      restProbability: {
+        bedside: 0.78,
+        object: 0.46,
+        ringing: 0.24
+      },
+      maxEventsPerPhrase: {
+        bedside: 1,
+        object: 2,
+        ringing: 2
+      },
+      attackSeconds: [5.5, 18],
+      releaseSeconds: [34, 110],
+      gainScale: 0.50,
+      foregroundGainScale: 0.64,
+      repeatMemory: 10,
+      droneVoiceLimit: 4,
+      orderedPhraseCells: [
+        [1.498],
+        [1.682, 1.498],
+        [1.189, 1],
+        [2.245, 2],
+        [1.335, 1.498],
+        [2.378, 2],
+        [3.364, 2.997],
+        [1]
+      ],
+      phraseCells: [
+        [1.498],
+        [1.682, 1.498],
+        [1.189, 1],
+        [2.245, 2],
+        [1.335, 1.498],
+        [2.378, 2],
+        [1, 1.498],
+        [2, 2.245, 1.682],
+        [1.498, 1],
+        [1]
+      ]
+    }
+  },
+  {
     id: 'space-field',
     name: 'C# Space Field',
     referenceHz: 'C# / F# 6/9 field',
@@ -255,7 +354,7 @@ const WORLDS = [
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
   { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'still-water', visualScore: 'default', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
   { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', visualScore: 'default', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
-  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'near-silent', visualScore: 'default', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
+  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
 ];
 
 const WAKE_CURVE = [
@@ -610,6 +709,29 @@ function createApertureRenderer(canvas) {
       };
     }
 
+    if (score === 'human-return') {
+      return {
+        breatheRate: 0.00012,
+        breatheDepth: 0.0045,
+        audioBreathe: 0.007,
+        driftXRate: 0.000040,
+        driftYRate: 0.000036,
+        driftX: 0.018,
+        driftY: 0.016,
+        outerScale: 2.35,
+        innerScale: 1.50,
+        coreScale: 1.08,
+        outerAlpha: 0.72,
+        innerAlpha: 0.82,
+        coreAlpha: 1.10,
+        rimAlpha: 0.62,
+        ceilingAlpha: 0.52,
+        pulseGain: 0.04,
+        eventWindowMs: 9000,
+        eventAlpha: 0.10
+      };
+    }
+
     return {
       breatheRate: 0.00035,
       breatheDepth: 0.010,
@@ -738,6 +860,17 @@ function createApertureRenderer(canvas) {
         [0.54, rgba(palette.inner, 0.012 * ringAlpha)],
         [0.74, rgba(palette.outer, 0.060 * ringAlpha)],
         [0.91, rgba(palette.spill, 0.020 * ringAlpha)],
+        [1, rgba(palette.outer, 0)]
+      ], 'screen');
+    }
+
+    if (visualScore === 'human-return' && eventPulse > 0) {
+      const ringAlpha = eventPulse * visualProfile.eventAlpha * glow;
+      fillCircle(cx + driftX * 0.08, cy + driftY * 0.08, r * (visualProfile.outerScale + eventPulse * 0.08), [
+        [0, rgba(palette.outer, 0)],
+        [0.62, rgba(palette.inner, 0.006 * ringAlpha)],
+        [0.80, rgba(palette.outer, 0.026 * ringAlpha)],
+        [0.94, rgba(palette.spill, 0.010 * ringAlpha)],
         [1, rgba(palette.outer, 0)]
       ], 'screen');
     }
@@ -896,7 +1029,7 @@ function createAudioEngine() {
     return range[0] + Math.random() * (range[1] - range[0]);
   }
   function isLongToneStyle(style) {
-    return style === 'field' || style === 'thread' || style === 'bowl' || style === 'lullaby';
+    return style === 'field' || style === 'thread' || style === 'bowl' || style === 'lullaby' || style === 'human';
   }
   function updateActiveOscillatorCount() {
     audioState.activeOscillators = droneOscillators.length + transientOscillators.length;
@@ -1046,19 +1179,26 @@ function createAudioEngine() {
     const isThread = profile.style === 'thread';
     const isBowl = profile.style === 'bowl';
     const isLullaby = profile.style === 'lullaby';
+    const isHuman = profile.style === 'human';
     const at = ctx.currentTime;
     const wakeEmphasis = modeName === 'ringing' ? 0.62 + getWakeDensity(modeName) * 0.84 : 1;
-    const attack = isLullaby
+    const attack = isHuman
+      ? randomBetween(profile.attackSeconds, 9)
+      : isLullaby
       ? randomBetween(profile.attackSeconds, 5.8)
       : isBowl
       ? randomBetween(profile.attackSeconds, 0.42)
       : randomBetween(profile.attackSeconds, isLongTone ? 7 : 1);
-    const release = isLullaby
+    const release = isHuman
+      ? randomBetween(profile.releaseSeconds, 70)
+      : isLullaby
       ? randomBetween(profile.releaseSeconds, 46)
       : isBowl
       ? randomBetween(profile.releaseSeconds, 28)
       : randomBetween(profile.releaseSeconds, isLongTone ? 22 : 8);
-    const hold = isLullaby
+    const hold = isHuman
+      ? randomBetween([6, 14], 9)
+      : isLullaby
       ? randomBetween([2.8, 10.5], 6)
       : isBowl
       ? randomBetween([0.9, 5.5], 2.8)
@@ -1066,29 +1206,32 @@ function createAudioEngine() {
     const rawFrequency = soundMode.baseFrequency * ratio;
     const cutoff = modeName === 'bedside' ? (soundMode.nightSafeCutoff || 640) : Math.min((soundMode.nightSafeCutoff || 900) * (isLongTone ? 1 : 1.16), isLongTone ? 720 : 1500);
     if (modeName === 'bedside' && rawFrequency > cutoff) return;
-    if (isLullaby && modeName === 'bedside' && ratio > 2.997) return;
+    if ((isLullaby || isHuman) && modeName === 'bedside' && ratio > 2.997) return;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    const modeScale = isLullaby ? (modeName === 'bedside' ? 0.34 : modeName === 'ringing' ? 0.68 : 0.56) : isBowl ? (modeName === 'bedside' ? 0.36 : modeName === 'ringing' ? 0.74 : 0.62) : modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
-    const fieldScale = isLullaby ? 0.052 : isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
-    const highToneScale = isLullaby && ratio >= 2.997 ? 0.52 : isLullaby && ratio >= 2.52 ? 0.72 : 1;
-    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
-    const detuneCents = (Math.random() - 0.5) * (isLullaby ? 2.2 : isLongTone ? 5 : 10);
+    const modeScale = isHuman ? (modeName === 'bedside' ? 0.28 : modeName === 'ringing' ? 0.58 : 0.46) : isLullaby ? (modeName === 'bedside' ? 0.34 : modeName === 'ringing' ? 0.68 : 0.56) : isBowl ? (modeName === 'bedside' ? 0.36 : modeName === 'ringing' ? 0.74 : 0.62) : modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
+    const fieldScale = isHuman ? 0.044 : isLullaby ? 0.052 : isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
+    const highToneScale = (isLullaby || isHuman) && ratio >= 2.997 ? 0.52 : (isLullaby || isHuman) && ratio >= 2.52 ? 0.72 : 1;
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const detuneCents = (Math.random() - 0.5) * (isHuman ? 1.6 : isLullaby ? 2.2 : isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
     const bowlTouch = isBowl && ratio >= 4;
 
-    osc.type = isLullaby ? 'sine' : isBowl ? (Math.random() > 0.84 ? 'triangle' : 'sine') : Math.random() > 0.72 && !isLongTone ? 'triangle' : 'sine';
+    osc.type = (isLullaby || isHuman) ? 'sine' : isBowl ? (Math.random() > 0.84 ? 'triangle' : 'sine') : Math.random() > 0.72 && !isLongTone ? 'triangle' : 'sine';
     osc.frequency.setValueAtTime(rawFrequency, at);
     if (osc.detune) osc.detune.setValueAtTime(detuneCents, at);
     filter.type = 'lowpass';
-    filter.frequency.value = Math.max(150, isLullaby ? Math.min(cutoff, modeName === 'ringing' ? 620 : 520) : isBowl ? Math.min(cutoff, modeName === 'bedside' ? 920 : 1800) : cutoff);
-    filter.Q.value = isLullaby ? 0.22 : isBowl ? 0.28 : isLongTone ? 0.32 : 0.45;
+    filter.frequency.value = Math.max(140, isHuman ? Math.min(cutoff, modeName === 'ringing' ? 540 : 430) : isLullaby ? Math.min(cutoff, modeName === 'ringing' ? 620 : 520) : isBowl ? Math.min(cutoff, modeName === 'bedside' ? 920 : 1800) : cutoff);
+    filter.Q.value = isHuman ? 0.18 : isLullaby ? 0.22 : isBowl ? 0.28 : isLongTone ? 0.32 : 0.45;
     gain.gain.value = 0.0001;
     gain.gain.setValueAtTime(0.0001, at);
-    if (isLullaby) {
+    if (isHuman) {
+      gain.gain.linearRampToValueAtTime(peak, at + Math.max(3.6, attack));
+      gain.gain.setTargetAtTime(0.0001, at + Math.max(3.6, attack) + hold, Math.max(14, release / 2.1));
+    } else if (isLullaby) {
       gain.gain.linearRampToValueAtTime(peak, at + Math.max(1.8, attack));
       gain.gain.setTargetAtTime(0.0001, at + Math.max(1.8, attack) + hold, Math.max(9, release / 2.2));
     } else if (isBowl) {
@@ -1100,7 +1243,7 @@ function createAudioEngine() {
     }
 
     if (pan) {
-      pan.pan.value = isLullaby ? (upperTone ? (Math.random() - 0.5) * 0.12 : 0) : bowlTouch ? (Math.random() - 0.5) * (modeName === 'bedside' ? 0.08 : 0.14) : upperTone ? (Math.random() - 0.5) * (isLongTone ? (isThread ? 0.18 : 0.24) : 0.42) : 0;
+      pan.pan.value = isHuman ? (upperTone ? (Math.random() - 0.5) * 0.06 : 0) : isLullaby ? (upperTone ? (Math.random() - 0.5) * 0.12 : 0) : bowlTouch ? (Math.random() - 0.5) * (modeName === 'bedside' ? 0.08 : 0.14) : upperTone ? (Math.random() - 0.5) * (isLongTone ? (isThread ? 0.18 : 0.24) : 0.42) : 0;
       if (upperTone) pan.pan.setTargetAtTime(-pan.pan.value * 0.72, at + attack + hold, release * 0.55);
       osc.connect(filter); filter.connect(gain); gain.connect(pan); pan.connect(modeGain);
     } else {
@@ -1114,7 +1257,7 @@ function createAudioEngine() {
     musicMemory.lastEventAt = nowMs();
     audioState.lastEventAt = musicMemory.lastEventAt;
     registerTransientOscillator(osc, pan ? 4 : 3, Math.ceil((stopAt - at) * 1000) + 200);
-    if (isLullaby) return;
+    if (isLullaby || isHuman) return;
     maybeScheduleBloom(modeName, soundMode, emphasis * wakeEmphasis * 0.6);
   }
   function scheduleStrike(modeName, world, soundMode, emphasis = 1) {
