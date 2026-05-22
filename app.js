@@ -10,6 +10,11 @@ const GRID_GEOMETRY_HARD_RULE = 'If the constellation cannot fit, shrink the orb
 const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
 const WORLD_DEFAULT_SOUND_MODE = 'world-default';
+const TUNING_A4_HZ = 432;
+
+function equalTemperamentHzFromMidi(midiNote, a4Hz = TUNING_A4_HZ) {
+  return a4Hz * Math.pow(2, (midiNote - 69) / 12);
+}
 
 const BED_DURATION_OPTIONS = [
   { id: '10m', label: '10', ms: 10 * 60 * 1000 },
@@ -32,10 +37,22 @@ const SOUND_MODES = [
     name: 'C# Space Field',
     referenceHz: 'C# / F# 6/9 field',
     description: 'C#-dominant F# 6/9 drone: deep, almost still, no beat, slow room pressure.',
-    baseFrequency: 69.31,
-    partialRatios: [0.667, 1, 1.5, 2, 2.667, 3, 3.375, 4, 4.5],
-    droneRatios: [0.667, 1, 1.5, 2, 2.667, 4],
-    strikeGrammar: [{ ratio: 1, weight: 10 }, { ratio: 2, weight: 7 }, { ratio: 1.5, weight: 5 }, { ratio: 2.667, weight: 3 }, { ratio: 4, weight: 2 }, { ratio: 3, weight: 1.5 }, { ratio: 3.375, weight: 0.35 }, { ratio: 4.5, weight: 0.30 }, { ratio: 0.667, weight: 0.25 }],
+    baseFrequency: Number(equalTemperamentHzFromMidi(37).toFixed(2)), // C#2 = 68.04 at A432
+    partialRatios: [0.667, 1, 1.5, 2, 2.667, 3, 3.375, 4, 4.5, 6.024, 8.058],
+    droneRatios: [1, 2, 6.024, 4, 1.5, 3, 0.667, 2.667],
+    strikeGrammar: [
+      { ratio: 1, weight: 10 },
+      { ratio: 2, weight: 8 },
+      { ratio: 1.5, weight: 6 },
+      { ratio: 4, weight: 4 },
+      { ratio: 6.024, weight: 3.2 },
+      { ratio: 3, weight: 2.4 },
+      { ratio: 2.667, weight: 2 },
+      { ratio: 4.5, weight: 0.6 },
+      { ratio: 3.375, weight: 0.45 },
+      { ratio: 8.058, weight: 0.35 },
+      { ratio: 0.667, weight: 0.25 }
+    ],
     bowlDensity: 0.025,
     shimmerProbability: 0.003,
     nightSafeCutoff: 520,
@@ -43,14 +60,29 @@ const SOUND_MODES = [
     ritualLabel: 'C#-anchored F# 6/9 drone reference',
     engineV2: {
       style: 'field',
-      phraseGapsMs: { bedside: [45000, 120000], object: [18000, 62000], ringing: [8000, 30000] },
-      restProbability: { bedside: 0.72, object: 0.38, ringing: 0.18 },
-      maxEventsPerPhrase: { bedside: 1, object: 2, ringing: 3 },
-      attackSeconds: [4.5, 16],
-      releaseSeconds: [14, 46],
-      gainScale: 0.72,
-      repeatMemory: 5,
-      phraseCells: [[1, 1.5], [1, 2], [1, 2, 1.5], [0.667, 1], [1, 2.667], [1, 2, 4], [1.5, 2], [1, 3.375], [1, 4.5]]
+      phraseGapsMs: { bedside: [52000, 150000], object: [26000, 90000], ringing: [11000, 42000] },
+      restProbability: { bedside: 0.76, object: 0.52, ringing: 0.22 },
+      maxEventsPerPhrase: { bedside: 1, object: 1, ringing: 2 },
+      attackSeconds: [7, 24],
+      releaseSeconds: [22, 70],
+      gainScale: 0.62,
+      foregroundGainScale: 0.72,
+      repeatMemory: 6,
+      droneVoiceLimit: 8,
+      phraseCells: [
+        [1],
+        [2],
+        [4],
+        [6.024],
+        [1, 2],
+        [1.5, 2],
+        [2, 4],
+        [4, 6.024],
+        [1, 4],
+        [3, 4],
+        [4.5],
+        [8.058]
+      ]
     }
   },
   {
@@ -58,9 +90,9 @@ const SOUND_MODES = [
     name: 'E Neroli Thread',
     referenceHz: 'E / Phrygian thread',
     description: 'Sparse E-centered phrygian thread: single tones, soft dissonance, no beat, botanical stillness.',
-    baseFrequency: 82.41,
+    baseFrequency: Number(equalTemperamentHzFromMidi(40).toFixed(2)), // E2 = 80.91 at A432
     partialRatios: [0.5, 1.194, 1.486, 1.789, 2.127, 2.397, 2.531, 2.842, 3.185, 3.578, 4.257, 4.788],
-    droneRatios: [0.5, 1.194, 1.789, 2.127],
+    droneRatios: [0.5, 1.194],
     strikeGrammar: [
       { ratio: 2.127, weight: 10 },
       { ratio: 1.789, weight: 8 },
@@ -83,34 +115,35 @@ const SOUND_MODES = [
     engineV2: {
       style: 'thread',
       phraseGapsMs: {
-        bedside: [52000, 150000],
-        object: [12000, 42000],
-        ringing: [6000, 24000]
+        bedside: [42000, 120000],
+        object: [8500, 24000],
+        ringing: [5000, 18000]
       },
       restProbability: {
-        bedside: 0.68,
-        object: 0.34,
-        ringing: 0.16
+        bedside: 0.62,
+        object: 0.18,
+        ringing: 0.10
       },
       maxEventsPerPhrase: {
         bedside: 1,
-        object: 2,
-        ringing: 3
+        object: 1,
+        ringing: 2
       },
-      attackSeconds: [0.8, 4.6],
-      releaseSeconds: [12, 38],
-      gainScale: 0.98,
+      attackSeconds: [0.18, 1.4],
+      releaseSeconds: [8, 26],
+      gainScale: 1.18,
+      foregroundGainScale: 1.35,
       repeatMemory: 7,
+      droneVoiceLimit: 2,
       phraseCells: [
         [2.127],
         [1.789],
-        [2.127, 1.789],
-        [1.194, 2.127],
-        [1.789, 2.397],
+        [2.397],
+        [2.127],
+        [1.789, 2.127],
         [2.127, 2.397],
         [2.127, 2.531],
-        [1.789, 2.127, 1.194],
-        [2.397, 2.127],
+        [1.194, 2.127],
         [3.185],
         [2.842, 2.127]
       ]
@@ -659,6 +692,7 @@ function createAudioEngine() {
   }
   function getV2Profile(modeName, soundMode) {
     const custom = soundMode.engineV2 || {};
+    const style = custom.style || 'canonical';
     const wakeDensity = getWakeDensity(modeName);
     const defaultGaps = { bedside: [26000, 90000], object: [7000, 22000], ringing: [5000, 16000] };
     const defaultRest = { bedside: 0.72, object: 0.28, ringing: 0.18 };
@@ -667,15 +701,18 @@ function createAudioEngine() {
     const ringingPull = modeName === 'ringing' ? clamp(1.12 - wakeDensity * 0.62, 0.46, 1.12) : 1;
     const maxEventsBase = (custom.maxEventsPerPhrase && custom.maxEventsPerPhrase[modeName]) || defaultMax[modeName] || 2;
     const restBase = (custom.restProbability && custom.restProbability[modeName] !== undefined) ? custom.restProbability[modeName] : (defaultRest[modeName] || 0.36);
+    const defaultForegroundGain = style === 'thread' ? 1.25 : 1;
     return {
-      style: custom.style || 'canonical',
+      style,
       phraseGapsMs: [gapRange[0] * ringingPull, gapRange[1] * ringingPull],
       restProbability: clamp(restBase - wakeDensity * 0.34, 0.05, 0.86),
       maxEvents: clamp(Math.round(maxEventsBase + wakeDensity * 2), 1, 5),
-      attackSeconds: custom.attackSeconds || (isLongToneStyle(custom.style) ? [3.5, 12] : [0.25, 1.6]),
-      releaseSeconds: custom.releaseSeconds || (isLongToneStyle(custom.style) ? [10, 32] : [4, 18]),
-      gainScale: custom.gainScale || (isLongToneStyle(custom.style) ? 0.55 : 0.82),
+      attackSeconds: custom.attackSeconds || (isLongToneStyle(style) ? [3.5, 12] : [0.25, 1.6]),
+      releaseSeconds: custom.releaseSeconds || (isLongToneStyle(style) ? [10, 32] : [4, 18]),
+      gainScale: custom.gainScale || (isLongToneStyle(style) ? 0.55 : 0.82),
+      foregroundGainScale: custom.foregroundGainScale || defaultForegroundGain,
       repeatMemory: custom.repeatMemory || 4,
+      droneVoiceLimit: custom.droneVoiceLimit,
       phraseCells: custom.phraseCells || buildDefaultPhraseCells(soundMode)
     };
   }
@@ -770,7 +807,7 @@ function createAudioEngine() {
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
     const modeScale = modeName === 'bedside' ? 0.56 : modeName === 'ringing' ? 0.92 : 0.78;
     const fieldScale = isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
-    const peak = clamp(fieldScale * profile.gainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
 
@@ -829,9 +866,12 @@ function createAudioEngine() {
     const profile = getV2Profile(modeName, soundMode);
     const isLongTone = isLongToneStyle(profile.style);
     const isThread = profile.style === 'thread';
-    const ratioLimit = isThread ? (modeName === 'bedside' ? 2 : 3) : modeName === 'bedside' ? 3 : isLongTone ? 6 : 4;
+    const isField = profile.style === 'field';
+    const existingFallback = isThread ? (modeName === 'bedside' ? 2 : 3) : modeName === 'bedside' ? 3 : isLongTone ? 6 : 4;
+    const ratioLimit = profile.droneVoiceLimit || existingFallback;
     const ratios = (soundMode.droneRatios || soundMode.partialRatios).slice(0, ratioLimit);
     const at = ctx.currentTime;
+    let haloVoiceCount = 0;
     ratios.forEach((ratio, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -880,6 +920,32 @@ function createAudioEngine() {
       osc.start();
       droneOscillators.push(osc);
       audioState.activeNodes += pan ? 3 : 2;
+      if (isField && modeName !== 'bedside' && frequency > 250 && haloVoiceCount < 3) {
+        const haloOsc = ctx.createOscillator();
+        const haloGain = ctx.createGain();
+        const haloPan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+        const detuneDirection = Math.random() > 0.5 ? 1 : -1;
+        const detuneCents = detuneDirection * (3 + Math.random() * 4);
+        const haloBaseGain = baseGain * (0.20 + Math.random() * 0.15);
+        const panValue = pan ? clamp(-pan.pan.value * 0.85, -0.22, 0.22) : (index % 2 === 0 ? 0.12 : -0.12);
+
+        haloOsc.type = 'sine';
+        haloOsc.frequency.value = frequency;
+        if (haloOsc.detune) haloOsc.detune.value = detuneCents;
+        haloGain.gain.setValueAtTime(haloBaseGain, at);
+        haloGain.gain.linearRampToValueAtTime(haloBaseGain * (0.88 + Math.random() * 0.24), at + 80 + Math.random() * 80);
+
+        if (haloPan) {
+          haloPan.pan.value = panValue;
+          haloOsc.connect(haloGain); haloGain.connect(haloPan); haloPan.connect(modeGain);
+        } else {
+          haloOsc.connect(haloGain); haloGain.connect(modeGain);
+        }
+        haloOsc.start();
+        droneOscillators.push(haloOsc);
+        audioState.activeNodes += haloPan ? 3 : 2;
+        haloVoiceCount += 1;
+      }
     });
     updateActiveOscillatorCount();
   }
@@ -1024,6 +1090,8 @@ function createAudioEngine() {
   }
   function getAudioDiagnostics() {
     updateContextState();
+    const diagnosticsSoundMode = getSoundMode(audioState.currentSoundModeId);
+    const diagnosticsProfile = getV2Profile(audioState.currentMode, diagnosticsSoundMode);
     return {
       audioPlaybackState: audioState.audioPlaybackState,
       userFacingAudioState: audioState.userFacingAudioState,
@@ -1032,6 +1100,8 @@ function createAudioEngine() {
       activeWorld: audioState.currentWorldId || state.selectedWorldId,
       currentSoundModeId: audioState.currentSoundModeId,
       engineStyle: audioState.engineStyle,
+      phraseStyle: diagnosticsProfile.style,
+      droneVoiceLimit: diagnosticsProfile.droneVoiceLimit || null,
       lastPhraseAt: audioState.lastPhraseAt,
       lastEventAt: audioState.lastEventAt,
       modeGain: Number(audioState.modeGainValue.toFixed(4)),
@@ -1039,6 +1109,8 @@ function createAudioEngine() {
       compressorEnabled: audioState.compressorEnabled,
       activeNodes: audioState.activeNodes,
       activeOscillators: audioState.activeOscillators,
+      activeDroneOscillators: droneOscillators.length,
+      activeTransientOscillators: transientOscillators.length,
       activeTimers: audioState.activeTimers,
       lastAudioError: audioState.lastAudioError,
       lastAudioStopReason: audioState.lastAudioStopReason,
