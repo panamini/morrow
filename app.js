@@ -35,6 +35,7 @@ const WORLD_NATIVE_SOUND_MODE_IDS = [
   'night-nest',
   'phi-dawn-chorale',
   'human-return',
+  'white-room-void',
   'space-field',
   'afternoon-glass',
   'neroli-thread',
@@ -309,6 +310,126 @@ const SOUND_MODES = [
         [2, 2.245, 1.682],
         [1.498, 1],
         [1]
+      ]
+    }
+  },
+  {
+    id: 'white-room-void',
+    name: 'White Room Void',
+    referenceHz: 'C / open air field',
+    description: 'Sparse white-room field: quiet air, soft void, and gentle optical depth without bells or bright shimmer.',
+    baseFrequency: Number(equalTemperamentHzFromMidi(36).toFixed(2)), // C2 at A432
+    partialRatios: [
+      0.5,
+      1,
+      1.122,
+      1.189,
+      1.335,
+      1.682,
+      2.378,
+      2.670
+    ],
+    droneRatios: [
+      0.5,
+      1.122,
+      1.682
+    ],
+    strikeGrammar: [
+      { ratio: 1.122, weight: 8 },
+      { ratio: 1.189, weight: 6 },
+      { ratio: 1.335, weight: 4 },
+      { ratio: 1.682, weight: 3 },
+      { ratio: 1, weight: 2 },
+      { ratio: 2.378, weight: 0.9 },
+      { ratio: 2.670, weight: 0.25 },
+      { ratio: 0.5, weight: 0.2 }
+    ],
+    bowlDensity: 0.006,
+    shimmerProbability: 0.001,
+    nightSafeCutoff: 340,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'Open white-room air field tuned from A=432',
+    engineV2: {
+      style: 'field',
+      phraseGapsMs: {
+        bedside: [89000, 233000],
+        object: [42000, 130000],
+        ringing: [21000, 72000]
+      },
+      phraseGapSequenceMs: {
+        bedside: [144000, 233000, 89000, 144000, 377000],
+        object: [55000, 89000, 130000, 89000, 144000],
+        ringing: [21000, 34000, 55000, 34000, 72000]
+      },
+      restProbability: {
+        bedside: 0.86,
+        object: 0.68,
+        ringing: 0.42
+      },
+      maxEventsPerPhrase: {
+        bedside: 1,
+        object: 1,
+        ringing: 2
+      },
+      attackSeconds: [10, 34],
+      releaseSeconds: [65, 190],
+      gainScale: 0.34,
+      foregroundGainScale: 0.34,
+      repeatMemory: 12,
+      droneVoiceLimit: 3,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.026,
+        bedsideGain: 0.016,
+        voiceRatios: [
+          0.5,
+          1,
+          1.122,
+          1.189,
+          1.335,
+          1.682,
+          2.378
+        ],
+        maxVoices: 6,
+        attackSeconds: [34, 89],
+        releaseSeconds: [110, 260],
+        cyclesSeconds: [89, 144, 233, 377],
+        panDrift: 0.10,
+        detuneCents: 1.4,
+        lowpassHz: [180, 420],
+        highpassHz: 46
+      },
+      waveMotion: {
+        enabled: true,
+        gain: 0.009,
+        bedsideGain: 0.006,
+        voiceRatios: [0.5, 1.122, 1.682],
+        maxVoices: 3,
+        cyclesSeconds: [89, 144, 233, 377],
+        gainDepth: 0.18,
+        panDrift: 0.08,
+        detuneCents: 0.9,
+        lowpassHz: [160, 360],
+        highpassHz: 44
+      },
+      orderedPhraseCells: [
+        [1.122],
+        [1.189],
+        [1.335],
+        [1.682],
+        [1],
+        [2.378],
+        [0.5, 1.122]
+      ],
+      phraseCells: [
+        [1.122],
+        [1.189],
+        [1.335],
+        [1.682],
+        [1],
+        [2.378],
+        [0.5, 1.122],
+        [1.189, 1.335]
       ]
     }
   },
@@ -1145,7 +1266,7 @@ const WORLDS = [
   { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#064fc8', spill: '#2456bd', outer: '#6c58ad', inner: '#f0717b', core: '#ff604f', core2: '#b86cac', shadow: '#03195e' }, bedside: { wall: '#181109', spill: '#3d2408', outer: '#9b652a', inner: '#b64a25', core: '#190905', core2: '#4a1809', shadow: '#030100' }, wake: { wall: '#0755d0', spill: '#2d61c4', outer: '#7764b8', inner: '#ff7a7f', core: '#ff6650', core2: '#c374b5', shadow: '#041f69' } } },
   { id: 'phi-dawn', name: 'Golden Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'night-nest', name: 'Night Nest', mood: 'low blue shelter, soft breath, sleep return', soundMode: 'night-nest', visualScore: 'night-nest', palettes: { object: { wall: '#020714', spill: '#061a3d', outer: '#2d7286', inner: '#3b8a88', core: '#01040b', core2: '#071226', shadow: '#000104' }, bedside: { wall: '#00030a', spill: '#031026', outer: '#164355', inner: '#1f5b5c', core: '#000207', core2: '#040b17', shadow: '#000000' }, wake: { wall: '#07111f', spill: '#0b2a55', outer: '#3a8794', inner: '#4fa09a', core: '#020713', core2: '#0b1d34', shadow: '#000207' } } },
-  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
+  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'white-room-void', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
 ];
 
 const NIGHT_PASSAGE_PROGRAM = {
