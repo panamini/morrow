@@ -1904,6 +1904,113 @@ function createApertureRenderer(canvas) {
     ctx.fill();
     ctx.restore();
   }
+  function drawMilkBlueLightStudy(cx, cy, r, palette, visualProfile, glow, brightness, driftX, driftY, eventPulse, pulseEase, tapPulse) {
+    const roomGlow = glow * visualProfile.outerAlpha;
+    const membraneGlow = glow * visualProfile.rimAlpha;
+    const slowShiftX = driftX * 0.28;
+    const slowShiftY = driftY * 0.22;
+
+    fillCircle(cx + slowShiftX, cy + slowShiftY, r * 2.92, [
+      [0, rgba(palette.spill, 0.018 * roomGlow)],
+      [0.19, rgba(palette.core2, 0.032 * roomGlow)],
+      [0.43, rgba(palette.spill, 0.062 * roomGlow)],
+      [0.68, rgba(palette.outer, 0.030 * roomGlow)],
+      [0.87, rgba(palette.spill, 0.012 * roomGlow)],
+      [1, rgba(palette.spill, 0)]
+    ], 'screen');
+
+    fillCircle(cx - slowShiftX * 0.52, cy - slowShiftY * 0.44, r * 2.34, [
+      [0, rgba(palette.core, 0.012 * brightness)],
+      [0.29, rgba(palette.core2, 0.026 * brightness)],
+      [0.56, rgba(palette.spill, 0.020 * roomGlow)],
+      [0.78, rgba(palette.shadow, 0.018 * brightness)],
+      [1, rgba(palette.shadow, 0)]
+    ], 'multiply');
+
+    fillCircle(cx + driftX * 0.18, cy + driftY * 0.16, r * 1.48, [
+      [0, rgba(palette.core2, 0.040 * glow)],
+      [0.21, rgba(palette.core, 0.110 * brightness)],
+      [0.47, rgba(palette.spill, 0.105 * glow)],
+      [0.69, rgba(palette.outer, 0.082 * membraneGlow)],
+      [0.86, rgba(palette.inner, 0.038 * membraneGlow)],
+      [1, rgba(palette.outer, 0)]
+    ], 'screen');
+
+    fillCircle(cx + driftX * 0.10, cy + driftY * 0.08, r * 1.06, [
+      [0, rgba(palette.core, 0.580 * brightness)],
+      [0.18, rgba(palette.core2, 0.560 * brightness)],
+      [0.39, rgba(palette.core2, 0.390 * brightness)],
+      [0.58, rgba(palette.spill, 0.250 * glow)],
+      [0.74, rgba(palette.inner, 0.210 * glow)],
+      [0.86, rgba(palette.outer, 0.155 * membraneGlow)],
+      [0.94, rgba(palette.outer, 0.052 * membraneGlow)],
+      [1, rgba(palette.outer, 0)]
+    ]);
+
+    fillCircle(cx - driftX * 0.18, cy - driftY * 0.14, r * 0.74, [
+      [0, rgba(palette.core2, 0.420 * brightness)],
+      [0.23, rgba(palette.core, 0.250 * brightness)],
+      [0.51, rgba(palette.spill, 0.160 * glow)],
+      [0.73, rgba(palette.inner, 0.088 * glow)],
+      [0.91, rgba(palette.outer, 0.026 * membraneGlow)],
+      [1, rgba(palette.outer, 0)]
+    ], 'screen');
+
+    fillCircle(cx + driftX * 0.06, cy + driftY * 0.05, r * 0.46, [
+      [0, rgba(palette.core2, 0.320 * brightness)],
+      [0.27, rgba(palette.core, 0.300 * brightness)],
+      [0.54, rgba(palette.core2, 0.170 * brightness)],
+      [0.78, rgba(palette.spill, 0.070 * glow)],
+      [1, rgba(palette.core, 0)]
+    ], 'screen');
+
+    fillCircle(cx, cy, r * 1.10, [
+      [0, rgba(palette.outer, 0)],
+      [0.68, rgba(palette.outer, 0.000)],
+      [0.758, rgba(palette.inner, 0.070 * membraneGlow)],
+      [0.812, rgba(palette.outer, 0.155 * membraneGlow)],
+      [0.862, rgba(palette.inner, 0.070 * membraneGlow)],
+      [0.928, rgba(palette.spill, 0.024 * roomGlow)],
+      [1, rgba(palette.outer, 0)]
+    ], 'screen');
+
+    fillCircle(cx - driftX * 0.38, cy - driftY * 0.34, r * 0.98, [
+      [0, rgba(palette.shadow, 0.000)],
+      [0.34, rgba(palette.shadow, 0.016 * brightness)],
+      [0.63, rgba(palette.core, 0.044 * brightness)],
+      [0.82, rgba(palette.shadow, 0.034 * brightness)],
+      [1, rgba(palette.shadow, 0)]
+    ], 'multiply');
+
+    fillCircle(cx, cy, r * 2.72, [
+      [0, rgba(palette.shadow, 0)],
+      [0.55, rgba(palette.shadow, 0)],
+      [0.76, rgba(palette.shadow, 0.034 * brightness)],
+      [0.91, rgba(palette.shadow, 0.070 * brightness)],
+      [1, rgba(palette.shadow, 0.118 * brightness)]
+    ], 'multiply');
+
+    if (eventPulse > 0) {
+      const eventAlpha = eventPulse * visualProfile.eventAlpha * glow;
+      fillCircle(cx + driftX * 0.10, cy + driftY * 0.09, r * 1.16, [
+        [0, rgba(palette.outer, 0)],
+        [0.62, rgba(palette.inner, 0.006 * eventAlpha)],
+        [0.78, rgba(palette.outer, 0.034 * eventAlpha)],
+        [0.90, rgba(palette.spill, 0.014 * eventAlpha)],
+        [1, rgba(palette.outer, 0)]
+      ], 'screen');
+    }
+
+    if (tapPulse > 0) {
+      fillCircle(cx, cy, r * (1.04 + (1 - tapPulse) * 0.30), [
+        [0, rgba(palette.outer, 0.030 * pulseEase)],
+        [0.46, rgba(palette.inner, 0.062 * pulseEase)],
+        [0.72, rgba(palette.spill, 0.036 * pulseEase)],
+        [0.90, rgba(palette.outer, 0.014 * pulseEase)],
+        [1, rgba(palette.spill, 0)]
+      ], 'screen');
+    }
+  }
   function draw(time = performance.now()) {
     resizeCanvasToDisplaySize();
     const cssW = width / dpr; const cssH = height / dpr;
@@ -1930,6 +2037,13 @@ function createApertureRenderer(canvas) {
     const tapPulse = mode === 'object' ? clamp((visualState.objectTapPulseUntil - time) / 620, 0, 1) : 0;
     const pulseEase = tapPulse * tapPulse * (3 - 2 * tapPulse);
     const glow = brightness * bedDim * (1 + wakeBoost * 0.24 + pulseEase * visualProfile.pulseGain);
+
+    if (visualScore === 'blue-bowl') {
+      drawMilkBlueLightStudy(cx, cy, r, palette, visualProfile, glow, brightness, driftX, driftY, eventPulse, pulseEase, tapPulse);
+      if (gridOverlayEnabled) setRootCenter(cssW / 2, cssH / 2, r);
+      if (running) rafId = window.requestAnimationFrame(draw);
+      return;
+    }
 
     fillCircle(cx, cy, r * visualProfile.outerScale, [
       [0, rgba(palette.spill, 0.030 * glow * visualProfile.outerAlpha)],
