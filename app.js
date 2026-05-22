@@ -1145,7 +1145,7 @@ const WORLDS = [
   { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'paper-sun-morning', visualScore: 'paper-sun', palettes: { object: { wall: '#064fc8', spill: '#2456bd', outer: '#6c58ad', inner: '#f0717b', core: '#ff604f', core2: '#b86cac', shadow: '#03195e' }, bedside: { wall: '#181109', spill: '#3d2408', outer: '#9b652a', inner: '#b64a25', core: '#190905', core2: '#4a1809', shadow: '#030100' }, wake: { wall: '#0755d0', spill: '#2d61c4', outer: '#7764b8', inner: '#ff7a7f', core: '#ff6650', core2: '#c374b5', shadow: '#041f69' } } },
   { id: 'phi-dawn', name: 'Golden Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
   { id: 'night-nest', name: 'Night Nest', mood: 'low blue shelter, soft breath, sleep return', soundMode: 'night-nest', visualScore: 'night-nest', palettes: { object: { wall: '#020714', spill: '#061a3d', outer: '#2d7286', inner: '#3b8a88', core: '#01040b', core2: '#071226', shadow: '#000104' }, bedside: { wall: '#00030a', spill: '#031026', outer: '#164355', inner: '#1f5b5c', core: '#000207', core2: '#040b17', shadow: '#000000' }, wake: { wall: '#07111f', spill: '#0b2a55', outer: '#3a8794', inner: '#4fa09a', core: '#020713', core2: '#0b1d34', shadow: '#000207' } } },
-  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#f7f7f2', outer: '#f5f5ef', inner: '#aeb2ad', core: '#111827', core2: '#26324d', shadow: '#05070b' }, bedside: { wall: '#d8d8d4', spill: '#e7e7e2', outer: '#deded8', inner: '#858985', core: '#020407', core2: '#1d2538', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#fbfbf5', inner: '#c0c4bf', core: '#131a2a', core2: '#303b56', shadow: '#06080c' } } }
+  { id: 'focus-white', name: 'Focus White', mood: 'white field, soft grey shell, dark center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#efefea', spill: '#f8f8f2', outer: '#f4f4ee', inner: '#a9aaa5', core: '#000000', core2: '#2b2b2b', shadow: '#050505' }, bedside: { wall: '#d8d8d3', spill: '#ecece6', outer: '#deded8', inner: '#7d7e7a', core: '#000000', core2: '#1c1c1c', shadow: '#000000' }, wake: { wall: '#f7f7f2', spill: '#ffffff', outer: '#fbfbf6', inner: '#c2c2bc', core: '#000000', core2: '#303030', shadow: '#050505' } } }
 ];
 
 const NIGHT_PASSAGE_PROGRAM = {
@@ -1615,11 +1615,11 @@ function createApertureRenderer(canvas) {
         outerScale: 2.245,
         innerScale: 1.682,
         coreScale: 1.335,
-        outerAlpha: 0.66,
-        innerAlpha: 0.70,
-        coreAlpha: 0.92,
-        rimAlpha: 0.54,
-        ceilingAlpha: 0.46,
+        outerAlpha: 0.58,
+        innerAlpha: 0.82,
+        coreAlpha: 1.10,
+        rimAlpha: 0.46,
+        ceilingAlpha: 0.40,
         pulseGain: 0.04,
         eventWindowMs: 9000,
         eventAlpha: 0.10
@@ -1826,12 +1826,18 @@ function createApertureRenderer(canvas) {
 
     if (visualScore === 'human-return') {
       fillCircle(cx, cy + coreOffsetY, r * visualProfile.coreScale, [
-        [0, rgba(palette.core, 0.80 * brightness * visualProfile.coreAlpha)],
-        [0.20, rgba(palette.core, 0.66 * brightness * visualProfile.coreAlpha)],
-        [0.42, rgba(palette.core2, 0.44 * brightness * visualProfile.coreAlpha)],
-        [0.64, rgba(palette.inner, 0.28 * glow * visualProfile.innerAlpha)],
-        [0.84, rgba(palette.outer, 0.14 * glow * visualProfile.rimAlpha)],
+        [0, rgba(palette.core, 0.94 * brightness * visualProfile.coreAlpha)],
+        [0.18, rgba(palette.core, 0.78 * brightness * visualProfile.coreAlpha)],
+        [0.36, rgba(palette.core2, 0.48 * brightness * visualProfile.coreAlpha)],
+        [0.58, rgba(palette.inner, 0.30 * glow * visualProfile.innerAlpha)],
+        [0.82, rgba(palette.outer, 0.12 * glow * visualProfile.rimAlpha)],
         [1, rgba(palette.outer, 0)]
+      ]);
+      fillCircle(cx + driftX * 0.04, cy + driftY * 0.04 + coreOffsetY, r * 0.667, [
+        [0, rgba(palette.core, 1)],
+        [0.42, rgba(palette.core, 0.96 * brightness)],
+        [0.70, rgba(palette.shadow, 0.52 * brightness)],
+        [1, rgba(palette.core, 0)]
       ]);
     } else {
       fillCircle(cx, cy + coreOffsetY, r * visualProfile.coreScale, [
