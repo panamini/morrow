@@ -1615,11 +1615,11 @@ function createApertureRenderer(canvas) {
         outerScale: 2.245,
         innerScale: 1.682,
         coreScale: 1.335,
-        outerAlpha: 0.58,
-        innerAlpha: 0.82,
-        coreAlpha: 1.10,
-        rimAlpha: 0.46,
-        ceilingAlpha: 0.40,
+        outerAlpha: 0.66,
+        innerAlpha: 0.86,
+        coreAlpha: 1.18,
+        rimAlpha: 0.54,
+        ceilingAlpha: 0.48,
         pulseGain: 0.04,
         eventWindowMs: 9000,
         eventAlpha: 0.10
@@ -1833,10 +1833,10 @@ function createApertureRenderer(canvas) {
         [0.82, rgba(palette.outer, 0.12 * glow * visualProfile.rimAlpha)],
         [1, rgba(palette.outer, 0)]
       ]);
-      fillCircle(cx + driftX * 0.04, cy + driftY * 0.04 + coreOffsetY, r * 0.667, [
+      fillCircle(cx + driftX * 0.04, cy + driftY * 0.04 + coreOffsetY, r * 0.75, [
         [0, rgba(palette.core, 1)],
-        [0.42, rgba(palette.core, 0.96 * brightness)],
-        [0.70, rgba(palette.shadow, 0.52 * brightness)],
+        [0.44, rgba(palette.core, 0.98 * brightness)],
+        [0.70, rgba(palette.shadow, 0.58 * brightness)],
         [1, rgba(palette.core, 0)]
       ]);
     } else {
