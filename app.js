@@ -152,13 +152,13 @@ const SOUND_MODES = [
 ];
 
 const WORLDS = [
-  { id: 'milk-blue', name: 'Milk Blue', mood: 'cyan membrane, cobalt depth, quiet wall', soundMode: 'night-temple', palettes: { object: { wall: '#141d30', spill: '#0937ce', outer: '#5ff0c7', inner: '#79f0dd', core: '#244d9a', core2: '#43a7c2', shadow: '#02030a' }, bedside: { wall: '#020710', spill: '#061f4a', outer: '#2aa982', inner: '#3b7b8f', core: '#081120', core2: '#102439', shadow: '#000204' }, wake: { wall: '#7f563c', spill: '#c7efe2', outer: '#d7fff0', inner: '#a9ffd9', core: '#4a6475', core2: '#81c4c0', shadow: '#1b120d' } } },
-  { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-human', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
-  { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
-  { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
-  { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'still-water', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
-  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
-  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'near-silent', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
+  { id: 'milk-blue', name: 'Milk Blue', mood: 'cyan membrane, cobalt depth, quiet wall', soundMode: 'night-temple', visualScore: 'default', palettes: { object: { wall: '#141d30', spill: '#0937ce', outer: '#5ff0c7', inner: '#79f0dd', core: '#244d9a', core2: '#43a7c2', shadow: '#02030a' }, bedside: { wall: '#020710', spill: '#061f4a', outer: '#2aa982', inner: '#3b7b8f', core: '#081120', core2: '#102439', shadow: '#000204' }, wake: { wall: '#7f563c', spill: '#c7efe2', outer: '#d7fff0', inner: '#a9ffd9', core: '#4a6475', core2: '#81c4c0', shadow: '#1b120d' } } },
+  { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-human', visualScore: 'default', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
+  { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', visualScore: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
+  { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
+  { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'still-water', visualScore: 'default', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
+  { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', visualScore: 'default', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
+  { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'near-silent', visualScore: 'default', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
 ];
 
 const WAKE_CURVE = [
@@ -341,6 +341,9 @@ function getWorldSoundModeId(world = getWorld()) {
 function getEffectiveSoundMode(world = getWorld()) {
   return getSoundMode(getWorldSoundModeId(world));
 }
+function getVisualScore(world = getWorld()) {
+  return world.visualScore || 'default';
+}
 function recordError(scope, error) {
   const message = error && error.message ? error.message : String(error || 'Unknown error');
   audioState.lastAudioError = `${scope}: ${message}`;
@@ -437,6 +440,83 @@ function createApertureRenderer(canvas) {
     if (crossfade >= 1) displayWorldId = worldId;
     return out;
   }
+  function currentVisualScore() {
+    return getVisualScore(getWorld(worldId));
+  }
+  function visualProfileFor(score) {
+    if (score === 'space-field') {
+      return {
+        breatheRate: 0.00016,
+        breatheDepth: 0.006,
+        audioBreathe: 0.010,
+        driftXRate: 0.000055,
+        driftYRate: 0.000045,
+        driftX: 0.030,
+        driftY: 0.024,
+        outerScale: 2.72,
+        innerScale: 1.86,
+        coreScale: 1.16,
+        outerAlpha: 1.22,
+        innerAlpha: 0.82,
+        coreAlpha: 1.08,
+        rimAlpha: 0.78,
+        ceilingAlpha: 1.35,
+        pulseGain: 0.08,
+        eventWindowMs: 1600,
+        eventAlpha: 0
+      };
+    }
+
+    if (score === 'neroli-thread') {
+      return {
+        breatheRate: 0.00028,
+        breatheDepth: 0.008,
+        audioBreathe: 0.012,
+        driftXRate: 0.000095,
+        driftYRate: 0.000082,
+        driftX: 0.034,
+        driftY: 0.026,
+        outerScale: 2.22,
+        innerScale: 1.56,
+        coreScale: 1.10,
+        outerAlpha: 0.92,
+        innerAlpha: 1.06,
+        coreAlpha: 1.04,
+        rimAlpha: 1.18,
+        ceilingAlpha: 0.78,
+        pulseGain: 0.10,
+        eventWindowMs: 4200,
+        eventAlpha: 0.34
+      };
+    }
+
+    return {
+      breatheRate: 0.00035,
+      breatheDepth: 0.010,
+      audioBreathe: 0.018,
+      driftXRate: 0.00013,
+      driftYRate: 0.00011,
+      driftX: 0.045,
+      driftY: 0.035,
+      outerScale: 2.45,
+      innerScale: 1.72,
+      coreScale: 1.22,
+      outerAlpha: 1,
+      innerAlpha: 1,
+      coreAlpha: 1,
+      rimAlpha: 1,
+      ceilingAlpha: 1,
+      pulseGain: 0.34,
+      eventWindowMs: 2200,
+      eventAlpha: 0
+    };
+  }
+  function currentEventPulse(profile) {
+    if (!audioState.lastEventAt) return 0;
+    const age = Date.now() - audioState.lastEventAt;
+    const raw = clamp(1 - age / profile.eventWindowMs, 0, 1);
+    return raw * raw * (3 - 2 * raw);
+  }
   function fillCircle(cx, cy, radius, stops, composite = 'source-over') {
     ctx.save();
     ctx.globalCompositeOperation = composite;
@@ -453,6 +533,9 @@ function createApertureRenderer(canvas) {
     const cssW = width / dpr; const cssH = height / dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const palette = mixedPalette(time);
+    const visualScore = currentVisualScore();
+    const visualProfile = visualProfileFor(visualScore);
+    const eventPulse = currentEventPulse(visualProfile);
     const wakeBoost = mode === 'ringing' ? visualState.wakeVisualIntensity : 0;
     const brightness = clamp(state.settings.visualBrightness + wakeBoost * 0.18, 0.08, 1);
     ctx.fillStyle = palette.wall;
@@ -461,35 +544,35 @@ function createApertureRenderer(canvas) {
     const cy = mode === 'object' ? cssH * 0.49 : mode === 'bedside' ? cssH * 0.49 : cssH * 0.50;
     const minDim = Math.min(cssW, cssH);
     const radius = mode === 'worlds' ? minDim * 0.24 : mode === 'wakeSet' ? minDim * 0.36 : mode === 'bedside' ? minDim * 0.62 : minDim * 0.45;
-    const breathe = 1 + Math.sin(time * 0.00035) * 0.010 + visualState.audioIntensity * 0.018;
+    const breathe = 1 + Math.sin(time * visualProfile.breatheRate) * visualProfile.breatheDepth + visualState.audioIntensity * visualProfile.audioBreathe;
     const r = radius * breathe;
-    const driftX = Math.sin(time * 0.00013) * r * 0.045;
-    const driftY = Math.cos(time * 0.00011) * r * 0.035;
+    const driftX = Math.sin(time * visualProfile.driftXRate) * r * visualProfile.driftX;
+    const driftY = Math.cos(time * visualProfile.driftYRate) * r * visualProfile.driftY;
     const bedDim = mode === 'bedside' ? 0.72 : 1;
     const tapPulse = mode === 'object' ? clamp((visualState.objectTapPulseUntil - time) / 620, 0, 1) : 0;
     const pulseEase = tapPulse * tapPulse * (3 - 2 * tapPulse);
-    const glow = brightness * bedDim * (1 + wakeBoost * 0.24 + pulseEase * 0.34);
+    const glow = brightness * bedDim * (1 + wakeBoost * 0.24 + pulseEase * visualProfile.pulseGain);
 
-    fillCircle(cx, cy, r * 2.45, [
-      [0, rgba(palette.spill, 0.030 * glow)],
-      [0.38, rgba(palette.spill, 0.120 * glow)],
-      [0.70, rgba(palette.outer, 0.050 * glow)],
+    fillCircle(cx, cy, r * visualProfile.outerScale, [
+      [0, rgba(palette.spill, 0.030 * glow * visualProfile.outerAlpha)],
+      [0.38, rgba(palette.spill, 0.120 * glow * visualProfile.outerAlpha)],
+      [0.70, rgba(palette.outer, 0.050 * glow * visualProfile.ceilingAlpha)],
       [1, rgba(palette.spill, 0)]
     ], 'screen');
 
-    fillCircle(cx + driftX, cy + driftY, r * 1.72, [
-      [0, rgba(palette.inner, 0.030 * glow)],
-      [0.44, rgba(palette.outer, 0.085 * glow)],
-      [0.78, rgba(palette.spill, 0.070 * glow)],
+    fillCircle(cx + driftX, cy + driftY, r * visualProfile.innerScale, [
+      [0, rgba(palette.inner, 0.030 * glow * visualProfile.innerAlpha)],
+      [0.44, rgba(palette.outer, 0.085 * glow * visualProfile.rimAlpha)],
+      [0.78, rgba(palette.spill, 0.070 * glow * visualProfile.innerAlpha)],
       [1, rgba(palette.spill, 0)]
     ], 'screen');
 
-    fillCircle(cx, cy, r * 1.22, [
-      [0, rgba(palette.core, 0.92 * brightness)],
-      [0.30, rgba(palette.core2, 0.78 * brightness)],
-      [0.56, rgba(palette.inner, 0.52 * glow)],
-      [0.76, rgba(palette.outer, 0.34 * glow)],
-      [0.91, rgba(palette.outer, 0.075 * glow)],
+    fillCircle(cx, cy, r * visualProfile.coreScale, [
+      [0, rgba(palette.core, 0.92 * brightness * visualProfile.coreAlpha)],
+      [0.30, rgba(palette.core2, 0.78 * brightness * visualProfile.coreAlpha)],
+      [0.56, rgba(palette.inner, 0.52 * glow * visualProfile.innerAlpha)],
+      [0.76, rgba(palette.outer, 0.34 * glow * visualProfile.rimAlpha)],
+      [0.91, rgba(palette.outer, 0.075 * glow * visualProfile.rimAlpha)],
       [1, rgba(palette.outer, 0)]
     ]);
 
@@ -499,12 +582,33 @@ function createApertureRenderer(canvas) {
       [1, rgba(palette.core, 0)]
     ], 'multiply');
 
-    fillCircle(cx, cy, r * 1.82, [
+    fillCircle(cx, cy, r * (visualProfile.innerScale + 0.10), [
       [0, rgba(palette.outer, 0)],
-      [0.58, rgba(palette.outer, 0.026 * glow)],
-      [0.82, rgba(palette.spill, 0.022 * glow)],
+      [0.58, rgba(palette.outer, 0.026 * glow * visualProfile.rimAlpha)],
+      [0.82, rgba(palette.spill, 0.022 * glow * visualProfile.ceilingAlpha)],
       [1, rgba(palette.outer, 0)]
     ], 'screen');
+
+    if (visualScore === 'space-field') {
+      const ceilingDrift = Math.sin(time * 0.000035) * r * 0.018;
+      fillCircle(cx, cy - r * 0.18 + ceilingDrift, r * 2.05, [
+        [0, rgba(palette.outer, 0)],
+        [0.52, rgba(palette.outer, 0.020 * glow)],
+        [0.76, rgba(palette.inner, 0.040 * glow)],
+        [0.92, rgba(palette.spill, 0.020 * glow)],
+        [1, rgba(palette.outer, 0)]
+      ], 'screen');
+    }
+
+    if (visualScore === 'neroli-thread' && eventPulse > 0) {
+      fillCircle(cx + driftX * 0.25, cy + driftY * 0.25, r * (1.08 + eventPulse * 0.12), [
+        [0, rgba(palette.outer, 0)],
+        [0.60, rgba(palette.inner, 0.026 * eventPulse * visualProfile.eventAlpha * glow)],
+        [0.78, rgba(palette.outer, 0.120 * eventPulse * visualProfile.eventAlpha * glow)],
+        [0.93, rgba(palette.spill, 0.044 * eventPulse * visualProfile.eventAlpha * glow)],
+        [1, rgba(palette.outer, 0)]
+      ], 'screen');
+    }
 
     if (tapPulse > 0) {
       fillCircle(cx, cy, r * (1.05 + (1 - tapPulse) * 0.42), [
