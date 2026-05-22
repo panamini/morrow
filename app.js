@@ -11,7 +11,6 @@ const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
 const WORLD_DEFAULT_SOUND_MODE = 'world-default';
 const TUNING_A4_HZ = 432;
-const WAKE_ALARM_SOUND_MODE_ID = 'phi-dawn-chorale';
 
 function equalTemperamentHzFromMidi(midiNote, a4Hz = TUNING_A4_HZ) {
   return a4Hz * Math.pow(2, (midiNote - 69) / 12);
@@ -458,6 +457,7 @@ const WORLDS = [
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
   { id: 'mineral-green', name: 'Mineral Green', mood: 'green rim, blue interior, earthen room', soundMode: 'still-water', visualScore: 'default', palettes: { object: { wall: '#30351a', spill: '#6a7427', outer: '#dbff36', inner: '#82e872', core: '#065ee9', core2: '#233d7c', shadow: '#0a0d04' }, bedside: { wall: '#071005', spill: '#1e2d10', outer: '#557e2c', inner: '#3c7851', core: '#021d2f', core2: '#0e263c', shadow: '#000201' }, wake: { wall: '#4e4f32', spill: '#a4ac54', outer: '#edff4b', inner: '#a7ee5d', core: '#056bff', core2: '#315a9a', shadow: '#171909' } } },
   { id: 'paper-sun', name: 'Paper Sun', mood: 'print-like warmth, red yellow diffusion', soundMode: 'glass-orbit', visualScore: 'default', palettes: { object: { wall: '#f2eee6', spill: '#ffe36e', outer: '#fff5cf', inner: '#ffb44a', core: '#39150d', core2: '#e20d18', shadow: '#1a0804' }, bedside: { wall: '#1a150e', spill: '#4a2b0b', outer: '#8d5725', inner: '#9b3a28', core: '#120704', core2: '#3b160b', shadow: '#020100' }, wake: { wall: '#f2eee6', spill: '#ffe78d', outer: '#fff8d8', inner: '#ffcf55', core: '#5a1b10', core2: '#ee2d1b', shadow: '#2a0a04' } } },
+  { id: 'phi-dawn', name: 'Phi Dawn', mood: 'golden dawn, soft chorale, peaceful return', soundMode: 'phi-dawn-chorale', visualScore: 'phi-dawn', visualSourceWorldId: 'paper-sun' },
   { id: 'focus-white', name: 'Focus White', mood: 'paper edge, dark eye, silent center', soundMode: 'human-return', visualScore: 'human-return', palettes: { object: { wall: '#ececea', spill: '#ffffff', outer: '#f8f8f4', inner: '#9a9a96', core: '#050505', core2: '#303030', shadow: '#000000' }, bedside: { wall: '#d8d8d4', spill: '#f0f0ec', outer: '#e7e7e2', inner: '#7b7b78', core: '#000000', core2: '#202020', shadow: '#000000' }, wake: { wall: '#f6f6f2', spill: '#ffffff', outer: '#ffffff', inner: '#bfbfba', core: '#0a0a0a', core2: '#444440', shadow: '#000000' } } }
 ];
 
@@ -636,6 +636,7 @@ function parseCssPixels(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 function getWorld(id = state.selectedWorldId) { return WORLDS.find((world) => world.id === id) || WORLDS[0]; }
+function getVisualSourceWorld(world = getWorld()) { return world.visualSourceWorldId ? getWorld(world.visualSourceWorldId) : world; }
 function getSoundMode(id = 'night-temple') { return SOUND_MODES.find((mode) => mode.id === id) || SOUND_MODES[2]; }
 function getWorldSoundModeId(world = getWorld()) {
   const override = state.settings.audio.worldSoundModes?.[world.id];
@@ -733,7 +734,10 @@ function createApertureRenderer(canvas) {
     const nextHeight = Math.max(1, Math.round(rect.height * nextDpr));
     if (nextWidth !== width || nextHeight !== height || nextDpr !== dpr) { width = nextWidth; height = nextHeight; dpr = nextDpr; canvas.width = width; canvas.height = height; }
   }
-  function paletteFor(world, renderMode) { return world.palettes[renderMode === 'bedside' ? 'bedside' : renderMode === 'wakeSet' || renderMode === 'ringing' ? 'wake' : 'object']; }
+  function paletteFor(world, renderMode) {
+    const sourceWorld = getVisualSourceWorld(world);
+    return sourceWorld.palettes[renderMode === 'bedside' ? 'bedside' : renderMode === 'wakeSet' || renderMode === 'ringing' ? 'wake' : 'object'];
+  }
   function mixedPalette(time) {
     if (crossfade < 1) crossfade = clamp((time - crossfadeStart) / crossfadeMs, 0, 1);
     const from = paletteFor(getWorld(displayWorldId), mode);
@@ -836,6 +840,29 @@ function createApertureRenderer(canvas) {
         pulseGain: 0.04,
         eventWindowMs: 9000,
         eventAlpha: 0.10
+      };
+    }
+
+    if (score === 'phi-dawn') {
+      return {
+        breatheRate: 0.00016,
+        breatheDepth: 0.006,
+        audioBreathe: 0.012,
+        driftXRate: 0.000052,
+        driftYRate: 0.000046,
+        driftX: 0.024,
+        driftY: 0.020,
+        outerScale: 2.58,
+        innerScale: 1.70,
+        coreScale: 1.14,
+        outerAlpha: 1.10,
+        innerAlpha: 0.94,
+        coreAlpha: 1.04,
+        rimAlpha: 0.92,
+        ceilingAlpha: 1.12,
+        pulseGain: 0.06,
+        eventWindowMs: 8000,
+        eventAlpha: 0.12
       };
     }
 
@@ -1553,9 +1580,7 @@ function createAudioEngine() {
       audioState.currentAudioSessionId = nextSessionId;
       stopScheduledNodes('mode_crossfade_internal', wasPlaying ? 0.06 : 0.02);
       const world = getWorld(options.worldId || state.selectedWorldId);
-      const soundMode = modeName === 'ringing'
-        ? getSoundMode(WAKE_ALARM_SOUND_MODE_ID)
-        : getEffectiveSoundMode(world);
+      const soundMode = getEffectiveSoundMode(world);
       audioState.currentWorldId = world.id;
       audioState.currentMode = modeName;
       audioState.currentSoundModeId = soundMode.id;
@@ -1652,7 +1677,6 @@ function createAudioEngine() {
       audioContextState: audioState.audioContextState,
       currentMode: audioState.currentMode,
       activeWorld: audioState.currentWorldId || state.selectedWorldId,
-      wakeAlarmSoundModeId: WAKE_ALARM_SOUND_MODE_ID,
       currentWakePhaseName: currentWakePhase.name,
       currentWakeMinute: Number((currentWakePhase.atMinute || 0).toFixed(2)),
       currentSoundModeId: audioState.currentSoundModeId,
@@ -2231,7 +2255,7 @@ function renderWorlds() {
   const total = WORLDS.length;
   const activeIndex = WORLDS.findIndex((candidate) => candidate.id === (worldSelectionState.activeWorld || state.selectedWorldId));
   WORLDS.forEach((world, index) => {
-    const palette = world.palettes.object;
+    const palette = getVisualSourceWorld(world).palettes.object;
     const angle = (index / total) * Math.PI * 2 - Math.PI / 2;
     const point = polarPoint(geometry.objectCenterX, geometry.objectCenterY, geometry.constellationRadius, angle);
     const disc = document.createElement('button');
@@ -2400,7 +2424,6 @@ function refreshDiagnostics(immediate = false) {
       audioPlaybackState: diagnostics.audioPlaybackState,
       audioContextState: diagnostics.audioContextState,
       activeWorld: diagnostics.activeWorld,
-      wakeAlarmSoundModeId: diagnostics.wakeAlarmSoundModeId,
       currentWakePhaseName: diagnostics.currentWakePhaseName,
       currentWakeMinute: diagnostics.currentWakeMinute,
       currentSoundModeId: diagnostics.currentSoundModeId,
