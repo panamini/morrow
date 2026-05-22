@@ -79,17 +79,17 @@ const SOUND_MODES = [
       style: 'lullaby',
       phraseGapsMs: {
         bedside: [34000, 89000],
-        object: [13000, 55000],
+        object: [10000, 36000],
         ringing: [8000, 34000]
       },
       phraseGapSequenceMs: {
         bedside: [55000, 89000, 34000, 55000, 144000],
-        object: [13000, 21000, 34000, 21000, 55000],
+        object: [10000, 16000, 26000, 16000, 42000],
         ringing: [8000, 13000, 21000, 13000, 34000]
       },
       restProbability: {
         bedside: 0.72,
-        object: 0.34,
+        object: 0.24,
         ringing: 0.18
       },
       maxEventsPerPhrase: {
@@ -103,15 +103,37 @@ const SOUND_MODES = [
       foregroundGainScale: 0.74,
       repeatMemory: 8,
       droneVoiceLimit: 4,
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.020,
+        bedsideGain: 0.014,
+        voiceRatios: [
+          1,
+          1.498,
+          1.682,
+          2,
+          2.245,
+          2.52,
+          2.997
+        ],
+        maxVoices: 5,
+        attackSeconds: [18, 48],
+        releaseSeconds: [55, 150],
+        cyclesSeconds: [34, 55, 89, 144, 233],
+        panDrift: 0.12,
+        detuneCents: 2.5,
+        lowpassHz: [280, 560],
+        highpassHz: 34
+      },
       orderedPhraseCells: [
         [1.498],
         [1.682, 1.498],
         [2, 1.498],
         [2.245, 2],
         [2.52, 2.245],
-        [3.364, 2.997],
-        [1.682, 1.498],
-        [1]
+        [1.682, 2, 1.498],
+        [2.997, 2.245],
+        [1.498, 1]
       ],
       phraseCells: [
         [1.498],
@@ -859,6 +881,7 @@ let durationPointer = null;
 let wakePointer = null;
 let wakeWorldPointer = null;
 let wakeDirectEdit = null;
+let mobileBackSwipe = null;
 let desktopPointerIdleTimer = null;
 let uiIdleTimer = null;
 let wakeSettleTimer = null;
@@ -867,6 +890,9 @@ let wakeLastEntryAt = 0;
 let wakePreviewActive = false;
 let programPreviewTimers = [];
 let programPhaseTimers = [];
+const MOBILE_BACK_SWIPE_EDGE_PX = 30;
+const MOBILE_BACK_SWIPE_MIN_X = 78;
+const MOBILE_BACK_SWIPE_MAX_Y = 82;
 const programState = {
   activeProgramId: null,
   activePhaseId: null,
@@ -3139,6 +3165,80 @@ function closeWakeSet() {
   setMode('object', { keepAudio: true });
 }
 
+function isMobileBackSwipeMode(mode = state.currentMode) {
+  return mode === 'bedside' || mode === 'wakeSet' || mode === 'settings';
+}
+
+function isMobileBackSwipeDevice(event) {
+  if (!event || event.pointerType !== 'touch') return false;
+  const coarsePointer = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  return coarsePointer || window.innerWidth <= 820;
+}
+
+function finishMobileBackSwipe() {
+  const mode = state.currentMode;
+  mobileBackSwipe = null;
+  sensoryPointer = null;
+  durationPointer = null;
+  wakePointer = null;
+  wakeWorldPointer = null;
+  cancelWakeDirectEdit();
+  if (mode === 'bedside') return stopBedSessionAndClose();
+  if (mode === 'wakeSet') return closeWakeSet();
+  if (mode === 'settings') return setMode('object', { keepAudio: true });
+  return setMode('object', { keepAudio: true });
+}
+
+function handleMobileBackSwipeStart(event) {
+  if (!isMobileBackSwipeMode() || !isMobileBackSwipeDevice(event) || event.clientX > MOBILE_BACK_SWIPE_EDGE_PX || isEditableTarget(event.target)) {
+    mobileBackSwipe = null;
+    return;
+  }
+  mobileBackSwipe = {
+    x: event.clientX,
+    y: event.clientY,
+    at: nowMs(),
+    active: false,
+    pointerId: event.pointerId
+  };
+}
+
+function handleMobileBackSwipeMove(event) {
+  if (!mobileBackSwipe || event.pointerId !== mobileBackSwipe.pointerId) return;
+  const dx = event.clientX - mobileBackSwipe.x;
+  const dy = event.clientY - mobileBackSwipe.y;
+  if (dx > 14 && dx > Math.abs(dy) * 1.15) mobileBackSwipe.active = true;
+  if (mobileBackSwipe.active) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}
+
+function handleMobileBackSwipeEnd(event) {
+  if (!mobileBackSwipe || event.pointerId !== mobileBackSwipe.pointerId) return;
+  const dx = event.clientX - mobileBackSwipe.x;
+  const dy = event.clientY - mobileBackSwipe.y;
+  const shouldReturn = mobileBackSwipe.active
+    && dx > MOBILE_BACK_SWIPE_MIN_X
+    && Math.abs(dy) < MOBILE_BACK_SWIPE_MAX_Y
+    && dx > Math.abs(dy) * 1.25
+    && nowMs() - mobileBackSwipe.at < 1100;
+  const wasActive = mobileBackSwipe.active;
+  if (!shouldReturn) {
+    mobileBackSwipe = null;
+    return;
+  }
+  event.preventDefault();
+  event.stopPropagation();
+  finishMobileBackSwipe();
+  if (wasActive) armInterface();
+}
+
+function handleMobileBackSwipeCancel(event) {
+  if (!mobileBackSwipe || event.pointerId !== mobileBackSwipe.pointerId) return;
+  mobileBackSwipe = null;
+}
+
 function applyWorld(world) {
   if (!world) return null;
   state.selectedWorldId = world.id;
@@ -3526,6 +3626,10 @@ function bindEvents() {
   window.addEventListener('mousemove', armDesktopPointerActivity);
   window.addEventListener('pointerdown', (event) => { if (event.pointerType === 'mouse') armDesktopPointerActivity(); });
   window.addEventListener('blur', clearDesktopPointerIdleTimer);
+  window.addEventListener('pointerdown', handleMobileBackSwipeStart, { capture: true, passive: false });
+  window.addEventListener('pointermove', handleMobileBackSwipeMove, { capture: true, passive: false });
+  window.addEventListener('pointerup', handleMobileBackSwipeEnd, { capture: true, passive: false });
+  window.addEventListener('pointercancel', handleMobileBackSwipeCancel, { capture: true, passive: false });
 
   dom.objectGestureSurface.addEventListener('pointerdown', (event) => handleSensoryPointerStart(event, 'object'));
   dom.objectGestureSurface.addEventListener('pointermove', handleSensoryPointerMove);
