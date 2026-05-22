@@ -498,40 +498,62 @@ const SOUND_MODES = [
     engineV2: {
       style: 'sleep-nest',
       phraseGapsMs: {
-        bedside: [55000, 180000],
-        object: [18000, 64000],
+        bedside: [89000, 233000],
+        object: [34000, 144000],
         ringing: [21000, 89000]
       },
       phraseGapSequenceMs: {
-        bedside: [55000, 89000, 144000, 89000, 180000],
-        object: [21000, 34000, 55000, 34000, 21000, 89000],
+        bedside: [89000, 144000, 233000, 144000, 377000],
+        object: [34000, 55000, 89000, 55000, 144000],
         ringing: [21000, 34000, 55000, 34000, 89000]
       },
       restProbability: {
-        bedside: 0.80,
-        object: 0.38,
+        bedside: 0.88,
+        object: 0.58,
         ringing: 0.42
       },
       maxEventsPerPhrase: {
         bedside: 1,
-        object: 2,
+        object: 1,
         ringing: 2
       },
-      attackSeconds: [6, 22],
-      releaseSeconds: [42, 150],
-      gainScale: 0.46,
-      foregroundGainScale: 0.58,
+      attackSeconds: [12, 34],
+      releaseSeconds: [70, 210],
+      gainScale: 0.38,
+      foregroundGainScale: 0.42,
       repeatMemory: 10,
       droneVoiceLimit: 4,
       sleepNoise: {
         enabled: true,
         color: 'pink-brown',
-        gain: 0.014,
-        bedsideGain: 0.020,
-        lowpassHz: 560,
-        highpassHz: 38,
-        breathingRateHz: 0.10,
-        breathingDepth: 0.08
+        gain: 0.008,
+        bedsideGain: 0.012,
+        lowpassHz: 460,
+        highpassHz: 32,
+        breathingRateHz: 0.085,
+        breathingDepth: 0.045
+      },
+      spaceEnvelope: {
+        enabled: true,
+        gain: 0.030,
+        bedsideGain: 0.022,
+        voiceRatios: [
+          0.5,
+          1,
+          1.335,
+          1.498,
+          1.682,
+          2,
+          2.378
+        ],
+        maxVoices: 6,
+        attackSeconds: [22, 55],
+        releaseSeconds: [70, 180],
+        cyclesSeconds: [55, 89, 144, 233, 377],
+        panDrift: 0.16,
+        detuneCents: 4,
+        lowpassHz: [260, 520],
+        highpassHz: 28
       },
       orderedPhraseCells: [
         [1.498],
@@ -539,9 +561,8 @@ const SOUND_MODES = [
         [1.682, 1.498],
         [1.189, 1],
         [2, 1.498],
-        [1.335, 1.189],
         [1.782, 1.682],
-        [1],
+        [1.335, 1.189],
         [0.5, 1]
       ],
       phraseCells: [
@@ -550,9 +571,8 @@ const SOUND_MODES = [
         [1.682, 1.498],
         [1.189, 1],
         [2, 1.498],
-        [1.335, 1.189],
         [1.782, 1.682],
-        [1],
+        [1.335, 1.189],
         [0.5, 1]
       ]
     }
@@ -978,24 +998,24 @@ function createApertureRenderer(canvas) {
 
     if (score === 'night-nest') {
       return {
-        breatheRate: 0.00010,
-        breatheDepth: 0.004,
-        audioBreathe: 0.006,
-        driftXRate: 0.000032,
-        driftYRate: 0.000028,
-        driftX: 0.014,
-        driftY: 0.012,
-        outerScale: 2.42,
-        innerScale: 1.48,
-        coreScale: 1.06,
-        outerAlpha: 0.58,
-        innerAlpha: 0.68,
-        coreAlpha: 1.12,
-        rimAlpha: 0.48,
-        ceilingAlpha: 0.36,
-        pulseGain: 0.02,
-        eventWindowMs: 12000,
-        eventAlpha: 0.05
+        breatheRate: 0.000085,
+        breatheDepth: 0.0035,
+        audioBreathe: 0.005,
+        driftXRate: 0.000026,
+        driftYRate: 0.000021,
+        driftX: 0.020,
+        driftY: 0.016,
+        outerScale: 2.72,
+        innerScale: 1.72,
+        coreScale: 1.03,
+        outerAlpha: 0.66,
+        innerAlpha: 0.72,
+        coreAlpha: 1.10,
+        rimAlpha: 0.42,
+        ceilingAlpha: 0.48,
+        pulseGain: 0.018,
+        eventWindowMs: 15000,
+        eventAlpha: 0.035
       };
     }
 
@@ -1378,6 +1398,7 @@ function createAudioEngine() {
       droneVoiceLimit: custom.droneVoiceLimit,
       wakeRatioCeilings: custom.wakeRatioCeilings || null,
       sleepNoise: custom.sleepNoise || null,
+      spaceEnvelope: custom.spaceEnvelope || null,
       phraseGapSequenceMs: custom.phraseGapSequenceMs || null,
       orderedPhraseCells: custom.orderedPhraseCells || null,
       phraseCells: custom.phraseCells || buildDefaultPhraseCells(soundMode)
@@ -1544,7 +1565,7 @@ function createAudioEngine() {
     const fieldScale = isSleepNest ? 0.030 : isWakeChorale ? 0.046 : isHuman ? 0.044 : isLullaby ? 0.052 : isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
     const wakePhaseScale = isWakeChorale ? clamp(0.34 + getWakeDensity(modeName) * 0.82, 0.30, wakeMinute >= 13 ? 0.98 : 0.74) : 1;
     const highToneScale = isSleepNest && ratio >= 2.997 ? 0.22 : isSleepNest && ratio >= 2.378 ? 0.36 : isSleepNest && ratio >= 2 ? 0.56 : isWakeChorale && ratio >= 4 ? (wakeMinute >= 13 ? 0.38 : 0.26) : isWakeChorale && ratio >= 3.364 ? 0.54 : isWakeChorale && ratio >= 2.997 ? 0.72 : (isLullaby || isHuman) && ratio >= 2.997 ? 0.52 : (isLullaby || isHuman) && ratio >= 2.52 ? 0.72 : 1;
-    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * wakePhaseScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isSleepNest ? (modeName === 'bedside' ? 0.010 : modeName === 'object' ? 0.024 : 0.018) : isWakeChorale ? 0.044 : isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * highToneScale * wakePhaseScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isSleepNest ? (modeName === 'bedside' ? 0.010 : modeName === 'object' ? 0.020 : 0.018) : isWakeChorale ? 0.044 : isHuman ? (modeName === 'bedside' ? 0.018 : 0.038) : isLullaby ? (modeName === 'bedside' ? 0.026 : 0.052) : isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isSleepNest ? 0.9 : isWakeChorale ? 1.8 : isHuman ? 1.6 : isLullaby ? 2.2 : isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
     const bowlTouch = isBowl && ratio >= 4;
@@ -1669,6 +1690,73 @@ function createAudioEngine() {
     audioState.activeNodes += 4;
     updateActiveOscillatorCount();
   }
+  function startSleepSpaceEnvelope(modeName, soundMode, profile) {
+    const config = profile.spaceEnvelope;
+    if (!ctx || !modeGain || profile.style !== 'sleep-nest' || !config?.enabled) return;
+    const ratios = (config.voiceRatios || []).slice(0, clamp(config.maxVoices || 6, 1, 6));
+    const cycles = Array.isArray(config.cyclesSeconds) && config.cyclesSeconds.length ? config.cyclesSeconds : [89, 144, 233];
+    const at = ctx.currentTime;
+    const baseGain = modeName === 'bedside' ? (config.bedsideGain || config.gain || 0.022) : (config.gain || 0.030);
+    ratios.forEach((ratio, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const lowpass = ctx.createBiquadFilter();
+      const highpass = ctx.createBiquadFilter();
+      const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      const frequency = soundMode.baseFrequency * ratio;
+      const attack = randomBetween(config.attackSeconds, 34) + index * 2.7;
+      const release = randomBetween(config.releaseSeconds, 120);
+      const cycle = cycles[index % cycles.length];
+      const voiceGain = (baseGain / Math.sqrt(index + 1)) * (ratio <= 1 ? 0.72 : ratio >= 2 ? 0.34 : 0.52);
+      const targetGain = modeName === 'bedside' ? voiceGain * 0.74 : voiceGain;
+      const lowpassRange = Array.isArray(config.lowpassHz) ? config.lowpassHz : [260, 520];
+
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      if (osc.detune) osc.detune.value = (Math.random() - 0.5) * (config.detuneCents || 4);
+      highpass.type = 'highpass';
+      highpass.frequency.value = config.highpassHz || 28;
+      highpass.Q.value = 0.16;
+      lowpass.type = 'lowpass';
+      lowpass.frequency.setValueAtTime(randomBetween(lowpassRange, 360), at);
+      lowpass.Q.value = 0.12;
+      gain.gain.setValueAtTime(0.0001, at);
+      gain.gain.linearRampToValueAtTime(targetGain, at + attack);
+      let gainAt = at + attack;
+      for (let step = 0; step < 8; step += 1) {
+        gainAt += cycle * (0.82 + Math.random() * 0.36);
+        gain.gain.linearRampToValueAtTime(targetGain * (0.70 + Math.random() * 0.42), gainAt);
+      }
+      gain.gain.setTargetAtTime(targetGain * 0.62, at + 18 * 60, release);
+
+      let filterAt = at;
+      for (let step = 0; step < 10; step += 1) {
+        filterAt += randomBetween([55, 144], 89);
+        lowpass.frequency.linearRampToValueAtTime(randomBetween(lowpassRange, 360), filterAt);
+      }
+
+      if (pan) {
+        const drift = config.panDrift || 0.16;
+        const startsCentered = ratio <= 1 || frequency < 150;
+        const initialPan = startsCentered ? 0 : (index % 2 === 0 ? -drift : drift) * (0.30 + Math.random() * 0.45);
+        pan.pan.setValueAtTime(initialPan, at);
+        if (!startsCentered) {
+          let panAt = at;
+          for (let step = 0; step < 8; step += 1) {
+            panAt += cycle * (0.75 + Math.random() * 0.50);
+            pan.pan.linearRampToValueAtTime((Math.random() - 0.5) * drift, panAt);
+          }
+        }
+        osc.connect(highpass); highpass.connect(lowpass); lowpass.connect(gain); gain.connect(pan); pan.connect(modeGain);
+      } else {
+        osc.connect(highpass); highpass.connect(lowpass); lowpass.connect(gain); gain.connect(modeGain);
+      }
+      osc.start(at);
+      droneOscillators.push(osc);
+      audioState.activeNodes += pan ? 5 : 4;
+    });
+    updateActiveOscillatorCount();
+  }
   function startDrones(modeName, world, soundMode) {
     if (!ctx || !modeGain) return;
     const profile = getV2Profile(modeName, soundMode);
@@ -1681,6 +1769,7 @@ function createAudioEngine() {
     const at = ctx.currentTime;
     let haloVoiceCount = 0;
     if (profile.style === 'sleep-nest') startSleepNoiseBed(modeName, profile);
+    if (profile.style === 'sleep-nest') startSleepSpaceEnvelope(modeName, soundMode, profile);
     ratios.forEach((ratio, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
