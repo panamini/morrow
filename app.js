@@ -660,6 +660,7 @@ let wakeWorldPointer = null;
 let wakeSettleTimer = null;
 let wakeEntryGuardUntil = 0;
 let wakeLastEntryAt = 0;
+let wakePreviewActive = false;
 let worldPointer = null;
 let worldLongHoldTimer = null;
 let wheelWorldThrottleAt = 0;
@@ -747,6 +748,9 @@ function getWorldSoundModeId(world = getWorld()) {
 }
 function getEffectiveSoundMode(world = getWorld()) {
   return getSoundMode(getWorldSoundModeId(world));
+}
+function getWakeSoundMode(world = getWorld()) {
+  return getSoundMode(world.soundMode);
 }
 function getVisualScore(world = getWorld()) {
   return world.visualScore || 'default';
@@ -1763,14 +1767,17 @@ function createAudioEngine() {
       audioState.currentAudioSessionId = nextSessionId;
       stopScheduledNodes('mode_crossfade_internal', wasPlaying ? 0.06 : 0.02);
       const world = getWorld(options.worldId || state.selectedWorldId);
-      const soundMode = getEffectiveSoundMode(world);
+      const soundMode = modeName === 'ringing' ? getWakeSoundMode(world) : getEffectiveSoundMode(world);
       audioState.currentWorldId = world.id;
       audioState.currentMode = modeName;
       audioState.currentSoundModeId = soundMode.id;
       audioState.binauralEnabled = Boolean(state.settings.audio.binauralEnabled && soundMode.binaural.allowed);
       audioState.deltaHz = state.settings.audio.binauralDeltaHz;
       audioState.engineStyle = options.engine === 'legacy' ? 'legacy' : `v2-${soundMode.engineV2?.style || 'canonical'}`;
-      if (modeName === 'ringing') currentWakePhase = getCurrentWakePhase();
+      if (modeName === 'ringing') {
+        if (!wakeCurveStartedAt) startWakeCurve();
+        currentWakePhase = getCurrentWakePhase();
+      }
       window.setTimeout(() => {
         if (nextSessionId !== sessionId) return;
         if (modeName === 'ringing') syncWakePhase(currentWakePhase);
@@ -1890,16 +1897,33 @@ function createAudioEngine() {
 function unlockAudioFromGesture(event) { return ensureAudioEngine().unlockAudioFromGesture(event); }
 function playSoundFromGesture(event, modeName, options = {}) { return ensureAudioEngine().playFromGesture(event, modeName, options); }
 function startSoundFromGesture(event, modeName, options = {}) { return ensureAudioEngine().startModeFromGesture(event, modeName, options); }
-function playWakeSoundFromGesture(event) { return startSoundFromGesture(event, 'ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 }); }
+function playWakePreviewFromGesture(event) {
+  wakePreviewActive = true;
+  return startSoundFromGesture(event, 'object', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 0.46 });
+}
+function stopWakePreview() {
+  if (!wakePreviewActive) return;
+  wakePreviewActive = false;
+  ensureAudioEngine().stopExplicit();
+}
+function playWakeSoundFromGesture(event) {
+  wakePreviewActive = false;
+  return startSoundFromGesture(event, 'ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 });
+}
 function playCurrentSoundFromGesture(event) {
   if (state.currentMode === 'bedside') return startSoundFromGesture(event, 'bedside');
-  if (state.currentMode === 'wakeSet' || state.currentMode === 'ringing') return playWakeSoundFromGesture(event);
+  if (state.currentMode === 'wakeSet') return playWakePreviewFromGesture(event);
+  if (state.currentMode === 'ringing') return playWakeSoundFromGesture(event);
   return startSoundFromGesture(event, 'object', { worldId: state.selectedWorldId, intensity: 1 });
 }
 function stopSoundExplicit() { const result = ensureAudioEngine().stopExplicit(); updateSoundControls(); return result; }
 function startBedsideSound() { return ensureAudioEngine().startMode('bedside', { intensity: 0.72 }); }
 function startObjectSound() { return ensureAudioEngine().startMode('object', { intensity: 1 }); }
-function startWakeSequence() { return ensureAudioEngine().startMode('ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 }); }
+function startWakeSequence() {
+  wakePreviewActive = false;
+  if (state.currentMode !== 'ringing') setMode('ringing', { keepAudio: true });
+  return ensureAudioEngine().startMode('ringing', { worldId: state.wakeWorldId || state.selectedWorldId, intensity: 1 });
+}
 function getAudioDiagnostics() { return ensureAudioEngine().getAudioDiagnostics(); }
 
 function setMode(mode, options = {}) {
@@ -1999,7 +2023,8 @@ function checkAlarmTick() {
     state.alarm.lastTriggeredKey = key;
     saveState();
     setMode('ringing', { keepAudio: true });
-    showToast('Tap once for sound.', 1600);
+    if (audioState.unlocked) startWakeSequence();
+    else showToast('Tap once for sound.', 1600);
   }
 }
 function startAlarmWatcher() { if (alarmTimer) window.clearInterval(alarmTimer); alarmTimer = window.setInterval(checkAlarmTick, 1000); }
@@ -2258,11 +2283,13 @@ function confirmWakeSet() {
   if (isWakeEntryGuardActive()) return;
   saveState();
   showToast(`Wake ${state.alarm.time}`, 1100);
+  stopWakePreview();
   setMode('object', { keepAudio: true });
 }
 
 function closeWakeSet() {
   if (isWakeEntryGuardActive()) return;
+  stopWakePreview();
   setMode('object', { keepAudio: true });
 }
 
@@ -2291,7 +2318,9 @@ function setWakeWorldByStep(step) {
   saveState();
   setActiveVisualWorld(next.id);
   if (renderer && state.currentMode === 'wakeSet') renderer.setWorld(next.id);
-  if (state.currentMode === 'wakeSet' && audioState.userFacingAudioState === 'PLAYING' && audioState.currentMode === 'ringing') {
+  if (state.currentMode === 'wakeSet' && wakePreviewActive && audioState.userFacingAudioState === 'PLAYING') {
+    ensureAudioEngine().startMode('object', { worldId: next.id, intensity: 0.46 });
+  } else if (state.currentMode === 'wakeSet' && audioState.userFacingAudioState === 'PLAYING' && audioState.currentMode === 'ringing') {
     ensureAudioEngine().startMode('ringing', { worldId: next.id, intensity: 1 });
   }
   updateClocks();
@@ -2324,7 +2353,7 @@ function enterWakeFromGesture(event) {
   wakeLastEntryAt = nowMs();
   wakeEntryGuardUntil = nowMs() + 420;
   setMode('wakeSet', { keepAudio: true });
-  playWakeSoundFromGesture(event);
+  playWakePreviewFromGesture(event);
 }
 
 function isWakeEntryGuardActive() {
@@ -2803,12 +2832,12 @@ function bindEvents() {
   dom.use24hToggle.addEventListener('change', () => { state.settings.use24h = dom.use24hToggle.checked; saveState(); updateClocks(); });
   dom.softTestButton.addEventListener('pointerdown', (event) => playSoundFromGesture(event, 'object'));
   dom.mediumTestButton.addEventListener('pointerdown', (event) => playSoundFromGesture(event, 'object'));
-  dom.wakeTestButton.addEventListener('pointerdown', (event) => { playSoundFromGesture(event, 'ringing'); });
+  dom.wakeTestButton.addEventListener('pointerdown', (event) => { playWakeSoundFromGesture(event); });
   dom.stopAudioButton.addEventListener('click', stopSoundExplicit);
   dom.diagToneButton.addEventListener('pointerdown', (event) => playSoundFromGesture(event, 'object'));
   dom.diagPlayButton.addEventListener('pointerdown', (event) => playSoundFromGesture(event, 'object'));
   dom.diagBedsideButton.addEventListener('pointerdown', (event) => { setMode('bedside', { keepAudio: true }); playSoundFromGesture(event, 'bedside'); });
-  dom.diagWakeButton.addEventListener('pointerdown', (event) => playSoundFromGesture(event, 'ringing'));
+  dom.diagWakeButton.addEventListener('pointerdown', (event) => playWakeSoundFromGesture(event));
   dom.diagStopButton.addEventListener('click', stopSoundExplicit);
 
   dom.stopWakeButton.addEventListener('click', () => { ensureAudioEngine().stopForWakeDismiss(); setMode('object', { keepAudio: true }); });
