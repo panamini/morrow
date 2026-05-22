@@ -26,6 +26,68 @@ const BED_DURATION_OPTIONS = [
 
 const SOUND_MODES = [
   { id: 'still-water', name: '432 Still Water', referenceHz: '432 Hz', description: 'A=432-style consonance: 216 Hz bed with 432 Hz octave bloom, calm and rounded.', baseFrequency: 216, partialRatios: [0.5, 1, 1.25, 1.5, 2, 2.5], droneRatios: [0.5, 1, 2], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 2, weight: 6 }, { ratio: 1.5, weight: 5 }, { ratio: 1.25, weight: 2 }, { ratio: 2.5, weight: 1 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.20, shimmerProbability: 0.10, nightSafeCutoff: 720, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '432 Hz musical tuning reference' },
+  {
+    id: 'blue-bowl',
+    name: 'F# Blue Bowl',
+    referenceHz: 'F# / 432 crystal bowl',
+    description: 'F#-centered crystal bowl field: pure blue resonance, soft octave bloom, slow water-like decay.',
+    baseFrequency: Number(equalTemperamentHzFromMidi(42).toFixed(2)),
+    partialRatios: [0.5, 1, 1.335, 2, 2.997, 3.174, 4, 4.756, 5.34, 8, 10.678],
+    droneRatios: [1, 2, 4, 4.756],
+    strikeGrammar: [
+      { ratio: 4, weight: 10 },
+      { ratio: 8, weight: 6 },
+      { ratio: 4.756, weight: 4 },
+      { ratio: 2, weight: 3 },
+      { ratio: 10.678, weight: 2.2 },
+      { ratio: 2.997, weight: 1.2 },
+      { ratio: 3.174, weight: 0.8 },
+      { ratio: 1.335, weight: 0.6 },
+      { ratio: 1, weight: 0.5 },
+      { ratio: 0.5, weight: 0.2 }
+    ],
+    bowlDensity: 0.06,
+    shimmerProbability: 0.015,
+    nightSafeCutoff: 760,
+    binaural: { allowed: false, deltaHz: 2 },
+    ritualLabel: 'F# crystal bowl reference tuned from A=432',
+    engineV2: {
+      style: 'bowl',
+      phraseGapsMs: {
+        bedside: [36000, 110000],
+        object: [12000, 36000],
+        ringing: [6500, 22000]
+      },
+      restProbability: {
+        bedside: 0.62,
+        object: 0.28,
+        ringing: 0.12
+      },
+      maxEventsPerPhrase: {
+        bedside: 1,
+        object: 1,
+        ringing: 2
+      },
+      attackSeconds: [0.08, 0.95],
+      releaseSeconds: [18, 58],
+      gainScale: 0.92,
+      foregroundGainScale: 1.22,
+      repeatMemory: 5,
+      droneVoiceLimit: 4,
+      phraseCells: [
+        [4],
+        [4],
+        [8],
+        [4.756],
+        [4, 8],
+        [4, 4.756],
+        [2, 4],
+        [4, 10.678],
+        [2.997, 4],
+        [3.174, 4]
+      ]
+    }
+  },
   { id: 'limestone-harmonic', name: '417 Limestone Shift', referenceHz: '417 Hz', description: '417 Hz reference through 139 Hz fundamentals: mineral, slightly tense, good for transition.', baseFrequency: 139, partialRatios: [1, 1.5, 2, 3, 4.5, 6], droneRatios: [0.5, 1, 3], strikeGrammar: [{ ratio: 1, weight: 7 }, { ratio: 3, weight: 5 }, { ratio: 1.5, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 4.5, weight: 1 }, { ratio: 6, weight: 1 }], bowlDensity: 0.32, shimmerProbability: 0.18, nightSafeCutoff: 900, binaural: { allowed: false, deltaHz: 2 }, ritualLabel: '417 Hz symbolic frequency reference' },
   { id: 'night-temple', name: '138/111 Night Temple', referenceHz: '138 Hz + 111 Hz', description: 'The sleep anchor: 138 Hz bowl, 111 Hz night drone, slow binaural only with headphones.', baseFrequency: 138, partialRatios: [0.804, 1, 1.25, 1.5, 2, 2.25], droneRatios: [0.804, 1, 1.5], strikeGrammar: [{ ratio: 1, weight: 8 }, { ratio: 1.5, weight: 5 }, { ratio: 0.804, weight: 4 }, { ratio: 2, weight: 3 }, { ratio: 1.25, weight: 2 }, { ratio: 2.25, weight: 1 }], bowlDensity: 0.22, shimmerProbability: 0.12, nightSafeCutoff: 640, binaural: { allowed: true, deltaHz: 2 }, ritualLabel: '138 Hz bowl with 111 Hz night drone reference' },
   { id: 'glass-orbit', name: '528 Glass Orbit', referenceHz: '528 Hz', description: '528 Hz octave bloom from a 264 Hz bed: brighter, glassier, more wake-forward.', baseFrequency: 264, partialRatios: [0.5, 1, 1.25, 1.5, 2, 3], droneRatios: [0.5, 1, 2], strikeGrammar: [{ ratio: 1, weight: 6 }, { ratio: 2, weight: 6 }, { ratio: 1.5, weight: 4 }, { ratio: 1.25, weight: 3 }, { ratio: 3, weight: 2 }, { ratio: 0.5, weight: 1 }], bowlDensity: 0.40, shimmerProbability: 0.42, nightSafeCutoff: 1180, binaural: { allowed: false, deltaHz: 3 }, ritualLabel: '528 Hz symbolic frequency reference' },
@@ -152,7 +214,7 @@ const SOUND_MODES = [
 ];
 
 const WORLDS = [
-  { id: 'milk-blue', name: 'Milk Blue', mood: 'cyan membrane, cobalt depth, quiet wall', soundMode: 'night-temple', visualScore: 'default', palettes: { object: { wall: '#141d30', spill: '#0937ce', outer: '#5ff0c7', inner: '#79f0dd', core: '#244d9a', core2: '#43a7c2', shadow: '#02030a' }, bedside: { wall: '#020710', spill: '#061f4a', outer: '#2aa982', inner: '#3b7b8f', core: '#081120', core2: '#102439', shadow: '#000204' }, wake: { wall: '#7f563c', spill: '#c7efe2', outer: '#d7fff0', inner: '#a9ffd9', core: '#4a6475', core2: '#81c4c0', shadow: '#1b120d' } } },
+  { id: 'milk-blue', name: 'Milk Blue', mood: 'cyan membrane, cobalt depth, quiet wall', soundMode: 'blue-bowl', visualScore: 'blue-bowl', palettes: { object: { wall: '#141d30', spill: '#0937ce', outer: '#5ff0c7', inner: '#79f0dd', core: '#244d9a', core2: '#43a7c2', shadow: '#02030a' }, bedside: { wall: '#020710', spill: '#061f4a', outer: '#2aa982', inner: '#3b7b8f', core: '#081120', core2: '#102439', shadow: '#000204' }, wake: { wall: '#7f563c', spill: '#c7efe2', outer: '#d7fff0', inner: '#a9ffd9', core: '#4a6475', core2: '#81c4c0', shadow: '#1b120d' } } },
   { id: 'ember-mouth', name: 'Ember Mouth', mood: 'red field, violet center, warm return', soundMode: 'ember-human', visualScore: 'default', palettes: { object: { wall: '#210205', spill: '#6b0c17', outer: '#ff2c61', inner: '#ff5269', core: '#45165f', core2: '#bd1c3a', shadow: '#050003' }, bedside: { wall: '#080203', spill: '#2c0710', outer: '#973b34', inner: '#79293f', core: '#1d0b25', core2: '#32101b', shadow: '#010000' }, wake: { wall: '#5b1d12', spill: '#fd7252', outer: '#ff9b63', inner: '#f65342', core: '#50364b', core2: '#cf4e35', shadow: '#160603' } } },
   { id: 'violet-arc', name: 'Violet Arc', mood: 'black aperture, violet edge, moving hush', soundMode: 'space-field', visualScore: 'space-field', palettes: { object: { wall: '#010106', spill: '#1b0d42', outer: '#896dff', inner: '#4629b4', core: '#020205', core2: '#0b0b16', shadow: '#000000' }, bedside: { wall: '#000000', spill: '#08031a', outer: '#33236a', inner: '#24155c', core: '#000000', core2: '#050509', shadow: '#000000' }, wake: { wall: '#08070f', spill: '#321271', outer: '#b9a0ff', inner: '#6757f5', core: '#090913', core2: '#1a1742', shadow: '#000000' } } },
   { id: 'sakura-depth', name: 'Sakura Depth', mood: 'rose bloom, dark center, gridded softness', soundMode: 'neroli-thread', visualScore: 'neroli-thread', palettes: { object: { wall: '#ead7dd', spill: '#ff8bc7', outer: '#ffd2f0', inner: '#ff0f72', core: '#3b0628', core2: '#b50747', shadow: '#210215' }, bedside: { wall: '#150a10', spill: '#4b1231', outer: '#8b2a66', inner: '#a01f54', core: '#140412', core2: '#360619', shadow: '#020001' }, wake: { wall: '#f1e6ea', spill: '#ffb3da', outer: '#ffe2f3', inner: '#ff4d9a', core: '#6f174d', core2: '#fb1d79', shadow: '#321222' } } },
@@ -444,6 +506,29 @@ function createApertureRenderer(canvas) {
     return getVisualScore(getWorld(worldId));
   }
   function visualProfileFor(score) {
+    if (score === 'blue-bowl') {
+      return {
+        breatheRate: 0.00022,
+        breatheDepth: 0.007,
+        audioBreathe: 0.014,
+        driftXRate: 0.000075,
+        driftYRate: 0.000060,
+        driftX: 0.036,
+        driftY: 0.028,
+        outerScale: 2.56,
+        innerScale: 1.68,
+        coreScale: 1.18,
+        outerAlpha: 1.12,
+        innerAlpha: 1.02,
+        coreAlpha: 1.04,
+        rimAlpha: 1.06,
+        ceilingAlpha: 1.08,
+        pulseGain: 0.12,
+        eventWindowMs: 5200,
+        eventAlpha: 0.26
+      };
+    }
+
     if (score === 'space-field') {
       return {
         breatheRate: 0.00016,
@@ -610,6 +695,18 @@ function createApertureRenderer(canvas) {
       ], 'screen');
     }
 
+    if (visualScore === 'blue-bowl' && eventPulse > 0) {
+      const ringScale = 1.02 + eventPulse * 0.18;
+      const ringAlpha = eventPulse * visualProfile.eventAlpha * glow;
+      fillCircle(cx, cy, r * (visualProfile.innerScale + 0.18 * ringScale), [
+        [0, rgba(palette.outer, 0)],
+        [0.58, rgba(palette.inner, 0.020 * ringAlpha)],
+        [0.76, rgba(palette.outer, 0.110 * ringAlpha)],
+        [0.90, rgba(palette.spill, 0.036 * ringAlpha)],
+        [1, rgba(palette.outer, 0)]
+      ], 'screen');
+    }
+
     if (tapPulse > 0) {
       fillCircle(cx, cy, r * (1.05 + (1 - tapPulse) * 0.42), [
         [0, rgba(palette.outer, 0.060 * pulseEase)],
@@ -764,7 +861,7 @@ function createAudioEngine() {
     return range[0] + Math.random() * (range[1] - range[0]);
   }
   function isLongToneStyle(style) {
-    return style === 'field' || style === 'thread';
+    return style === 'field' || style === 'thread' || style === 'bowl';
   }
   function updateActiveOscillatorCount() {
     audioState.activeOscillators = droneOscillators.length + transientOscillators.length;
@@ -896,11 +993,18 @@ function createAudioEngine() {
     const profile = getV2Profile(modeName, soundMode);
     const isLongTone = isLongToneStyle(profile.style);
     const isThread = profile.style === 'thread';
+    const isBowl = profile.style === 'bowl';
     const at = ctx.currentTime;
     const wakeEmphasis = modeName === 'ringing' ? 0.62 + getWakeDensity(modeName) * 0.84 : 1;
-    const attack = randomBetween(profile.attackSeconds, isLongTone ? 7 : 1);
-    const release = randomBetween(profile.releaseSeconds, isLongTone ? 22 : 8);
-    const hold = isThread ? randomBetween([0.75, 4.5], 2.5) : isLongTone ? randomBetween([1.5, 8], 4) : randomBetween([0.35, 2.5], 1);
+    const attack = isBowl
+      ? randomBetween(profile.attackSeconds, 0.42)
+      : randomBetween(profile.attackSeconds, isLongTone ? 7 : 1);
+    const release = isBowl
+      ? randomBetween(profile.releaseSeconds, 28)
+      : randomBetween(profile.releaseSeconds, isLongTone ? 22 : 8);
+    const hold = isBowl
+      ? randomBetween([0.9, 5.5], 2.8)
+      : isThread ? randomBetween([0.75, 4.5], 2.5) : isLongTone ? randomBetween([1.5, 8], 4) : randomBetween([0.35, 2.5], 1);
     const rawFrequency = soundMode.baseFrequency * ratio;
     const cutoff = modeName === 'bedside' ? (soundMode.nightSafeCutoff || 640) : Math.min((soundMode.nightSafeCutoff || 900) * (isLongTone ? 1 : 1.16), isLongTone ? 720 : 1500);
     if (modeName === 'bedside' && rawFrequency > cutoff) return;
@@ -909,25 +1013,31 @@ function createAudioEngine() {
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    const modeScale = modeName === 'bedside' ? 0.56 : modeName === 'ringing' ? 0.92 : 0.78;
-    const fieldScale = isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
-    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const modeScale = modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
+    const fieldScale = isBowl ? 0.074 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isBowl ? 0.072 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
+    const bowlTouch = isBowl && ratio >= 4;
 
-    osc.type = Math.random() > 0.72 && !isLongTone ? 'triangle' : 'sine';
+    osc.type = isBowl ? (Math.random() > 0.84 ? 'triangle' : 'sine') : Math.random() > 0.72 && !isLongTone ? 'triangle' : 'sine';
     osc.frequency.setValueAtTime(rawFrequency, at);
     if (osc.detune) osc.detune.setValueAtTime(detuneCents, at);
     filter.type = 'lowpass';
-    filter.frequency.value = Math.max(160, cutoff);
-    filter.Q.value = isLongTone ? 0.32 : 0.45;
+    filter.frequency.value = Math.max(160, isBowl ? Math.min(cutoff, modeName === 'bedside' ? 920 : 1800) : cutoff);
+    filter.Q.value = isBowl ? 0.28 : isLongTone ? 0.32 : 0.45;
     gain.gain.value = 0.0001;
     gain.gain.setValueAtTime(0.0001, at);
-    gain.gain.linearRampToValueAtTime(peak, at + attack);
-    gain.gain.setTargetAtTime(0.0001, at + attack + hold, Math.max(1.2, release / 3));
+    if (isBowl) {
+      gain.gain.linearRampToValueAtTime(peak, at + Math.max(0.04, attack));
+      gain.gain.setTargetAtTime(0.0001, at + Math.max(0.04, attack) + hold, Math.max(2.8, release / 2.4));
+    } else {
+      gain.gain.linearRampToValueAtTime(peak, at + attack);
+      gain.gain.setTargetAtTime(0.0001, at + attack + hold, Math.max(1.2, release / 3));
+    }
 
     if (pan) {
-      pan.pan.value = upperTone ? (Math.random() - 0.5) * (isLongTone ? (isThread ? 0.18 : 0.24) : 0.42) : 0;
+      pan.pan.value = bowlTouch ? (Math.random() - 0.5) * (modeName === 'bedside' ? 0.08 : 0.14) : upperTone ? (Math.random() - 0.5) * (isLongTone ? (isThread ? 0.18 : 0.24) : 0.42) : 0;
       if (upperTone) pan.pan.setTargetAtTime(-pan.pan.value * 0.72, at + attack + hold, release * 0.55);
       osc.connect(filter); filter.connect(gain); gain.connect(pan); pan.connect(modeGain);
     } else {
