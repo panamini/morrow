@@ -846,8 +846,19 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   width: auto;
   transform: translateY(-1px);
 }
-.digit-zone { width: auto; min-width: 0; min-height: clamp(108px, 18vw, 168px); display: grid; place-items: center; background: transparent; border: 0; padding: 0; touch-action: none; }
+.wake-numerals.is-editing .digit-value,
+.wake-numerals.is-editing .digit-colon {
+  opacity: 0;
+  visibility: hidden;
+}
+.digit-zone { position: relative; width: auto; min-width: 0; min-height: clamp(108px, 18vw, 168px); display: grid; place-items: center; background: transparent; border: 0; padding: 0; touch-action: none; }
 .digit-zone:focus-visible { outline: 0; }
+.wake-stage.is-editing-time .digit-value,
+.wake-stage.is-editing-time .digit-colon {
+  opacity: 0;
+  visibility: hidden;
+  filter: none;
+}
 .digit-value {
   display: block;
   width: auto;
@@ -864,6 +875,63 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   transform: scale(1);
   text-shadow: 0 22px 94px rgba(0,0,0,.24);
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
+}
+.wake-time-editor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wake-digit-gap);
+  width: auto;
+  min-width: 0;
+  height: 1em;
+  color: var(--ink);
+  font-family: var(--clock-typeface);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  font-size: var(--wake-time-size);
+  line-height: .92;
+  letter-spacing: 0;
+  font-weight: var(--clock-weight);
+  text-shadow: 0 22px 94px rgba(0,0,0,.24);
+}
+.wake-clock-input {
+  width: 2ch;
+  min-width: 2ch;
+  height: 1em;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  caret-color: rgba(250,248,239,.78);
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.wake-clock-input:focus,
+.wake-clock-input:focus-visible {
+  outline: 0;
+}
+.wake-clock-input::selection {
+  background: rgba(250,248,239,.22);
+}
+.wake-clock-input::-webkit-outer-spin-button,
+.wake-clock-input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+.wake-clock-separator {
+  width: var(--wake-colon-width);
+  margin: 0 .015em;
+  text-align: center;
+  color: rgba(250,248,239,.68);
+  user-select: none;
+  pointer-events: none;
 }
 .digit-zone.is-selected .digit-value { opacity: .98; filter: blur(0); transform: scale(1); }
 .wake-stage[data-active-ring="hour"] #wakeMinute .digit-value,

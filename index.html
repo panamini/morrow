@@ -10,7 +10,7 @@
   <meta name="description" content="Dawn Chamber — an orbital chromatic bedside object for light, sound, sleep and waking.">
   <title>Dawn Chamber</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=20260522-ring-dot-focus">
+  <link rel="stylesheet" href="styles.css?v=20260522-wake-fixed-colon-input">
 </head>
 <body data-mode="object" data-audio="stopped">
   <canvas id="apertureCanvas" aria-hidden="true"></canvas>
@@ -64,7 +64,7 @@
       <div id="wakeGestureArea" class="wake-stage" aria-label="Wake time selector. Inner ring sets hours. Outer ring sets minutes.">
         <div id="minuteRing" class="orbital-ring minute-ring" aria-label="Outer minute ring"></div>
         <div id="hourRing" class="orbital-ring hour-ring" aria-label="Inner hour ring"></div>
-        <div class="wake-numerals" aria-live="polite">
+        <div id="wakeNumerals" class="wake-numerals" aria-live="polite">
           <button id="wakeHour" class="digit-zone" type="button" aria-label="Wake hour"><span id="wakeHourValue" class="digit-value">07</span></button>
           <span id="wakeColon" class="digit-colon" aria-hidden="true">:</span>
           <button id="wakeMinute" class="digit-zone" type="button" aria-label="Wake minute"><span id="wakeMinuteValue" class="digit-value">30</span></button>
@@ -220,6 +220,6 @@
       if (event.persisted) window.location.reload();
     });
   </script>
-  <script src="app.js?v=20260522-ring-dot-focus"></script>
+  <script src="app.js?v=20260522-wake-fixed-colon-input"></script>
 </body>
 </html>

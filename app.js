@@ -858,6 +858,7 @@ let sensoryPointer = null;
 let durationPointer = null;
 let wakePointer = null;
 let wakeWorldPointer = null;
+let wakeDirectEdit = null;
 let desktopPointerIdleTimer = null;
 let uiIdleTimer = null;
 let wakeSettleTimer = null;
@@ -1091,7 +1092,7 @@ function cacheDom() {
   [
     'apertureCanvas', 'grain', 'debugGridOverlay', 'toast', 'soundToggleButton', 'objectPanel', 'objectGestureSurface', 'objectTime', 'nextWake', 'objectRail', 'railBed', 'railWake', 'railWorld', 'railSet',
     'bedsidePanel', 'bedsideGestureSurface', 'bedsideTime', 'bedsideWakeMemory', 'bedSessionSummary', 'bedsideProgramSteps', 'bedsideWorldPrev', 'bedsideWorldNext', 'durationRow', 'bedsideSetButton', 'bedsideRail', 'bedsideDurationButton', 'bedsideExitButton',
-    'wakeSetPanel', 'wakeCloseButton', 'wakeGestureArea', 'hourRing', 'minuteRing', 'wakeHour', 'wakeMinute', 'wakeHourValue', 'wakeMinuteValue', 'wakeColon', 'wakeWorldSelector', 'wakeWorldPrev', 'wakeWorldName', 'wakeWorldNext', 'wakeRail', 'wakeSetConfirmButton',
+    'wakeSetPanel', 'wakeCloseButton', 'wakeGestureArea', 'hourRing', 'minuteRing', 'wakeNumerals', 'wakeHour', 'wakeMinute', 'wakeHourValue', 'wakeMinuteValue', 'wakeColon', 'wakeWorldSelector', 'wakeWorldPrev', 'wakeWorldName', 'wakeWorldNext', 'wakeRail', 'wakeSetConfirmButton',
     'worldsPanel', 'worldsCloseButton', 'wakeWorldMemory', 'worldConstellation', 'worldPrevButton', 'worldNextButton', 'worldCopy', 'worldConstellationName', 'worldHint', 'worldRail', 'worldBackButton',
     'settingsPanel', 'settingsBackdrop', 'settingsSheet', 'settingsCloseButton', 'soundModeSelect', 'soundModeDescription', 'binauralToggle', 'deltaReadout', 'deltaSlider', 'masterVolumeReadout', 'masterVolume', 'bedsideVolumeReadout', 'bedsideVolume', 'objectVolumeReadout', 'objectVolume', 'wakeVolumeReadout', 'wakeVolume', 'airVolumeReadout', 'airVolume', 'strikeVolumeReadout', 'strikeVolume', 'shimmerReadout', 'shimmerAmount', 'softTestButton', 'mediumTestButton', 'wakeTestButton', 'stopAudioButton', 'brightnessReadout', 'brightnessSlider', 'reduceMotionToggle', 'use24hToggle', 'openSafetyButton', 'openDiagnosticsButton', 'diagGridButton',
     'safetyPanel', 'safetyBackdrop', 'safetySheet', 'safetyCloseButton',
@@ -2896,6 +2897,7 @@ function wakeRingDistanceModel(event) {
 }
 function syncWakeStateFromAlarm() { const parsed = parseTime(state.alarm.time); wakeSetState.candidateHour = parsed.hour; wakeSetState.candidateMinute = parsed.minute; wakeSetState.committedTime = state.alarm.time; }
 function clearWakeSetterFocus() {
+  cancelWakeDirectEdit();
   wakeSetState.activePart = null;
   if (dom.wakeHour) dom.wakeHour.classList.remove('is-selected');
   if (dom.wakeMinute) dom.wakeMinute.classList.remove('is-selected');
@@ -2906,7 +2908,7 @@ function scheduleWakeFocusSettle() {
   window.clearTimeout(wakeSettleTimer);
   wakeSettleTimer = window.setTimeout(() => {
     if (state.currentMode !== 'wakeSet') return;
-    if (wakeSetState.isDragging || wakePointer) {
+    if (wakeSetState.isDragging || wakePointer || wakeDirectEdit) {
       scheduleWakeFocusSettle();
       return;
     }
@@ -2935,6 +2937,132 @@ function changeWakeTime(part, delta) {
   wakeSetState.candidateMinute = parsed.minute;
   wakeSetState.lastInteractionAt = nowMs();
   saveState(); updateClocks(); markWakeInteraction();
+}
+function commitWakeDirectEdit() {
+  if (!wakeDirectEdit) return;
+  const { editor, hourInput, minuteInput } = wakeDirectEdit;
+  const parsed = parseTime(state.alarm.time);
+  const hour = /^\d{1,2}$/.test(hourInput.value) ? Number(hourInput.value) : NaN;
+  const minute = /^\d{1,2}$/.test(minuteInput.value) ? Number(minuteInput.value) : NaN;
+  if (Number.isFinite(hour)) parsed.hour = clamp(Math.round(hour), 0, 23);
+  if (Number.isFinite(minute)) parsed.minute = clamp(Math.round(minute), 0, 59);
+  if (Number.isFinite(parsed.hour) && Number.isFinite(parsed.minute)) {
+    state.alarm.time = formatTime(parsed.hour, parsed.minute);
+    wakeSetState.candidateHour = parsed.hour;
+    wakeSetState.candidateMinute = parsed.minute;
+    wakeSetState.lastInteractionAt = nowMs();
+    saveState();
+  }
+  if (dom.wakeNumerals) dom.wakeNumerals.classList.remove('is-editing');
+  if (dom.wakeGestureArea) dom.wakeGestureArea.classList.remove('is-editing-time');
+  editor.remove();
+  wakeDirectEdit = null;
+  updateClocks();
+  markWakeInteraction();
+}
+function cancelWakeDirectEdit() {
+  if (!wakeDirectEdit) return;
+  const { editor } = wakeDirectEdit;
+  if (dom.wakeNumerals) dom.wakeNumerals.classList.remove('is-editing');
+  if (dom.wakeGestureArea) dom.wakeGestureArea.classList.remove('is-editing-time');
+  editor.remove();
+  wakeDirectEdit = null;
+  updateClocks();
+}
+function cleanWakeClockInput(input, max) {
+  input.value = input.value.replace(/\D/g, '').slice(0, 2);
+  const value = Number(input.value);
+  if (Number.isFinite(value) && value > max) input.value = pad2(max);
+}
+function wireWakeClockInput(input, handlers = {}) {
+  input.addEventListener('pointerdown', (event) => event.stopPropagation());
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); commitWakeDirectEdit(); }
+    if (event.key === 'Escape') { event.preventDefault(); cancelWakeDirectEdit(); markWakeInteraction(); }
+    if (handlers.onBackspace && event.key === 'Backspace' && input.selectionStart === 0 && input.selectionEnd === 0) {
+      handlers.onBackspace(event);
+    }
+  });
+  input.addEventListener('paste', (event) => {
+    const pasted = event.clipboardData?.getData('text') || '';
+    const digits = pasted.replace(/\D/g, '').slice(0, 4);
+    if (digits.length < 3 || !wakeDirectEdit) return;
+    event.preventDefault();
+    const hourDigits = digits.length === 3 ? digits.slice(0, 1).padStart(2, '0') : digits.slice(0, 2);
+    const minuteDigits = digits.slice(-2);
+    wakeDirectEdit.hourInput.value = hourDigits;
+    wakeDirectEdit.minuteInput.value = minuteDigits;
+    cleanWakeClockInput(wakeDirectEdit.hourInput, 23);
+    cleanWakeClockInput(wakeDirectEdit.minuteInput, 59);
+    wakeDirectEdit.minuteInput.focus({ preventScroll: true });
+    wakeDirectEdit.minuteInput.select();
+  });
+}
+function beginWakeDirectEdit(part) {
+  if (part !== 'hour' && part !== 'minute') return;
+  if (wakeDirectEdit) {
+    const target = part === 'minute' ? wakeDirectEdit.minuteInput : wakeDirectEdit.hourInput;
+    target.focus({ preventScroll: true });
+    target.select();
+    return;
+  }
+  cancelWakeDirectEdit();
+  setActiveSetter(part, { settle: false });
+  if (!dom.wakeNumerals) return;
+  const parsed = parseTime(state.alarm.time);
+  const editor = document.createElement('div');
+  const hourInput = document.createElement('input');
+  const separator = document.createElement('span');
+  const minuteInput = document.createElement('input');
+  editor.className = 'wake-time-editor';
+  hourInput.className = 'wake-clock-input wake-clock-hour';
+  minuteInput.className = 'wake-clock-input wake-clock-minute';
+  separator.className = 'wake-clock-separator';
+  separator.textContent = ':';
+  [hourInput, minuteInput].forEach((input) => {
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.pattern = '[0-9]*';
+    input.maxLength = '2';
+  });
+  hourInput.value = pad2(parsed.hour);
+  minuteInput.value = pad2(parsed.minute);
+  hourInput.setAttribute('aria-label', 'Type wake hour');
+  minuteInput.setAttribute('aria-label', 'Type wake minute');
+  wireWakeClockInput(hourInput);
+  wireWakeClockInput(minuteInput, {
+    onBackspace: (event) => {
+      event.preventDefault();
+      hourInput.focus({ preventScroll: true });
+      hourInput.setSelectionRange(hourInput.value.length, hourInput.value.length);
+    }
+  });
+  hourInput.addEventListener('input', () => {
+    cleanWakeClockInput(hourInput, 23);
+    const value = Number(hourInput.value);
+    if (hourInput.value.length === 1 && Number.isFinite(value) && value > 2) hourInput.value = `0${hourInput.value}`;
+    if (hourInput.value.length >= 2) {
+      minuteInput.focus({ preventScroll: true });
+      minuteInput.select();
+    }
+  });
+  minuteInput.addEventListener('input', () => cleanWakeClockInput(minuteInput, 59));
+  editor.addEventListener('focusout', () => {
+    window.setTimeout(() => {
+      if (!wakeDirectEdit || editor.contains(document.activeElement)) return;
+      commitWakeDirectEdit();
+    }, 0);
+  });
+  editor.append(hourInput, separator, minuteInput);
+  dom.wakeNumerals.classList.add('is-editing');
+  if (dom.wakeGestureArea) dom.wakeGestureArea.classList.add('is-editing-time');
+  dom.wakeNumerals.appendChild(editor);
+  wakeDirectEdit = { part, editor, hourInput, minuteInput };
+  window.requestAnimationFrame(() => {
+    const target = part === 'minute' ? minuteInput : hourInput;
+    target.focus({ preventScroll: true });
+    target.select();
+  });
 }
 function setHourFromRing(event) {
   const parsed = parseTime(state.alarm.time);
@@ -2993,6 +3121,7 @@ function handleWakeStagePointerUp(event) {
 }
 function markWakeInteraction() {
   if (dom.wakeSetPanel) dom.wakeSetPanel.classList.remove('is-idle');
+  if (wakeDirectEdit) return;
   if (wakeSetState.activePart) scheduleWakeFocusSettle();
 }
 
@@ -3458,8 +3587,6 @@ function bindEvents() {
 
   dom.wakeCloseButton.addEventListener('click', closeWakeSet);
   dom.wakeSetConfirmButton.addEventListener('click', toggleWakeSet);
-  dom.wakeHour.addEventListener('click', () => setActiveSetter('hour'));
-  dom.wakeMinute.addEventListener('click', () => setActiveSetter('minute'));
   [dom.wakeHour, dom.wakeMinute].forEach((zone) => {
     const part = zone.id === 'wakeHour' ? 'hour' : 'minute';
     zone.addEventListener('pointerenter', (event) => { if (event.pointerType !== 'touch') setActiveSetter(part, { settle: false }); });
@@ -3470,6 +3597,7 @@ function bindEvents() {
       const dx = event.clientX - wakePointer.x; const dy = event.clientY - wakePointer.y; const speed = Math.hypot(dx, dy) / Math.max(1, nowMs() - wakePointer.at);
       if (Math.abs(dx) > 58 && Math.abs(dx) > Math.abs(dy) * 1.25) setActiveSetter(wakeSetState.editingPart === 'hour' ? 'minute' : 'hour');
       if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) { const stepBase = wakePointer.part === 'minute' ? (speed > 0.9 ? 5 : 1) : (speed > 0.9 ? 3 : 1); changeWakeTime(wakePointer.part, dy < 0 ? stepBase : -stepBase); }
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && nowMs() - wakePointer.at < 420) beginWakeDirectEdit(wakePointer.part);
       try { zone.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
       wakePointer = null;
       markWakeInteraction();
