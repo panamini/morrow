@@ -7,7 +7,7 @@
   <meta name="description" content="Dawn Chamber — an orbital chromatic bedside object for light, sound, sleep and waking.">
   <title>Dawn Chamber</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=20260522-set-align">
+  <link rel="stylesheet" href="styles.css?v=20260522-wake-focus">
 </head>
 <body data-mode="object" data-audio="stopped">
   <canvas id="apertureCanvas" aria-hidden="true"></canvas>
@@ -50,11 +50,11 @@
 
     <section id="wakeSetPanel" class="panel wake-set-panel" aria-label="Set wake time" hidden>
       <button id="wakeCloseButton" class="close-word" type="button" aria-label="Close wake setting">CLOSE</button>
-      <div id="wakeGestureArea" class="wake-stage" aria-label="Wake time selector. Inner ring sets hours. Outer ring sets minutes." data-active-ring="hour">
+      <div id="wakeGestureArea" class="wake-stage" aria-label="Wake time selector. Inner ring sets hours. Outer ring sets minutes.">
         <div id="minuteRing" class="orbital-ring minute-ring" aria-label="Outer minute ring"></div>
         <div id="hourRing" class="orbital-ring hour-ring" aria-label="Inner hour ring"></div>
         <div class="wake-numerals" aria-live="polite">
-          <button id="wakeHour" class="digit-zone is-selected" type="button" aria-label="Wake hour"><span id="wakeHourValue" class="digit-value">07</span></button>
+          <button id="wakeHour" class="digit-zone" type="button" aria-label="Wake hour"><span id="wakeHourValue" class="digit-value">07</span></button>
           <span id="wakeColon" class="digit-colon" aria-hidden="true">:</span>
           <button id="wakeMinute" class="digit-zone" type="button" aria-label="Wake minute"><span id="wakeMinuteValue" class="digit-value">30</span></button>
         </div>
@@ -206,6 +206,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=20260522-audio-v2f"></script>
+  <script src="app.js?v=20260522-audio-lift"></script>
 </body>
 </html>

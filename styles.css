@@ -566,6 +566,8 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
 .orbital-ring .dot.is-far { opacity: .26; filter: blur(.8px); }
 .hour-ring .dot.is-active { width: 15px; height: 15px; opacity: .95; background: rgba(250,248,239,.94); box-shadow: 0 0 42px rgba(250,248,239,.32); }
 .minute-ring .dot.is-active { width: 15px; height: 15px; opacity: .96; background: rgba(250,248,239,.96); box-shadow: 0 0 0 1px rgba(250,248,239,.20), 0 0 46px rgba(250,248,239,.36); }
+.wake-stage[data-active-ring="hour"] .hour-ring { opacity: .82; }
+.wake-stage[data-active-ring="minute"] .minute-ring { opacity: .80; }
 .wake-stage[data-active-ring="hour"] .minute-ring { opacity: .36; filter: blur(1.2px); }
 .wake-stage[data-active-ring="minute"] .hour-ring { opacity: .38; filter: blur(1.2px); }
 .wake-numerals {
@@ -591,14 +593,17 @@ body[data-mode="bedside"].bedside-idle .bedside-world-edge {
   letter-spacing: 0;
   font-weight: var(--clock-weight);
   color: var(--ink);
-  opacity: .58;
-  filter: blur(2.4px);
-  transform: scale(.98);
+  opacity: .94;
+  filter: blur(0);
+  transform: scale(1);
   text-shadow: 0 22px 94px rgba(0,0,0,.24);
   transition: opacity .26s ease, filter .26s ease, transform .26s ease;
 }
 .digit-zone.is-selected .digit-value { opacity: .98; filter: blur(0); transform: scale(1); }
-.digit-colon { width: var(--wake-colon-width); margin: 0 .015em; text-align: center; font-size: var(--wake-time-size); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.44); transform: none; }
+.wake-stage[data-active-ring="hour"] #wakeMinute .digit-value,
+.wake-stage[data-active-ring="minute"] #wakeHour .digit-value { opacity: .36; filter: blur(1.3px); transform: scale(.985); }
+.digit-colon { width: var(--wake-colon-width); margin: 0 .015em; text-align: center; font-size: var(--wake-time-size); line-height: .82; letter-spacing: 0; font-weight: var(--clock-weight); color: rgba(250,248,239,.68); transform: none; transition: color .26s ease, opacity .26s ease, filter .26s ease; }
+.wake-stage[data-active-ring] .digit-colon { color: rgba(250,248,239,.58); }
 .wake-rail .world-word { color: var(--ink); }
 .inline-world-selector {
   position: absolute;

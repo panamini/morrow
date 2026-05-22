@@ -3,8 +3,9 @@
 const APP_SCHEMA_VERSION = 9;
 const STORAGE_KEY = 'dawnChamberV4State';
 const MASTER_GAIN_CEILING = 1;
-const OUTPUT_GAIN_BOOST = 1.55;
-const OUTPUT_GAIN_CEILING = 1.35;
+const OUTPUT_GAIN_BOOST = 2.15;
+const OUTPUT_GAIN_CEILING = 1.85;
+const WAKE_FOCUS_SETTLE_MS = 1900;
 const GRID_GEOMETRY_HARD_RULE = 'If the constellation cannot fit, shrink the orbit';
 const POINTER_MOVE_THRESHOLD = 8;
 const WORLD_LABEL_HIDE_SAFE_MIN = 540;
@@ -83,22 +84,22 @@ const SOUND_MODES = [
       style: 'thread',
       phraseGapsMs: {
         bedside: [52000, 150000],
-        object: [24000, 90000],
-        ringing: [11000, 42000]
+        object: [12000, 42000],
+        ringing: [6000, 24000]
       },
       restProbability: {
-        bedside: 0.78,
-        object: 0.52,
-        ringing: 0.26
+        bedside: 0.68,
+        object: 0.34,
+        ringing: 0.16
       },
       maxEventsPerPhrase: {
         bedside: 1,
         object: 2,
         ringing: 3
       },
-      attackSeconds: [1.8, 7.5],
+      attackSeconds: [0.8, 4.6],
       releaseSeconds: [12, 38],
-      gainScale: 0.62,
+      gainScale: 0.98,
       repeatMemory: 7,
       phraseCells: [
         [2.127],
@@ -227,6 +228,7 @@ let apertureTapToggleArmed = false;
 const wakeSetState = {
   wakeStep: 'time',
   editingPart: 'hour',
+  activePart: null,
   isDragging: false,
   dragRing: null,
   candidateHour: parseTime(state.alarm.time).hour,
@@ -527,9 +529,9 @@ function createAudioEngine() {
     masterGain = ctx.createGain();
     modeGain = ctx.createGain();
     compressor = ctx.createDynamicsCompressor();
-    compressor.threshold.value = -18;
-    compressor.knee.value = 18;
-    compressor.ratio.value = 8;
+    compressor.threshold.value = -14;
+    compressor.knee.value = 22;
+    compressor.ratio.value = 5;
     compressor.attack.value = 0.018;
     compressor.release.value = 0.28;
     modeGain.gain.value = 0.0001;
@@ -767,8 +769,8 @@ function createAudioEngine() {
     const filter = ctx.createBiquadFilter();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
     const modeScale = modeName === 'bedside' ? 0.56 : modeName === 'ringing' ? 0.92 : 0.78;
-    const fieldScale = isThread ? 0.060 : isLongTone ? 0.078 : 0.052;
-    const peak = clamp(fieldScale * profile.gainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isLongTone ? (isThread ? 0.065 : 0.085) : 0.095);
+    const fieldScale = isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
+    const peak = clamp(fieldScale * profile.gainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
 
@@ -838,8 +840,8 @@ function createAudioEngine() {
       const frequency = soundMode.baseFrequency * ratio;
       osc.frequency.value = frequency;
       if (osc.detune) osc.detune.value = (Math.random() - 0.5) * (isLongTone ? 4 : 7);
-      const droneBase = modeName === 'bedside' ? 0.010 : isThread ? 0.008 : isLongTone ? 0.013 : 0.026;
-      const baseGain = (droneBase * (isLongTone ? profile.gainScale + (isThread ? 0.02 : 0.12) : 1)) / Math.sqrt(index + 1);
+      const droneBase = modeName === 'bedside' ? (isThread ? 0.014 : 0.010) : isThread ? 0.018 : isLongTone ? 0.013 : 0.026;
+      const baseGain = (droneBase * (isLongTone ? profile.gainScale + (isThread ? 0.10 : 0.12) : 1)) / Math.sqrt(index + 1);
       const breathDepth = index === 0 ? 0.035 : index < 3 ? 0.055 : 0.038;
       const breathCycle = [8, 14, 25, 46, 96, 150, 220][index % 7];
       let breathAt = at;
@@ -963,7 +965,10 @@ function createAudioEngine() {
           audioState.activeTimers = 1;
           eventTimer = window.setTimeout(scheduleNextStrike, 70);
         } else {
-          const firstPhraseDelay = modeName === 'bedside' ? randomBetween([5000, 14000], 9000) : modeName === 'ringing' ? 500 : randomBetween([300, 1300], 700);
+          const isThread = soundMode.engineV2?.style === 'thread';
+          const firstPhraseDelay = isThread
+            ? (modeName === 'bedside' ? randomBetween([1200, 3600], 2200) : modeName === 'ringing' ? 250 : randomBetween([80, 360], 180))
+            : modeName === 'bedside' ? randomBetween([5000, 14000], 9000) : modeName === 'ringing' ? 500 : randomBetween([300, 1300], 700);
           audioState.activeTimers = 1;
           eventTimer = window.setTimeout(() => {
             if (nextSessionId !== sessionId) return;
@@ -1083,7 +1088,7 @@ function setMode(mode, options = {}) {
   if (mode === 'bedside') { revealBedsideControls(); startBedsideSessionTimer(); } else { document.body.classList.remove('bedside-idle'); clearBedsideIdleTimer(); clearBedsideSessionTimer(); }
   if (mode === 'ringing') startWakeCurve();
   else if (previous === 'ringing') stopWakeCurve();
-  if (mode === 'wakeSet') { wakeSetState.wakeStep = 'time'; syncWakeStateFromAlarm(); setActiveSetter('hour'); markWakeInteraction(); }
+  if (mode === 'wakeSet') { wakeSetState.wakeStep = 'time'; syncWakeStateFromAlarm(); clearWakeSetterFocus(); }
   if (mode === 'worlds') { initializeWorldSelection(options.entry || previous); renderWorlds(); }
   if (mode === 'settings') syncSettingsControls();
   if (mode === 'diagnostics') refreshDiagnostics(true);
@@ -1310,11 +1315,36 @@ function wakeRingDistanceModel(event) {
   return null;
 }
 function syncWakeStateFromAlarm() { const parsed = parseTime(state.alarm.time); wakeSetState.candidateHour = parsed.hour; wakeSetState.candidateMinute = parsed.minute; wakeSetState.committedTime = state.alarm.time; }
-function setActiveSetter(part) {
+function clearWakeSetterFocus() {
+  wakeSetState.activePart = null;
+  if (dom.wakeHour) dom.wakeHour.classList.remove('is-selected');
+  if (dom.wakeMinute) dom.wakeMinute.classList.remove('is-selected');
+  if (dom.wakeGestureArea) delete dom.wakeGestureArea.dataset.activeRing;
+  if (dom.wakeSetPanel) dom.wakeSetPanel.classList.add('is-idle');
+}
+function scheduleWakeFocusSettle() {
+  window.clearTimeout(wakeSettleTimer);
+  wakeSettleTimer = window.setTimeout(() => {
+    if (state.currentMode !== 'wakeSet') return;
+    if (wakeSetState.isDragging || wakePointer) {
+      scheduleWakeFocusSettle();
+      return;
+    }
+    clearWakeSetterFocus();
+  }, WAKE_FOCUS_SETTLE_MS);
+}
+function setActiveSetter(part, options = {}) {
+  if (part !== 'hour' && part !== 'minute') {
+    clearWakeSetterFocus();
+    return;
+  }
   wakeSetState.editingPart = part;
+  wakeSetState.activePart = part;
   if (dom.wakeHour) dom.wakeHour.classList.toggle('is-selected', part === 'hour');
   if (dom.wakeMinute) dom.wakeMinute.classList.toggle('is-selected', part === 'minute');
   if (dom.wakeGestureArea) dom.wakeGestureArea.dataset.activeRing = part;
+  if (dom.wakeSetPanel) dom.wakeSetPanel.classList.remove('is-idle');
+  if (options.settle !== false) scheduleWakeFocusSettle();
 }
 function changeWakeTime(part, delta) {
   const parsed = parseTime(state.alarm.time);
@@ -1383,8 +1413,7 @@ function handleWakeStagePointerUp(event) {
 }
 function markWakeInteraction() {
   if (dom.wakeSetPanel) dom.wakeSetPanel.classList.remove('is-idle');
-  window.clearTimeout(wakeSettleTimer);
-  wakeSettleTimer = window.setTimeout(() => { if (dom.wakeSetPanel) dom.wakeSetPanel.classList.add('is-idle'); }, 1800);
+  if (wakeSetState.activePart) scheduleWakeFocusSettle();
 }
 
 function confirmWakeSet() {
@@ -1832,13 +1861,23 @@ function bindEvents() {
   dom.wakeHour.addEventListener('click', () => setActiveSetter('hour'));
   dom.wakeMinute.addEventListener('click', () => setActiveSetter('minute'));
   [dom.wakeHour, dom.wakeMinute].forEach((zone) => {
-    zone.addEventListener('pointerdown', (event) => { wakePointer = { x: event.clientX, y: event.clientY, at: nowMs(), part: zone.id === 'wakeHour' ? 'hour' : 'minute' }; setActiveSetter(wakePointer.part); zone.setPointerCapture(event.pointerId); });
+    const part = zone.id === 'wakeHour' ? 'hour' : 'minute';
+    zone.addEventListener('pointerenter', (event) => { if (event.pointerType !== 'touch') setActiveSetter(part, { settle: false }); });
+    zone.addEventListener('pointerleave', () => { if (!wakeSetState.isDragging) markWakeInteraction(); });
+    zone.addEventListener('pointerdown', (event) => { wakePointer = { x: event.clientX, y: event.clientY, at: nowMs(), part }; setActiveSetter(wakePointer.part); zone.setPointerCapture(event.pointerId); });
     zone.addEventListener('pointerup', (event) => {
       if (!wakePointer) return;
       const dx = event.clientX - wakePointer.x; const dy = event.clientY - wakePointer.y; const speed = Math.hypot(dx, dy) / Math.max(1, nowMs() - wakePointer.at);
       if (Math.abs(dx) > 58 && Math.abs(dx) > Math.abs(dy) * 1.25) setActiveSetter(wakeSetState.editingPart === 'hour' ? 'minute' : 'hour');
       if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) { const stepBase = wakePointer.part === 'minute' ? (speed > 0.9 ? 5 : 1) : (speed > 0.9 ? 3 : 1); changeWakeTime(wakePointer.part, dy < 0 ? stepBase : -stepBase); }
+      try { zone.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
       wakePointer = null;
+      markWakeInteraction();
+    });
+    zone.addEventListener('pointercancel', (event) => {
+      try { zone.releasePointerCapture(event.pointerId); } catch (error) { /* pointer may already be released */ }
+      wakePointer = null;
+      markWakeInteraction();
     });
   });
   dom.wakeGestureArea.addEventListener('pointerdown', handleWakeStagePointerDown);
