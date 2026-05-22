@@ -30,25 +30,25 @@ const SOUND_MODES = [
     id: 'blue-bowl',
     name: 'F# Blue Bowl',
     referenceHz: 'F# / 432 crystal bowl',
-    description: 'F#-centered crystal bowl field: pure blue resonance, soft octave bloom, slow water-like decay.',
+    description: 'F#-centered crystal bowl field: deep blue resonance, soft low octave bloom, slow water-like decay.',
     baseFrequency: Number(equalTemperamentHzFromMidi(42).toFixed(2)),
-    partialRatios: [0.5, 1, 1.335, 2, 2.997, 3.174, 4, 4.756, 5.34, 8, 10.678],
-    droneRatios: [1, 2, 4, 4.756],
+    partialRatios: [0.5, 1, 1.335, 2, 2.997, 3.174, 4, 4.756, 5.34, 8],
+    droneRatios: [1, 2, 2.997, 4],
     strikeGrammar: [
-      { ratio: 4, weight: 10 },
-      { ratio: 8, weight: 6 },
-      { ratio: 4.756, weight: 4 },
-      { ratio: 2, weight: 3 },
-      { ratio: 10.678, weight: 2.2 },
-      { ratio: 2.997, weight: 1.2 },
-      { ratio: 3.174, weight: 0.8 },
+      { ratio: 2, weight: 10 },
+      { ratio: 1, weight: 5 },
+      { ratio: 4, weight: 3 },
+      { ratio: 2.997, weight: 2 },
+      { ratio: 3.174, weight: 1.2 },
+      { ratio: 4.756, weight: 0.8 },
       { ratio: 1.335, weight: 0.6 },
-      { ratio: 1, weight: 0.5 },
-      { ratio: 0.5, weight: 0.2 }
+      { ratio: 5.34, weight: 0.4 },
+      { ratio: 0.5, weight: 0.3 },
+      { ratio: 8, weight: 0.12 }
     ],
-    bowlDensity: 0.06,
-    shimmerProbability: 0.015,
-    nightSafeCutoff: 760,
+    bowlDensity: 0.04,
+    shimmerProbability: 0.004,
+    nightSafeCutoff: 520,
     binaural: { allowed: false, deltaHz: 2 },
     ritualLabel: 'F# crystal bowl reference tuned from A=432',
     engineV2: {
@@ -70,21 +70,21 @@ const SOUND_MODES = [
       },
       attackSeconds: [0.08, 0.95],
       releaseSeconds: [18, 58],
-      gainScale: 0.92,
-      foregroundGainScale: 1.22,
+      gainScale: 0.62,
+      foregroundGainScale: 0.82,
       repeatMemory: 5,
       droneVoiceLimit: 4,
       phraseCells: [
-        [4],
-        [4],
-        [8],
-        [4.756],
-        [4, 8],
-        [4, 4.756],
+        [2],
+        [2],
+        [1],
+        [2.997],
         [2, 4],
-        [4, 10.678],
-        [2.997, 4],
-        [3.174, 4]
+        [1, 2],
+        [2, 2.997],
+        [2, 3.174],
+        [2, 4.756],
+        [8]
       ]
     }
   },
@@ -1013,9 +1013,9 @@ function createAudioEngine() {
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    const modeScale = modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
-    const fieldScale = isBowl ? 0.074 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
-    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isBowl ? 0.072 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
+    const modeScale = isBowl ? (modeName === 'bedside' ? 0.36 : modeName === 'ringing' ? 0.74 : 0.62) : modeName === 'bedside' ? 0.48 : modeName === 'ringing' ? 0.92 : 0.78;
+    const fieldScale = isBowl ? 0.064 : isThread ? 0.086 : isLongTone ? 0.078 : 0.052;
+    const peak = clamp(fieldScale * profile.gainScale * profile.foregroundGainScale * modeScale * state.settings.audio.strikeVolume * emphasis * wakeEmphasis, 0.001, isBowl ? 0.045 : isLongTone ? (isThread ? 0.105 : 0.085) : 0.095);
     const detuneCents = (Math.random() - 0.5) * (isLongTone ? 5 : 10);
     const upperTone = rawFrequency >= 130 && ratio >= 1.5;
     const bowlTouch = isBowl && ratio >= 4;
